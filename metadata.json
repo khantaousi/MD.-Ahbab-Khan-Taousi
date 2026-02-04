@@ -1,0 +1,7 @@
+{
+  "name": "Dynamic Personal Portfolio CMS",
+  "description": "A feature-rich personal portfolio website with a fully functional admin dashboard to manage all content, including text, projects, skills, and images, persisted via local storage.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

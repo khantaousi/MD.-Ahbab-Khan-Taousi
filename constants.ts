@@ -24,14 +24,14 @@ export const ORDER_STATUS_OPTIONS: { id: OrderStatus; labelEn: string; labelBn: 
 export const CURRENCY_SYMBOLS = ['৳', '$', '€', '£', '¥', '₹', 'د.إ'];
 
 export const INITIAL_DATA: PortfolioData = {
-  name: "John Doe",
-  title: "Professional Web Developer",
-  bio: "I am an experienced web developer and designer. I love learning new things and creating great digital solutions.",
-  currentWork: "Frontend Engineer at Tech Corp",
-  profileImage: "https://picsum.photos/400/400",
-  aboutText: "Write details about yourself here. Discuss your work style, goals, and experience.",
-  email: "example@mail.com",
-  phone: "+880 1234 567 890",
+  name: "MD Ahbab Khan",
+  title: "Professional Web Developer & Creative Designer",
+  bio: "Hello, I am MD Ahbab Khan. I am a passionate web developer dedicated to building modern, responsive, and user-centric digital solutions that empower businesses and individuals.",
+  currentWork: "Freelance Full Stack Developer",
+  profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop", 
+  aboutText: "I am MD Ahbab Khan, a tech enthusiast and developer with a focus on crafting high-quality web applications. With expertise in modern frameworks and a keen eye for design, I strive to create web experiences that are not only functional but also visually stunning. My goal is to help clients transform their ideas into reality through clean, efficient code.",
+  email: "khantaousi@gmail.com",
+  phone: "01518934191",
   theme: 'neon',
   showAbout: true,
   showSkills: true,
@@ -43,7 +43,7 @@ export const INITIAL_DATA: PortfolioData = {
   showWork: true,
   showProducts: true,
   notice: {
-    text: "Welcome to my updated portfolio! New projects coming soon.",
+    text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",
     updatedAt: new Date().toISOString()
   },
   socialLinks: [
@@ -54,22 +54,25 @@ export const INITIAL_DATA: PortfolioData = {
   projects: [
     {
       id: "1",
-      title: "Blog Post 1",
-      description: "Write a summary of your first blog post here.",
+      title: "Portfolio CMS Development",
+      description: "A professional management system for personal portfolios with cloud storage integration.",
       image: "https://picsum.photos/600/400?random=1",
       link: "#"
     }
   ],
   gallery: [
-    { id: "1", image: "https://picsum.photos/800/800?random=10", title: "Moments" },
-    { id: "2", image: "https://picsum.photos/800/800?random=11", title: "Travel" }
+    { id: "1", image: "https://picsum.photos/800/800?random=10", title: "Tech Innovation" },
+    { id: "2", image: "https://picsum.photos/800/800?random=11", title: "Creative Workspace" }
   ],
   skills: [
-    { id: "1", name: "React" },
-    { id: "2", name: "Tailwind CSS" }
+    { id: "1", name: "HTML & CSS" },
+    { id: "2", name: "JavaScript" },
+    { id: "3", name: "React JS" },
+    { id: "4", name: "Tailwind CSS" },
+    { id: "5", name: "Node.js" }
   ],
   products: [
-    { id: "1", name: "Premium Web Design", amount: "5000", currency: "৳", description: "Get a high-quality personal landing page for your brand.", image: "https://picsum.photos/600/600?random=20" }
+    { id: "1", name: "Business Website Setup", amount: "10000", currency: "৳", description: "Get a complete professional business website with a premium design and setup.", image: "https://picsum.photos/600/600?random=20" }
   ],
   orders: []
 };
@@ -99,7 +102,7 @@ export const TRANSLATIONS = {
     orderContactLabel: "Phone Number",
     orderCountryLabel: "Country",
     orderConfirmBtn: "Confirm Order",
-    orderSuccess: "Thank you for placing your order. One of our representatives will get in touch with you shortly to assist you further.",
+    orderSuccess: "Thank you for placing your order. MD Ahbab Khan will contact you soon.",
     blogReadMore: "Read More",
     blogDesc: "Insights into my process and discoveries.",
     galleryDesc: "Visual snapshots of my creative journey.",
@@ -186,7 +189,7 @@ export const TRANSLATIONS = {
     orderContactLabel: "ফোন নম্বর",
     orderCountryLabel: "দেশ",
     orderConfirmBtn: "অর্ডার সম্পন্ন করুন",
-    orderSuccess: "আপনার অর্ডার দেওয়ার জন্য ধন্যবাদ। আমাদের একজন প্রতিনিধি শীঘ্রই আপনার সাথে যোগাযোগ করবেন এবং আপনাকে আরও সহায়তা করবেন।",
+    orderSuccess: "অর্ডারটি সফলভাবে সম্পন্ন হয়েছে। শীঘ্রই আপনার সাথে যোগাযোগ করা হবে।",
     blogReadMore: "বিস্তারিত",
     blogDesc: "প্রযুক্তি এবং জীবনধারা নিয়ে আমার ভাবনা।",
     galleryDesc: "স্মৃতি এবং কাজের কিছু মুহূর্ত।",

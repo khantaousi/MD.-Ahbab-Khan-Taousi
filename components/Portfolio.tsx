@@ -260,7 +260,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 {data.showBlog && <a href="#blog" onClick={(e) => scrollToSection(e, 'blog')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-all hover:translate-y-[-1px] active:scale-95">{t.navBlog}</a>}
               </div>
               <button onClick={() => setLang(lang === 'en' ? 'bn' : 'en')} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-black hover:bg-white/10 hover:border-white/30 transition-all tracking-widest uppercase hover:scale-110 active:scale-95">{lang.toUpperCase()}</button>
-              <Link to="/login" className="px-5 py-2 rounded-full text-[8px] font-black shadow-2xl uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 hover:scale-105 hover:-translate-y-0.5 transition-all" style={{ backgroundColor: themeConfig.accent, color: '#000' }}>{t.navAdmin}</Link>
+              <Link to="/login" className="w-10 h-10 rounded-full flex items-center justify-center shadow-2xl hover:brightness-110 active:scale-95 hover:scale-110 hover:-translate-y-0.5 transition-all" style={{ backgroundColor: themeConfig.accent, color: '#000' }} aria-label="Admin">
+                <User size={16} />
+              </Link>
             </div>
           </div>
         </div>
@@ -479,8 +481,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             </div>
             <div className="pt-20 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
               <p className="text-slate-600 font-black text-[9px] uppercase tracking-[0.3em]">&copy; {new Date().getFullYear()} {data.name} // ALL RIGHTS RESERVED</p>
-              <Link to="/login" className="text-slate-600 font-black uppercase tracking-[0.2em] text-[9px] hover:text-white transition-all flex items-center gap-2 hover:scale-110 active:scale-95 hover:translate-x-1">
-                {t.footerAdmin} <ArrowRight size={14} />
+              <Link to="/login" className="text-slate-600 font-black uppercase tracking-[0.2em] text-[9px] hover:text-white transition-all flex items-center gap-2 hover:scale-110 active:scale-95 hover:translate-x-1" aria-label="Admin Dashboard">
+                <User size={14} className="mr-1" /> <ArrowRight size={14} />
               </Link>
             </div>
           </div>

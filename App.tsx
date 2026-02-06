@@ -29,20 +29,20 @@ const App: React.FC = () => {
         if (response.ok) {
           const cloudData = await response.json();
           if (cloudData && typeof cloudData === 'object') {
-            setData(cloudData);
-            // Also backup to local
-            localStorage.setItem('portfolio_data', JSON.stringify(cloudData));
+            // CRITICAL FIX: Merge cloud data with INITIAL_DATA to ensure all keys exist
+            const mergedData = { ...INITIAL_DATA, ...cloudData };
+            setData(mergedData);
+            localStorage.setItem('portfolio_data', JSON.stringify(mergedData));
           }
         } else {
-          // Fallback to local storage if cloud fails
           const saved = localStorage.getItem('portfolio_data');
-          if (saved) setData(JSON.parse(saved));
+          if (saved) setData({ ...INITIAL_DATA, ...JSON.parse(saved) });
         }
       } catch (error) {
         console.error("Sync Error:", error);
         setSyncError(true);
         const saved = localStorage.getItem('portfolio_data');
-        if (saved) setData(JSON.parse(saved));
+        if (saved) setData({ ...INITIAL_DATA, ...JSON.parse(saved) });
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +57,6 @@ const App: React.FC = () => {
 
   const handleUpdateData = (newData: PortfolioData) => {
     setData(newData);
-    // Persist to local storage as backup
     localStorage.setItem('portfolio_data', JSON.stringify(newData));
   };
 
@@ -82,7 +81,7 @@ const App: React.FC = () => {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<Portfolio data={data} lang={lang} setLang={setLang} t={t} />} />
+        <Route path="/" element={<Portfolio data={data} lang={lang} setLang={setLang} t={t} onUpdate={handleUpdateData} />} />
         <Route 
           path="/login" 
           element={isLoggedIn ? <Navigate to="/admin" /> : <Login onLogin={() => handleLogin(true)} lang={lang} t={t} />} 

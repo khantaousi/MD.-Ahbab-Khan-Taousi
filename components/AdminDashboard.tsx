@@ -498,6 +498,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                             <input name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-12 py-4 font-bold outline-none" placeholder="+880123456789" />
                          </div>
                       </div>
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">WhatsApp Number</label>
+                         <div className="relative">
+                            <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
+                            <input name="whatsappNumber" value={formData.whatsappNumber} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-12 py-4 font-bold outline-none" placeholder="+880123456789" />
+                         </div>
+                      </div>
                     </div>
                   </div>
 

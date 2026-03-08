@@ -376,7 +376,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </footer>
       )}
 
-      {data.showLiveChat && <Chat accentColor={themeConfig.accent} />}
+      {data.showLiveChat && <Chat accentColor={themeConfig.accent} whatsappNumber={data.whatsappNumber} />}
 
       <style>{`
         .flag-wrapper {

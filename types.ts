@@ -35,7 +35,7 @@ export interface Product {
   amount: string;
   currency: string;
   description: string;
-  image: string;
+  images: string[]; // Changed from single image string to array
 }
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled';
@@ -44,12 +44,12 @@ export interface Order {
   id: string;
   productId: string;
   productName: string;
-  productImage?: string; // Added for better identification
+  productImage?: string; 
   customerName: string;
   customerContact: string;
   customerCountry: string;
   timestamp: string;
-  status: OrderStatus; // Added status field
+  status: OrderStatus;
 }
 
 export interface PortfolioData {

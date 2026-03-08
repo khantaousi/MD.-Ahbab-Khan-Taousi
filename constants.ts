@@ -1,11 +1,6 @@
 
 import { PortfolioData, OrderStatus } from './types';
 
-export const CLOUD_SYNC_CONFIG = {
-  BUCKET_ID: "ahbab_portfolio_v1_global",
-  API_URL: "https://kvdb.io/An9rXmU8j8P7rPq8q8q8/data"
-};
-
 export const THEME_OPTIONS = [
   { id: 'neon', name: 'Cyber Azure', color: '#0ea5e9' },
   { id: 'gold', name: 'Luxury Gold', color: '#d4af37' },
@@ -72,7 +67,7 @@ export const INITIAL_DATA: PortfolioData = {
     { id: "5", name: "Node.js" }
   ],
   products: [
-    { id: "1", name: "Business Website Setup", amount: "10000", currency: "৳", description: "Get a complete professional business website with a premium design and setup.", image: "https://picsum.photos/600/600?random=20" }
+    { id: "1", name: "Business Website Setup", amount: "10000", currency: "৳", description: "Get a complete professional business website with a premium design and setup.", images: ["https://picsum.photos/600/600?random=20"] }
   ],
   orders: []
 };
@@ -113,11 +108,12 @@ export const TRANSLATIONS = {
     contactSocialLabel: "Social Networks",
     footerAdmin: "Admin Dashboard",
     loginHeader: "Security Access",
-    loginSub: "Restricted Area",
     loginIdLabel: "System ID",
     loginPassLabel: "Access Token",
     loginBtn: "Authorize",
     loginBack: "Exit to Portal",
+    loginWelcome: "Welcome Admin",
+    loginProceed: "Continue to Login",
     adminHeader: "System Core",
     adminSub: "Portfolio Management",
     adminMenu: "Control Center",
@@ -128,7 +124,7 @@ export const TRANSLATIONS = {
     adminProducts: "Storefront",
     adminOrders: "Order Queue",
     adminNotice: "Global Broadcast",
-    adminContact: "Access Points",
+    adminContact: "Contact Settings",
     adminDeploy: "Cloud Core",
     adminSave: "Sync Changes",
     adminSaving: "Syncing...",
@@ -145,14 +141,7 @@ export const TRANSLATIONS = {
     adminWorkplace: "Station",
     adminOrderStatus: "Status",
     adminProductTitle: "Item",
-    deployTitle: "Cloud Nexus",
-    deployDesc: "Direct synchronization with the global database cluster.",
-    deployStatus: "Node Status: Online",
-    deploySyncId: "Bucket UID",
-    deployCopy: "Copy Credentials",
-    deployCopied: "Copied!",
     syncLoading: "Loading Profile...",
-    syncError: "Neural link lost. Using cache.",
     visLabelAbout: "About Section",
     visLabelSkills: "Skills Section",
     visLabelBlog: "Blog Section",
@@ -180,9 +169,9 @@ export const TRANSLATIONS = {
     clockLabel: "বাংলাদেশ সময়",
     skillsHeader: "দক্ষতাসমূহ",
     aboutHeader: "আমার সম্পর্কে",
-    blogHeader: "মাই ব্লগ",
-    galleryHeader: "ফটো গ্যালারি",
-    productsHeader: "আমার পণ্যসমূহ",
+    blogHeader: "ব্লগ",
+    galleryHeader: "গ্যালারি",
+    productsHeader: "পণ্যসমূহ",
     orderBtn: "অর্ডার করুন",
     orderModalTitle: "অর্ডার ফর্ম",
     orderNameLabel: "আপনার নাম",
@@ -200,11 +189,12 @@ export const TRANSLATIONS = {
     contactSocialLabel: "সোশ্যাল মিডিয়া",
     footerAdmin: "ড্যাশবোর্ড",
     loginHeader: "সুরক্ষিত প্রবেশ",
-    loginSub: "অ্যাডমিন প্যানেল",
     loginIdLabel: "ইউজার আইডি",
     loginPassLabel: "পাসওয়ার্ড",
     loginBtn: "লগইন",
     loginBack: "হোমে ফিরুন",
+    loginWelcome: "স্বাগতম অ্যাডমিন",
+    loginProceed: "লগইন করতে এগিয়ে যান",
     adminHeader: "সিস্টেম কন্ট্রোল",
     adminSub: "ম্যানেজমেন্ট ড্যাশবোর্ড",
     adminMenu: "কন্টেন্ট মেনু",
@@ -215,8 +205,7 @@ export const TRANSLATIONS = {
     adminProducts: "পণ্য তালিকা",
     adminOrders: "অর্ডার তালিকা",
     adminNotice: "ব্রডকাস্ট",
-    adminContact: "যোগাযোগ",
-    adminDeploy: "ক্লাউড স্টোরেজ",
+    adminContact: "যোগাযোগ সেটিংস",
     adminSave: "লাইভ আপডেট",
     adminSaving: "আপডেট হচ্ছে...",
     adminSaved: "আপডেট হয়েছে!",
@@ -232,14 +221,7 @@ export const TRANSLATIONS = {
     adminWorkplace: "কর্মস্থল",
     adminOrderStatus: "অবস্থা",
     adminProductTitle: "পণ্য",
-    deployTitle: "ক্লাউড সিঙ্ক্রোনাইজেশন",
-    deployDesc: "সরাসরি গ্লোবাল ডাটাবেসে সেভ হবে।",
-    deployStatus: "সিঙ্ক স্ট্যাটাস: একটিভ",
-    deploySyncId: "ইউনিক আইডি",
-    deployCopy: "কপি আইডি",
-    deployCopied: "কপি হয়েছে!",
     syncLoading: "ডাটা লোড হচ্ছে...",
-    syncError: "সার্ভার কানেক্ট হতে পারেনি।",
     visLabelAbout: "সম্পর্কে সেকশন",
     visLabelSkills: "দক্ষতা সেকশন",
     visLabelBlog: "ব্লগ সেকশন",
@@ -252,9 +234,4 @@ export const TRANSLATIONS = {
     noticeLabel: "জরুরী নোটিশ",
     noticePublished: "প্রকাশিত"
   }
-};
-
-export const ADMIN_CREDENTIALS = {
-  id: "Admin",
-  password: "Ahbab85565"
 };

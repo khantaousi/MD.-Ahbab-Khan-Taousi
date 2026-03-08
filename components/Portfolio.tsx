@@ -266,9 +266,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             <h2 className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase">
               <Briefcase size={40} style={{ color: themeConfig.accent }} /> {t.jobExperienceHeader || "Experience"}
             </h2>
-            <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {data.jobExperiences.map((job) => (
-                <div key={job.id} className="glass p-8 rounded-[32px] border border-white/10 flex flex-col sm:flex-row gap-6 items-start hover:border-white/30 transition-all">
+                <div key={job.id} className="glass p-8 rounded-[32px] border border-white/10 flex flex-col gap-6 items-start hover:border-white/30 transition-all h-full">
                   <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 shrink-0">
                     <img src={job.logoUrl} alt={job.companyName} className="w-full h-full object-cover" />
                   </div>

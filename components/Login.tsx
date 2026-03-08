@@ -2,8 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, User, LogIn, ArrowLeft, ShieldCheck } from 'lucide-react';
-import { auth, googleProvider, signInWithEmailAndPassword } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { auth, signInWithEmailAndPassword } from '../firebase';
 
 interface LoginProps {
   onLogin: () => void;
@@ -21,21 +20,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       onLogin();
-    } catch (err: any) {
-      console.error(err);
-      setError(lang === 'bn' ? 'লগইন ব্যর্থ হয়েছে!' : 'Login failed!');
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      if (result.user.email === 'khantaousi@gmail.com') {
-        onLogin();
-      } else {
-        await auth.signOut();
-        setError(lang === 'bn' ? 'অননুমোদিত ইমেইল!' : 'Unauthorized Email!');
-      }
     } catch (err: any) {
       console.error(err);
       setError(lang === 'bn' ? 'লগইন ব্যর্থ হয়েছে!' : 'Login failed!');
@@ -90,16 +74,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
             {lang === 'bn' ? 'লগইন করুন' : 'Sign in'} <LogIn size={20} />
           </button>
         </form>
-        
-        <div className="mt-8 text-center">
-            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Or</p>
-            <button
-                onClick={handleGoogleLogin}
-                className="w-full bg-slate-800 hover:bg-slate-700 text-white font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-4 uppercase tracking-[0.25em] text-xs"
-            >
-                {lang === 'bn' ? 'গুগল দিয়ে লগইন করুন' : 'Sign in with Google'}
-            </button>
-        </div>
         
         <div className="mt-12 text-center">
             <Link to="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.2em] group">

@@ -7,6 +7,7 @@ import {
   BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2
 } from 'lucide-react';
 import Chat from './Chat';
+import EventSection from './EventSection';
 
 interface PortfolioProps {
   data: PortfolioData;
@@ -342,6 +343,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             </div>
           </div>
         </section>
+      )}
+
+      {/* Event Section */}
+      {data.showEventSection && data.event && (
+        <EventSection 
+          title={data.event.title} 
+          subtitle={data.event.subtitle} 
+          animationType={data.event.animationType}
+          theme={data.event.theme}
+        />
       )}
 
       {/* Footer */}

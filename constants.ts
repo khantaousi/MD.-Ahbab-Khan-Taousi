@@ -28,10 +28,17 @@ export const INITIAL_DATA: PortfolioData = {
   showWork: true,
   showJobExperience: true,
   showLiveChat: true,
+  showEventSection: true,
   whatsappNumber: "+8801518934191",
   notice: {
     text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",
     updatedAt: new Date().toISOString()
+  },
+  event: {
+    title: "EID MUBARAK",
+    subtitle: "Wishing you and your family a blessed Ramadan and a joyous Eid filled with peace, prosperity, and happiness.",
+    animationType: "float",
+    theme: "islamic"
   },
   socialLinks: [
     { id: "1", platform: "GitHub", url: "https://github.com" },
@@ -114,6 +121,7 @@ export const TRANSLATIONS = {
     adminNotice: "Global Broadcast",
     adminContact: "Contact Settings",
     adminJobExperience: "Job Experience",
+    adminEvent: "Event Banner",
     adminDeploy: "Cloud Core",
     adminSave: "Sync Changes",
     adminSaving: "Syncing...",
@@ -139,6 +147,7 @@ export const TRANSLATIONS = {
     visLabelWork: "Work Status",
     visLabelJobExperience: "Job Experience Section",
     visLabelLiveChat: "Live Chat",
+    visLabelEvent: "Event Banner",
     noticeLabel: "ALERT",
     noticePublished: "Broadcasted"
   },
@@ -192,6 +201,7 @@ export const TRANSLATIONS = {
     adminNotice: "ব্রডকাস্ট",
     adminContact: "যোগাযোগ সেটিংস",
     adminJobExperience: "কাজের অভিজ্ঞতা",
+    adminEvent: "ইভেন্ট ব্যানার",
     adminSave: "লাইভ আপডেট",
     adminSaving: "আপডেট হচ্ছে...",
     adminSaved: "আপডেট হয়েছে!",
@@ -216,6 +226,7 @@ export const TRANSLATIONS = {
     visLabelWork: "কাজের স্ট্যাটাস",
     visLabelJobExperience: "কাজের অভিজ্ঞতা সেকশন",
     visLabelLiveChat: "লাইভ চ্যাট",
+    visLabelEvent: "ইভেন্ট ব্যানার",
     noticeLabel: "জরুরী নোটিশ",
     noticePublished: "প্রকাশিত"
   }

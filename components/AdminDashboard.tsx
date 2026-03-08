@@ -7,7 +7,7 @@ import {
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
-  Phone, Mail
+  Phone, Mail, Sparkles
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -24,7 +24,7 @@ const SOCIAL_PLATFORMS = [
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogout, lang, t }) => {
   const [formData, setFormData] = useState<PortfolioData>(data);
-  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event'>('basic');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
@@ -219,6 +219,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
               { id: 'gallery', label: t.adminGallery, icon: <ImageIcon size={16} /> },
               { id: 'skills', label: t.adminSkills, icon: <Layout size={16} /> },
               { id: 'jobExperience', label: t.adminJobExperience, icon: <Briefcase size={16} /> },
+              { id: 'event', label: t.adminEvent, icon: <Sparkles size={16} /> },
             ].map((tab) => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all text-[9px] font-black uppercase tracking-widest ${activeTab === tab.id ? 'text-slate-950 shadow-lg' : 'text-slate-500 hover:text-white hover:bg-white/5'}`} style={activeTab === tab.id ? { backgroundColor: currentThemeColor } : {}}>
                 {tab.icon} {tab.label}
@@ -290,6 +291,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                  <VisibilityToggle label={t.visLabelContact} field="showContact" />
                  <VisibilityToggle label={t.visLabelJobExperience} field="showJobExperience" />
                  <VisibilityToggle label={t.visLabelLiveChat} field="showLiveChat" />
+                 <VisibilityToggle label={t.visLabelEvent} field="showEventSection" />
                </div>
             </div>
           )}
@@ -534,6 +536,71 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                        ))}
                     </div>
                   </div>
+               </div>
+            </div>
+          )}
+          {/* 11. Event Settings */}
+          {activeTab === 'event' && (
+            <div className="space-y-8 animate-in fade-in">
+               <h2 className="text-2xl font-black">{t.adminEvent}</h2>
+               <div className="space-y-6">
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Section Title</label>
+                    <input 
+                      value={formData.event?.title || ''} 
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, event: { ...prev.event, title: e.target.value } }));
+                        setHasUnsavedChanges(true);
+                      }} 
+                      className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                      placeholder="EID MUBARAK" 
+                    />
+                 </div>
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Greeting Message</label>
+                    <textarea 
+                      value={formData.event?.subtitle || ''} 
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, event: { ...prev.event, subtitle: e.target.value } }));
+                        setHasUnsavedChanges(true);
+                      }} 
+                      className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" 
+                      placeholder="Greeting message..." 
+                    />
+                 </div>
+                 <div className="grid grid-cols-2 gap-6">
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Visual Theme</label>
+                      <select 
+                        value={formData.event?.theme || 'auto'} 
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, event: { ...prev.event, theme: e.target.value as any } }));
+                          setHasUnsavedChanges(true);
+                        }} 
+                        className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none"
+                      >
+                        <option value="auto">Auto (Based on Title)</option>
+                        <option value="islamic">Islamic / Eid</option>
+                        <option value="party">Celebration / Party</option>
+                        <option value="minimal">Minimal / Elegant</option>
+                      </select>
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Animation Style</label>
+                      <select 
+                        value={formData.event?.animationType || 'float'} 
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, event: { ...prev.event, animationType: e.target.value as any } }));
+                          setHasUnsavedChanges(true);
+                        }} 
+                        className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none"
+                      >
+                        <option value="float">Floating</option>
+                        <option value="pulse">Pulsing</option>
+                        <option value="none">No Animation</option>
+                      </select>
+                   </div>
+                 </div>
                </div>
             </div>
           )}

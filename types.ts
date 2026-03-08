@@ -45,6 +45,13 @@ export interface JobExperience {
   description: string;
 }
 
+export interface EventData {
+  title: string;
+  subtitle: string;
+  animationType: 'float' | 'pulse' | 'none';
+  theme: 'auto' | 'islamic' | 'party' | 'minimal';
+}
+
 export interface PortfolioData {
   name: string;
   title: string;
@@ -66,6 +73,7 @@ export interface PortfolioData {
   showWork: boolean;
   showJobExperience: boolean;
   showLiveChat: boolean;
+  showEventSection: boolean;
   whatsappNumber: string;
   socialLinks: SocialLink[];
   projects: Project[];
@@ -73,6 +81,7 @@ export interface PortfolioData {
   skills: Skill[];
   jobExperiences: JobExperience[];
   notice: Notice;
+  event: EventData;
 }
 
 export interface AuthState {

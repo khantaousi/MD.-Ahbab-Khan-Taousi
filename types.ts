@@ -1,4 +1,11 @@
 
+export interface ChatMessage {
+  id: string;
+  sender: string;
+  text: string;
+  timestamp: any;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -29,6 +36,15 @@ export interface Notice {
   updatedAt: string;
 }
 
+export interface JobExperience {
+  id: string;
+  companyName: string;
+  website: string;
+  logoUrl: string;
+  duration: string;
+  description: string;
+}
+
 export interface PortfolioData {
   name: string;
   title: string;
@@ -48,10 +64,13 @@ export interface PortfolioData {
   showClock: boolean;
   showNotice: boolean;
   showWork: boolean;
+  showJobExperience: boolean;
+  showLiveChat: boolean;
   socialLinks: SocialLink[];
   projects: Project[];
   gallery: GalleryItem[];
   skills: Skill[];
+  jobExperiences: JobExperience[];
   notice: Notice;
 }
 

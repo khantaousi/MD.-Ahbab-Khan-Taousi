@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { PortfolioData, Project, Skill, SocialLink, GalleryItem } from '../types';
+import { PortfolioData, Project, Skill, SocialLink, GalleryItem, JobExperience } from '../types';
 import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
 import { auth } from '../firebase';
 import { 
@@ -25,7 +24,7 @@ const SOCIAL_PLATFORMS = [
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogout, lang, t }) => {
   const [formData, setFormData] = useState<PortfolioData>(data);
-  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience'>('basic');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
@@ -143,6 +142,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     setHasUnsavedChanges(true);
   };
 
+  // Job Experience Actions
+  const addJobExperience = () => {
+    const newJob: JobExperience = { id: Date.now().toString(), companyName: "New Company", website: "https://", logoUrl: "https://picsum.photos/100/100", duration: "1 year", description: "Role" };
+    setFormData(prev => ({ ...prev, jobExperiences: [...(prev.jobExperiences || []), newJob] }));
+    setHasUnsavedChanges(true);
+  };
+
+  const updateJobExperience = (id: string, field: keyof JobExperience, value: string) => {
+    setFormData(prev => ({ ...prev, jobExperiences: (prev.jobExperiences || []).map(j => j.id === id ? { ...j, [field]: value } : j) }));
+    setHasUnsavedChanges(true);
+  };
+
+  const removeJobExperience = (id: string) => {
+    setFormData(prev => ({ ...prev, jobExperiences: (prev.jobExperiences || []).filter(j => j.id !== id) }));
+    setHasUnsavedChanges(true);
+  };
+
   // Order Actions
   const updateOrderStatus = (id: string, status: OrderStatus) => {
     setFormData(prev => ({
@@ -202,6 +218,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
               { id: 'blog', label: t.adminBlog, icon: <BookOpen size={16} /> },
               { id: 'gallery', label: t.adminGallery, icon: <ImageIcon size={16} /> },
               { id: 'skills', label: t.adminSkills, icon: <Layout size={16} /> },
+              { id: 'jobExperience', label: t.adminJobExperience, icon: <Briefcase size={16} /> },
             ].map((tab) => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all text-[9px] font-black uppercase tracking-widest ${activeTab === tab.id ? 'text-slate-950 shadow-lg' : 'text-slate-500 hover:text-white hover:bg-white/5'}`} style={activeTab === tab.id ? { backgroundColor: currentThemeColor } : {}}>
                 {tab.icon} {tab.label}
@@ -301,8 +318,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
             </div>
           )}
 
-          {/* 4. Products */}
-          {/* 5. Orders Management */}
+          {/* 4. Job Experience */}
+          {activeTab === 'jobExperience' && (
+            <div className="space-y-8 animate-in fade-in">
+               <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-black">{t.adminJobExperience}</h2>
+                  <button onClick={addJobExperience} className="bg-white/5 px-6 py-2 rounded-full border border-white/10 font-black text-[9px] uppercase hover:bg-white/10 transition-all">
+                    <Plus size={14} className="inline mr-1" /> {t.adminNewJob}
+                  </button>
+               </div>
+               <div className="space-y-6">
+                  {formData.jobExperiences.map(job => (
+                    <div key={job.id} className="bg-white/5 rounded-[32px] p-6 border border-white/5 flex flex-col md:flex-row gap-6">
+                       <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shrink-0">
+                          <img src={job.logoUrl} className="w-full h-full object-cover" />
+                       </div>
+                       <div className="flex-1 space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <input value={job.companyName} onChange={(e) => updateJobExperience(job.id, 'companyName', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-black text-sm outline-none" placeholder="Company Name" />
+                             <input value={job.website} onChange={(e) => updateJobExperience(job.id, 'website', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-mono text-xs outline-none" placeholder="Website URL" />
+                             <input value={job.duration} onChange={(e) => updateJobExperience(job.id, 'duration', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-bold text-sm outline-none" placeholder="Duration (e.g., 2 years)" />
+                             <input value={job.logoUrl} onChange={(e) => updateJobExperience(job.id, 'logoUrl', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-mono text-xs outline-none" placeholder="Logo URL" />
+                          </div>
+                          <textarea value={job.description} onChange={(e) => updateJobExperience(job.id, 'description', e.target.value)} className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-sm outline-none resize-none" placeholder="Role Description" />
+                       </div>
+                       <button onClick={() => removeJobExperience(job.id)} className="text-red-500/50 hover:text-red-500 p-2 h-fit"><Trash2 size={20} /></button>
+                    </div>
+                  ))}
+               </div>
+            </div>
+          )}
 
           {/* 6. Notice */}
           {activeTab === 'notice' && (

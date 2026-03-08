@@ -6,6 +6,7 @@ import {
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
   BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2
 } from 'lucide-react';
+import Chat from './Chat';
 
 interface PortfolioProps {
   data: PortfolioData;
@@ -248,6 +249,36 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </section>
       )}
 
+      {/* Job Experience */}
+      {data.showWork && data.jobExperiences && data.jobExperiences.length > 0 && (
+        <section className="py-24 px-6 lg:px-12">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase">
+              <Briefcase size={40} style={{ color: themeConfig.accent }} /> {t.jobExperienceHeader || "Experience"}
+            </h2>
+            <div className="space-y-8">
+              {data.jobExperiences.map((job) => (
+                <div key={job.id} className="glass p-8 rounded-[32px] border border-white/10 flex flex-col sm:flex-row gap-6 items-start hover:border-white/30 transition-all">
+                  <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 shrink-0">
+                    <img src={job.logoUrl} alt={job.companyName} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-black text-white">{job.companyName}</h3>
+                      <a href={job.website} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors">
+                        <ExternalLink size={16} />
+                      </a>
+                    </div>
+                    <p className="text-sm font-bold text-slate-400">{job.duration}</p>
+                    <p className="text-sm text-slate-300 leading-relaxed">{job.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* About */}
       {data.showAbout && (
         <section id="about" className="py-24 px-6 lg:px-12 scroll-mt-20">
@@ -335,6 +366,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
           </div>
         </footer>
       )}
+
+      {data.showLiveChat && <Chat accentColor={themeConfig.accent} />}
 
       <style>{`
         .flag-wrapper {

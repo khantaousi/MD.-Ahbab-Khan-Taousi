@@ -26,6 +26,8 @@ export const INITIAL_DATA: PortfolioData = {
   showClock: true,
   showNotice: true,
   showWork: true,
+  showJobExperience: true,
+  showLiveChat: true,
   notice: {
     text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",
     updatedAt: new Date().toISOString()
@@ -54,6 +56,9 @@ export const INITIAL_DATA: PortfolioData = {
     { id: "3", name: "React JS" },
     { id: "4", name: "Tailwind CSS" },
     { id: "5", name: "Node.js" }
+  ],
+  jobExperiences: [
+    { id: "1", companyName: "Tech Corp", website: "https://techcorp.com", logoUrl: "https://picsum.photos/100/100?random=50", duration: "2 years", description: "Full Stack Developer" }
   ]
 };
 
@@ -107,6 +112,7 @@ export const TRANSLATIONS = {
     adminGallery: "Media Assets",
     adminNotice: "Global Broadcast",
     adminContact: "Contact Settings",
+    adminJobExperience: "Job Experience",
     adminDeploy: "Cloud Core",
     adminSave: "Sync Changes",
     adminSaving: "Syncing...",
@@ -117,6 +123,7 @@ export const TRANSLATIONS = {
     adminNewPost: "Draft Story",
     adminNewPhoto: "Upload Media",
     adminNewLink: "Signal Link",
+    adminNewJob: "Add Job",
     adminTheme: "Visual Environment",
     adminVisibility: "Module Toggle",
     adminWorkplace: "Station",
@@ -129,6 +136,8 @@ export const TRANSLATIONS = {
     visLabelClock: "Live Clock",
     visLabelNotice: "Notice Board",
     visLabelWork: "Work Status",
+    visLabelJobExperience: "Job Experience Section",
+    visLabelLiveChat: "Live Chat",
     noticeLabel: "ALERT",
     noticePublished: "Broadcasted"
   },
@@ -181,6 +190,7 @@ export const TRANSLATIONS = {
     adminGallery: "মিডিয়া ফাইল",
     adminNotice: "ব্রডকাস্ট",
     adminContact: "যোগাযোগ সেটিংস",
+    adminJobExperience: "কাজের অভিজ্ঞতা",
     adminSave: "লাইভ আপডেট",
     adminSaving: "আপডেট হচ্ছে...",
     adminSaved: "আপডেট হয়েছে!",
@@ -190,6 +200,7 @@ export const TRANSLATIONS = {
     adminNewPost: "নতুন পোস্ট",
     adminNewPhoto: "ছবি যোগ করুন",
     adminNewLink: "নতুন লিংক",
+    adminNewJob: "নতুন চাকরি",
     adminTheme: "ওয়েবসাইট থিম",
     adminVisibility: "সেকশন কন্ট্রোল",
     adminWorkplace: "কর্মস্থল",
@@ -202,6 +213,8 @@ export const TRANSLATIONS = {
     visLabelClock: "লাইভ ঘড়ি",
     visLabelNotice: "নোটিশ বোর্ড",
     visLabelWork: "কাজের স্ট্যাটাস",
+    visLabelJobExperience: "কাজের অভিজ্ঞতা সেকশন",
+    visLabelLiveChat: "লাইভ চ্যাট",
     noticeLabel: "জরুরী নোটিশ",
     noticePublished: "প্রকাশিত"
   }

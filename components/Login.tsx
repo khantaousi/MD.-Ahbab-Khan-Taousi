@@ -22,7 +22,13 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
       onLogin();
     } catch (err: any) {
       console.error("Login Error Details:", err);
-      setError(lang === 'bn' ? `লগইন ব্যর্থ হয়েছে: ${err.message}` : `Login failed: ${err.message}`);
+      let errorMessage = err.message;
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        errorMessage = lang === 'bn' ? 'ভুল ইমেইল বা পাসওয়ার্ড' : 'Invalid email or password';
+      } else {
+        errorMessage = lang === 'bn' ? `লগইন ব্যর্থ হয়েছে: ${err.message}` : `Login failed: ${err.message}`;
+      }
+      setError(errorMessage);
     }
   };
 

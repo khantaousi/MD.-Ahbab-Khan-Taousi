@@ -22,6 +22,8 @@
         "showClock": { "type": "boolean" },
         "showNotice": { "type": "boolean" },
         "showWork": { "type": "boolean" },
+        "showJobExperience": { "type": "boolean" },
+        "showLiveChat": { "type": "boolean" },
         "socialLinks": {
           "type": "array",
           "items": {
@@ -67,6 +69,20 @@
             }
           }
         },
+        "jobExperiences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "companyName": { "type": "string" },
+              "website": { "type": "string" },
+              "logoUrl": { "type": "string" },
+              "duration": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
         "notice": {
           "type": "object",
           "properties": {
@@ -81,6 +97,17 @@
     "/portfolio/{documentId}": {
       "schema": { "$ref": "#/entities/PortfolioData" },
       "description": "Stores the global portfolio data."
+    },
+    "/chatMessages/{messageId}": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "sender": { "type": "string" },
+          "text": { "type": "string" },
+          "timestamp": { "type": "string" }
+        }
+      },
+      "description": "Stores live chat messages."
     }
   }
 }

@@ -274,9 +274,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                   </div>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-black text-white">{job.companyName}</h3>
-                      <a href={job.website} target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white transition-colors">
-                        <ExternalLink size={16} />
+                      <a href={job.website} target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity">
+                        <h3 className="text-xl font-black text-white">{job.companyName}</h3>
                       </a>
                     </div>
                     <p className="text-sm font-bold text-slate-400">{job.duration}</p>

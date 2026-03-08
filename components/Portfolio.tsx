@@ -86,6 +86,7 @@ import { db, handleFirestoreError, OperationType } from '../firebase';
 
 const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [asyncError, setAsyncError] = useState<Error | null>(null);
 
   if (asyncError) {
@@ -183,7 +184,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 </div>
               </div>
             )}
-            <p className="text-lg lg:text-xl text-slate-400 max-w-xl font-medium leading-relaxed opacity-70 mx-auto lg:mx-0">{data.bio}</p>
+            <p className="text-lg lg:text-xl text-slate-400 max-w-xl font-medium leading-relaxed opacity-70 mx-auto lg:mx-0">
+              {isBioExpanded ? data.bio : `${data.bio.substring(0, 200)}...`}
+              <button 
+                onClick={() => setIsBioExpanded(!isBioExpanded)} 
+                className="ml-2 font-black text-[10px] uppercase tracking-widest hover:underline"
+                style={{ color: themeConfig.accent }}
+              >
+                {isBioExpanded ? 'Show Less' : 'Read More'}
+              </button>
+            </p>
             <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
               <a href={`mailto:${data.email}`} className="px-12 py-5 rounded-full font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-3xl transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: themeConfig.accent, color: '#000' }}>{t.heroEmailBtn} <Mail size={20} /></a>
               <div className="flex gap-3.5 justify-center">

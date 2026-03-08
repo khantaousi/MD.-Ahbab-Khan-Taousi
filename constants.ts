@@ -11,7 +11,7 @@ export const THEME_OPTIONS = [
 export const INITIAL_DATA: PortfolioData = {
   name: "MD Ahbab Khan",
   title: "Professional Web Developer & Creative Designer",
-  bio: "Hello, I am MD Ahbab Khan. I am a passionate web developer dedicated to building modern, responsive, and user-centric digital solutions that empower businesses and individuals.",
+  bio: "Hello, I am MD Ahbab Khan. I am a passionate Data Analyst who enjoys turning raw data into meaningful insights. I work with data to discover patterns, solve problems, and help businesses make smarter decisions. With a strong interest in analytics, visualization, and data-driven strategies, I focus on transforming complex information into clear and actionable results that create real value for organizations and individuals.",
   currentWork: "Freelance Full Stack Developer",
   profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop", 
   aboutText: "I am MD Ahbab Khan, a tech enthusiast and developer with a focus on crafting high-quality web applications. With expertise in modern frameworks and a keen eye for design, I strive to create web experiences that are not only functional but also visually stunning. My goal is to help clients transform their ideas into reality through clean, efficient code.",

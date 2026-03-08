@@ -1,5 +1,5 @@
 
-import { PortfolioData, OrderStatus } from './types';
+import { PortfolioData } from './types';
 
 export const THEME_OPTIONS = [
   { id: 'neon', name: 'Cyber Azure', color: '#0ea5e9' },
@@ -7,16 +7,6 @@ export const THEME_OPTIONS = [
   { id: 'rose', name: 'Deep Crimson', color: '#e11d48' },
   { id: 'emerald', name: 'Nordic Forest', color: '#10b981' }
 ];
-
-export const ORDER_STATUS_OPTIONS: { id: OrderStatus; labelEn: string; labelBn: string; color: string }[] = [
-  { id: 'pending', labelEn: 'Pending', labelBn: 'পেন্ডিং', color: '#f59e0b' },
-  { id: 'processing', labelEn: 'Processing', labelBn: 'প্রসেসিং', color: '#3b82f6' },
-  { id: 'shipped', labelEn: 'Shipped', labelBn: 'শিপড', color: '#8b5cf6' },
-  { id: 'completed', labelEn: 'Completed', labelBn: 'সম্পন্ন', color: '#10b981' },
-  { id: 'cancelled', labelEn: 'Cancelled', labelBn: 'বাতিল', color: '#ef4444' }
-];
-
-export const CURRENCY_SYMBOLS = ['৳', '$', '€', '£', '¥', '₹', 'د.إ'];
 
 export const INITIAL_DATA: PortfolioData = {
   name: "MD Ahbab Khan",
@@ -36,7 +26,6 @@ export const INITIAL_DATA: PortfolioData = {
   showClock: true,
   showNotice: true,
   showWork: true,
-  showProducts: true,
   notice: {
     text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",
     updatedAt: new Date().toISOString()
@@ -65,11 +54,7 @@ export const INITIAL_DATA: PortfolioData = {
     { id: "3", name: "React JS" },
     { id: "4", name: "Tailwind CSS" },
     { id: "5", name: "Node.js" }
-  ],
-  products: [
-    { id: "1", name: "Business Website Setup", amount: "10000", currency: "৳", description: "Get a complete professional business website with a premium design and setup.", images: ["https://picsum.photos/600/600?random=20"] }
-  ],
-  orders: []
+  ]
 };
 
 export const TRANSLATIONS = {
@@ -78,7 +63,6 @@ export const TRANSLATIONS = {
     navBlog: "Blog",
     navGallery: "Gallery",
     navContact: "Contact",
-    navProducts: "Shop",
     navAdmin: "Admin",
     heroWelcome: "Welcome to my digital profile",
     heroIam: "I am",
@@ -121,8 +105,6 @@ export const TRANSLATIONS = {
     adminSkills: "Expertise",
     adminBlog: "Editorial",
     adminGallery: "Media Assets",
-    adminProducts: "Storefront",
-    adminOrders: "Order Queue",
     adminNotice: "Global Broadcast",
     adminContact: "Contact Settings",
     adminDeploy: "Cloud Core",
@@ -134,13 +116,10 @@ export const TRANSLATIONS = {
     adminNewSkill: "Add Competency",
     adminNewPost: "Draft Story",
     adminNewPhoto: "Upload Media",
-    adminNewProduct: "Stock Item",
     adminNewLink: "Signal Link",
     adminTheme: "Visual Environment",
     adminVisibility: "Module Toggle",
     adminWorkplace: "Station",
-    adminOrderStatus: "Status",
-    adminProductTitle: "Item",
     syncLoading: "Loading Profile...",
     visLabelAbout: "About Section",
     visLabelSkills: "Skills Section",
@@ -150,7 +129,6 @@ export const TRANSLATIONS = {
     visLabelClock: "Live Clock",
     visLabelNotice: "Notice Board",
     visLabelWork: "Work Status",
-    visLabelProducts: "Shop/Storefront",
     noticeLabel: "ALERT",
     noticePublished: "Broadcasted"
   },
@@ -159,7 +137,6 @@ export const TRANSLATIONS = {
     navBlog: "ব্লগ",
     navGallery: "গ্যালারি",
     navContact: "যোগাযোগ",
-    navProducts: "শপ",
     navAdmin: "অ্যাডমিন",
     heroWelcome: "আমার ডিজিটাল প্রোফাইলে স্বাগতম",
     heroIam: "আমি",
@@ -202,8 +179,6 @@ export const TRANSLATIONS = {
     adminSkills: "দক্ষতাসমূহ",
     adminBlog: "ব্লগ ম্যানেজমেন্ট",
     adminGallery: "মিডিয়া ফাইল",
-    adminProducts: "পণ্য তালিকা",
-    adminOrders: "অর্ডার তালিকা",
     adminNotice: "ব্রডকাস্ট",
     adminContact: "যোগাযোগ সেটিংস",
     adminSave: "লাইভ আপডেট",
@@ -214,13 +189,10 @@ export const TRANSLATIONS = {
     adminNewSkill: "নতুন স্কিল",
     adminNewPost: "নতুন পোস্ট",
     adminNewPhoto: "ছবি যোগ করুন",
-    adminNewProduct: "নতুন পণ্য",
     adminNewLink: "নতুন লিংক",
     adminTheme: "ওয়েবসাইট থিম",
     adminVisibility: "সেকশন কন্ট্রোল",
     adminWorkplace: "কর্মস্থল",
-    adminOrderStatus: "অবস্থা",
-    adminProductTitle: "পণ্য",
     syncLoading: "ডাটা লোড হচ্ছে...",
     visLabelAbout: "সম্পর্কে সেকশন",
     visLabelSkills: "দক্ষতা সেকশন",
@@ -230,7 +202,6 @@ export const TRANSLATIONS = {
     visLabelClock: "লাইভ ঘড়ি",
     visLabelNotice: "নোটিশ বোর্ড",
     visLabelWork: "কাজের স্ট্যাটাস",
-    visLabelProducts: "শপ/স্টোর সেকশন",
     noticeLabel: "জরুরী নোটিশ",
     noticePublished: "প্রকাশিত"
   }

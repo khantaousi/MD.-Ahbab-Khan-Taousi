@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { PortfolioData, Product, Order } from '../types';
+import { PortfolioData } from '../types';
 import { 
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
-  BookOpen, Code, Facebook, Instagram, Twitter, Globe, MessageCircle, Youtube, Clock, Calendar, Sparkles, Languages, Image as ImageIcon, Bell, Briefcase, ShoppingBag, X, Send, RefreshCw, ChevronDown, Maximize2, ChevronLeft, ChevronRight
+  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2
 } from 'lucide-react';
 
 interface PortfolioProps {
@@ -84,14 +84,7 @@ import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 
 const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate }) => {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
-  const [currentViewImageIdx, setCurrentViewImageIdx] = useState(0);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [orderName, setOrderName] = useState('');
-  const [orderContact, setOrderContact] = useState('');
-  const [orderCountry, setOrderCountry] = useState('BD');
-  const [isOrdering, setIsOrdering] = useState(false);
   const [asyncError, setAsyncError] = useState<Error | null>(null);
 
   if (asyncError) {
@@ -105,58 +98,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
     rose: { accent: '#e11d48', gradient: 'radial-gradient(at 0% 0%, hsla(340,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(330,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(345,100%,6%,1) 0, transparent 50%)' },
     emerald: { accent: '#10b981', gradient: 'radial-gradient(at 0% 0%, hsla(150,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(160,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(155,100%,6%,1) 0, transparent 50%)' }
   }[theme];
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/[^0-9+]/g, '');
-    setOrderContact(val);
-    if (val.startsWith('+880') || val.startsWith('880')) {
-      setOrderCountry('BD');
-    }
-  };
-
-  const handlePlaceOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedProduct) return;
-    setIsOrdering(true);
-    
-    const newOrder: Order = {
-      id: Date.now().toString(),
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      productImage: selectedProduct.images?.[0] || '',
-      customerName: orderName,
-      customerContact: orderContact,
-      customerCountry: orderCountry, 
-      timestamp: new Date().toISOString(),
-      status: 'pending'
-    };
-
-    const updatedData = {
-      ...data,
-      orders: [...(data.orders || []), newOrder]
-    };
-
-    try {
-      const docRef = doc(db, 'portfolio', 'global');
-      await updateDoc(docRef, {
-        orders: arrayUnion(newOrder)
-      });
-      
-      alert(t.orderSuccess);
-      setSelectedProduct(null);
-      setOrderName('');
-      setOrderContact('');
-      setOrderCountry('BD');
-    } catch (error) {
-      try {
-        handleFirestoreError(error, OperationType.UPDATE, 'portfolio/global');
-      } catch (e) {
-        setAsyncError(e as Error);
-      }
-    } finally {
-      setIsOrdering(false);
-    }
-  };
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
@@ -201,72 +142,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </div>
       )}
 
-      {/* Lightbox Modal: Product Multi-Image Viewer */}
-      {viewingProduct && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-3xl animate-in fade-in duration-500">
-           <button onClick={() => setViewingProduct(null)} className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-3 bg-white/5 rounded-full border border-white/10 z-[130]"><X size={28} /></button>
-           <div className="relative w-full max-w-5xl aspect-video flex items-center justify-center">
-              {viewingProduct.images.length > 1 && (
-                <button 
-                  onClick={() => setCurrentViewImageIdx(prev => (prev === 0 ? viewingProduct.images.length - 1 : prev - 1))}
-                  className="absolute left-4 z-[130] p-4 bg-white/5 border border-white/10 rounded-full text-white hover:bg-white/10 transition-all active:scale-95"
-                >
-                  <ChevronLeft size={32} />
-                </button>
-              )}
-              <div className="w-full h-full flex items-center justify-center">
-                 <img 
-                   src={viewingProduct.images[currentViewImageIdx]} 
-                   className="max-w-full max-h-full object-contain rounded-2xl shadow-3xl animate-in zoom-in-95 duration-500" 
-                   alt={viewingProduct.name} 
-                 />
-              </div>
-              {viewingProduct.images.length > 1 && (
-                <button 
-                  onClick={() => setCurrentViewImageIdx(prev => (prev === viewingProduct.images.length - 1 ? 0 : prev + 1))}
-                  className="absolute right-4 z-[130] p-4 bg-white/5 border border-white/10 rounded-full text-white hover:bg-white/10 transition-all active:scale-95"
-                >
-                  <ChevronRight size={32} />
-                </button>
-              )}
-           </div>
-           {/* Thumbnails */}
-           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-[130]">
-             {viewingProduct.images.map((img, i) => (
-               <button 
-                 key={i} 
-                 onClick={() => setCurrentViewImageIdx(i)}
-                 className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${currentViewImageIdx === i ? 'border-cyan-400 scale-110 shadow-lg shadow-cyan-400/20' : 'border-white/10 opacity-50 hover:opacity-100'}`}
-               >
-                 <img src={img} className="w-full h-full object-cover" />
-               </button>
-             ))}
-           </div>
-        </div>
-      )}
-
-      {selectedProduct && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-2xl animate-in fade-in duration-500">
-           <div className="bg-slate-900/80 border border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-3xl relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1" style={{ backgroundColor: themeConfig.accent }}></div>
-              <button onClick={() => setSelectedProduct(null)} className="absolute top-5 right-5 text-slate-500 hover:text-white transition-all p-2 rounded-full"><X size={20} /></button>
-              <h3 className="text-xl font-black text-center mb-6 text-white">{t.orderModalTitle}</h3>
-              <form onSubmit={handlePlaceOrder} className="space-y-6">
-                <input required value={orderName} onChange={(e) => setOrderName(e.target.value)} className="w-full bg-slate-950/50 border border-white/10 rounded-2xl px-6 py-4 font-bold text-sm outline-none focus:border-white/30" placeholder={t.orderNameLabel} />
-                <div className="flex gap-3">
-                  <select value={orderCountry} onChange={(e) => setOrderCountry(e.target.value)} className="bg-slate-950/50 border border-white/10 rounded-2xl px-3 py-4 font-black text-xs outline-none cursor-pointer">
-                    {COUNTRIES.map(c => <option key={c.code} value={c.code} className="bg-slate-900">{c.code}</option>)}
-                  </select>
-                  <input required type="tel" value={orderContact} onChange={handlePhoneChange} className="flex-1 bg-slate-950/50 border border-white/10 rounded-2xl px-6 py-4 font-bold text-sm outline-none focus:border-white/30" placeholder={t.orderContactLabel} />
-                </div>
-                <button type="submit" disabled={isOrdering} className="w-full py-5 rounded-2xl font-black text-[9px] uppercase tracking-[0.3em] shadow-2xl transition-all active:scale-95 hover:scale-105" style={{ backgroundColor: themeConfig.accent, color: '#000' }}>
-                  {isOrdering ? <RefreshCw className="animate-spin" size={16} /> : <Send size={16} />} {t.orderConfirmBtn}
-                </button>
-              </form>
-           </div>
-        </div>
-      )}
-
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 glass border-b border-white/5 h-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 h-full flex justify-between items-center">
@@ -277,7 +152,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             <div className="flex gap-4 items-center">
               <div className="hidden md:flex gap-6">
                 {data.showAbout && <a href="#about" onClick={(e) => scrollToSection(e, 'about')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navAbout}</a>}
-                {data.showProducts && <a href="#shop" onClick={(e) => scrollToSection(e, 'shop')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navProducts}</a>}
                 {data.showGallery && <a href="#gallery" onClick={(e) => scrollToSection(e, 'gallery')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navGallery}</a>}
                 {data.showBlog && <a href="#blog" onClick={(e) => scrollToSection(e, 'blog')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navBlog}</a>}
               </div>
@@ -356,43 +230,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       )}
 
       {/* Product Section */}
-      {data.showProducts && (
-        <section id="shop" className="py-24 px-6 lg:px-12 scroll-mt-20">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-black tracking-tighter text-white mb-12 text-center uppercase tracking-[0.1em]">{t.productsHeader}</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-              {data.products?.map((product) => (
-                <div key={product.id} className="glass rounded-[40px] overflow-hidden border border-white/10 flex flex-col shadow-3xl transition-all hover:-translate-y-2 hover:border-white/30 duration-500">
-                   <div 
-                     className="aspect-[4/5] relative overflow-hidden cursor-zoom-in group/img"
-                     onClick={() => {
-                       setViewingProduct(product);
-                       setCurrentViewImageIdx(0);
-                     }}
-                   >
-                      <img src={product.images?.[0] || 'https://picsum.photos/600/600?text=No+Image'} className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110" />
-                      <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40 opacity-0 group-hover/img:opacity-100 transition-all duration-300">
-                        <Maximize2 size={32} className="text-white drop-shadow-lg" />
-                      </div>
-                      <div className="absolute top-6 right-6 bg-slate-950/80 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-xl text-lg font-black shadow-2xl" style={{ color: themeConfig.accent }}>{product.currency}{product.amount}</div>
-                      {product.images?.length > 1 && (
-                        <div className="absolute bottom-6 left-6 bg-slate-950/60 backdrop-blur-md px-3 py-1 rounded-lg text-[10px] font-black text-white/70 uppercase tracking-widest border border-white/5">
-                          {product.images.length} Images
-                        </div>
-                      )}
-                   </div>
-                   <div className="p-8 space-y-5 flex flex-1 flex-col">
-                      <h3 className="text-xl font-black text-white">{product.name}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed flex-1 opacity-70">{product.description}</p>
-                      <button onClick={() => setSelectedProduct(product)} className="w-full py-4 rounded-2xl font-black text-[9px] uppercase tracking-[0.2em] transition-all bg-white text-slate-950 hover:bg-slate-200 shadow-xl">{t.orderBtn}</button>
-                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Skills */}
       {data.showSkills && (
         <section className="py-24 px-6 lg:px-12 bg-white/[0.01] border-y border-white/5">

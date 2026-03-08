@@ -29,29 +29,6 @@ export interface Notice {
   updatedAt: string;
 }
 
-export interface Product {
-  id: string;
-  name: string;
-  amount: string;
-  currency: string;
-  description: string;
-  images: string[]; // Changed from single image string to array
-}
-
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled';
-
-export interface Order {
-  id: string;
-  productId: string;
-  productName: string;
-  productImage?: string; 
-  customerName: string;
-  customerContact: string;
-  customerCountry: string;
-  timestamp: string;
-  status: OrderStatus;
-}
-
 export interface PortfolioData {
   name: string;
   title: string;
@@ -71,14 +48,11 @@ export interface PortfolioData {
   showClock: boolean;
   showNotice: boolean;
   showWork: boolean;
-  showProducts: boolean;
   socialLinks: SocialLink[];
   projects: Project[];
   gallery: GalleryItem[];
   skills: Skill[];
   notice: Notice;
-  products: Product[];
-  orders: Order[];
 }
 
 export interface AuthState {

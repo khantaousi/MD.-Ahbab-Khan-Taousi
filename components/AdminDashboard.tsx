@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { PortfolioData, Project, Skill, SocialLink, GalleryItem, Product, Order, OrderStatus } from '../types';
-import { THEME_OPTIONS, CURRENCY_SYMBOLS, ORDER_STATUS_OPTIONS } from '../constants';
+import { PortfolioData, Project, Skill, SocialLink, GalleryItem } from '../types';
+import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
 import { auth } from '../firebase';
 import { 
   Save, LogOut, Plus, Trash2, Camera, Link as LinkIcon, 
@@ -25,7 +25,7 @@ const SOCIAL_PLATFORMS = [
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogout, lang, t }) => {
   const [formData, setFormData] = useState<PortfolioData>(data);
-  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'products' | 'orders'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility'>('basic');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
@@ -42,21 +42,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     setHasUnsavedChanges(true);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'blog' | 'gallery' | 'product', id?: string) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'blog' | 'gallery', id?: string) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
         if (type === 'profile') setFormData(prev => ({ ...prev, profileImage: base64 }));
-        if (type === 'product' && id) {
-           setFormData(prev => ({
-             ...prev,
-             products: (prev.products || []).map(p => 
-               p.id === id ? { ...p, images: [...(p.images || []), base64].slice(0, 3) } : p
-             )
-           }));
-        }
         if (type === 'blog' && id) updateBlogPost(id, 'image', base64);
         if (type === 'gallery' && id) updateGalleryItem(id, 'image', base64);
         setHasUnsavedChanges(true);
@@ -81,36 +73,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const handleLogoutClick = async () => {
     await auth.signOut();
     onLogout();
-  };
-
-  // Product Actions
-  const addProduct = () => {
-    const newProduct: Product = { id: Date.now().toString(), name: "New Product", amount: "0", currency: "৳", description: "Details...", images: [] };
-    setFormData(prev => ({ ...prev, products: [...(prev.products || []), newProduct] }));
-    setHasUnsavedChanges(true);
-  };
-
-  const updateProduct = (id: string, field: keyof Product, value: any) => {
-    setFormData(prev => ({ 
-      ...prev, 
-      products: (prev.products || []).map(p => p.id === id ? { ...p, [field]: value } : p) 
-    }));
-    setHasUnsavedChanges(true);
-  };
-
-  const removeProductImage = (productId: string, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      products: (prev.products || []).map(p => 
-        p.id === productId ? { ...p, images: p.images.filter((_, i) => i !== index) } : p
-      )
-    }));
-    setHasUnsavedChanges(true);
-  };
-
-  const removeProduct = (id: string) => {
-    setFormData(prev => ({ ...prev, products: (prev.products || []).filter(p => p.id !== id) }));
-    setHasUnsavedChanges(true);
   };
 
   // Blog Actions
@@ -235,8 +197,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
               { id: 'basic', label: t.adminBasic, icon: <Info size={16} /> },
               { id: 'visibility', label: t.adminVisibility, icon: <Activity size={16} /> },
               { id: 'contact', label: t.adminContact, icon: <Phone size={16} /> },
-              { id: 'products', label: t.adminProducts, icon: <ShoppingBag size={16} /> },
-              { id: 'orders', label: t.adminOrders, icon: <ListChecks size={16} /> },
               { id: 'notice', label: t.adminNotice, icon: <Bell size={16} /> },
               { id: 'about', label: t.aboutHeader, icon: <FileText size={16} /> },
               { id: 'blog', label: t.adminBlog, icon: <BookOpen size={16} /> },
@@ -307,7 +267,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                  <VisibilityToggle label={t.visLabelSkills} field="showSkills" />
                  <VisibilityToggle label={t.visLabelBlog} field="showBlog" />
                  <VisibilityToggle label={t.visLabelGallery} field="showGallery" />
-                 <VisibilityToggle label={t.visLabelProducts} field="showProducts" />
                  <VisibilityToggle label={t.visLabelNotice} field="showNotice" />
                  <VisibilityToggle label={t.visLabelClock} field="showClock" />
                  <VisibilityToggle label={t.visLabelWork} field="showWork" />
@@ -343,135 +302,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
           )}
 
           {/* 4. Products */}
-          {activeTab === 'products' && (
-            <div className="space-y-6 animate-in fade-in">
-               <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-black">{t.adminProducts}</h2>
-                  <button onClick={addProduct} className="bg-white/5 px-6 py-2 rounded-full border border-white/10 font-black text-[9px] uppercase hover:bg-white/10 transition-all">
-                    <Plus size={14} className="inline mr-1" /> {t.adminNewProduct}
-                  </button>
-               </div>
-               <div className="grid md:grid-cols-2 gap-8">
-                  {formData.products.map(p => (
-                    <div key={p.id} className="bg-white/5 rounded-[32px] p-6 border border-white/10 space-y-6 group/prod transition-all hover:bg-white/[0.07]">
-                       <div className="flex flex-wrap gap-3">
-                         {p.images?.map((img, idx) => (
-                           <div key={idx} className="relative w-20 h-20 rounded-2xl overflow-hidden group/img">
-                              <img src={img} className="w-full h-full object-cover" />
-                              <button onClick={() => removeProductImage(p.id, idx)} className="absolute top-1 right-1 bg-red-500 p-1 rounded-full opacity-0 group-hover/img:opacity-100 transition-all">
-                                <X size={10} className="text-white" />
-                              </button>
-                           </div>
-                         ))}
-                         {(!p.images || p.images.length < 3) && (
-                           <label className="w-20 h-20 rounded-2xl border-2 border-dashed border-white/10 flex items-center justify-center cursor-pointer hover:border-white/30 transition-all bg-slate-900/50">
-                              <Plus size={20} className="text-slate-500" />
-                              <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'product', p.id)} />
-                           </label>
-                         )}
-                       </div>
-                       
-                       <div className="space-y-4">
-                          <input 
-                            value={p.name} 
-                            onChange={(e) => updateProduct(p.id, 'name', e.target.value)} 
-                            className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-black text-sm outline-none focus:border-cyan-500/30" 
-                            placeholder="Product Name" 
-                          />
-                          
-                          <div className="flex gap-3">
-                             <input 
-                               value={p.amount} 
-                               onChange={(e) => updateProduct(p.id, 'amount', e.target.value)} 
-                               className="flex-1 bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-black text-sm outline-none focus:border-cyan-500/30" 
-                               placeholder="Price" 
-                             />
-                             <select 
-                               value={p.currency} 
-                               onChange={(e) => updateProduct(p.id, 'currency', e.target.value)}
-                               className="bg-slate-950/50 border border-white/5 rounded-xl px-3 py-3 font-black text-sm outline-none"
-                             >
-                               {CURRENCY_SYMBOLS.map(c => <option key={c} value={c}>{c}</option>)}
-                             </select>
-                          </div>
-
-                          <textarea 
-                            value={p.description} 
-                            onChange={(e) => updateProduct(p.id, 'description', e.target.value)} 
-                            className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-xs min-h-[80px] outline-none focus:border-cyan-500/30 resize-none" 
-                            placeholder="Description" 
-                          />
-                       </div>
-                       
-                       <button onClick={() => removeProduct(p.id)} className="w-full py-3 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl font-black text-[9px] uppercase tracking-widest transition-all">
-                         <Trash2 size={14} className="inline mr-1" /> {lang === 'bn' ? "পণ্যটি মুছে ফেলুন" : "Remove Product"}
-                       </button>
-                    </div>
-                  ))}
-               </div>
-            </div>
-          )}
-
           {/* 5. Orders Management */}
-          {activeTab === 'orders' && (
-            <div className="space-y-8 animate-in fade-in">
-               <h2 className="text-2xl font-black">{t.adminOrders}</h2>
-               {(!formData.orders || formData.orders.length === 0) ? (
-                 <div className="bg-white/5 rounded-[32px] p-20 border border-white/5 flex flex-col items-center justify-center text-center opacity-50">
-                    <ListChecks size={48} className="mb-4" />
-                    <p className="font-black uppercase tracking-widest text-xs">{lang === 'bn' ? "কোনো অর্ডার পাওয়া যায়নি" : "No orders found"}</p>
-                 </div>
-               ) : (
-                 <div className="space-y-6">
-                    {formData.orders.sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map(order => {
-                      const statusInfo = ORDER_STATUS_OPTIONS.find(s => s.id === order.status);
-                      return (
-                        <div key={order.id} className="bg-white/5 rounded-[32px] p-6 border border-white/5 flex flex-col md:flex-row gap-8 hover:bg-white/[0.07] transition-all">
-                           <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-900 shrink-0 border border-white/10">
-                              <img src={order.productImage || 'https://picsum.photos/200'} className="w-full h-full object-cover" />
-                           </div>
-                           <div className="flex-1 space-y-4">
-                              <div className="flex flex-wrap justify-between items-start gap-4">
-                                 <div>
-                                    <h4 className="font-black text-lg text-white">{order.productName}</h4>
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{new Date(order.timestamp).toLocaleString()}</p>
-                                 </div>
-                                 <select 
-                                   value={order.status} 
-                                   onChange={(e) => updateOrderStatus(order.id, e.target.value as OrderStatus)}
-                                   className="bg-slate-900 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none shadow-lg cursor-pointer"
-                                   style={{ color: statusInfo?.color }}
-                                 >
-                                   {ORDER_STATUS_OPTIONS.map(opt => (
-                                     <option key={opt.id} value={opt.id}>{lang === 'bn' ? opt.labelBn : opt.labelEn}</option>
-                                   ))}
-                                 </select>
-                              </div>
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4 border-t border-white/5">
-                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Customer</p>
-                                    <p className="text-xs font-bold text-slate-300">{order.customerName}</p>
-                                 </div>
-                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Contact</p>
-                                    <p className="text-xs font-bold text-slate-300">{order.customerContact}</p>
-                                 </div>
-                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Country</p>
-                                    <p className="text-xs font-bold text-slate-300">{order.customerCountry}</p>
-                                 </div>
-                              </div>
-                           </div>
-                           <div className="flex items-end justify-end">
-                              <button onClick={() => removeOrder(order.id)} className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all"><Trash2 size={16} /></button>
-                           </div>
-                        </div>
-                      );
-                    })}
-                 </div>
-               )}
-            </div>
-          )}
 
           {/* 6. Notice */}
           {activeTab === 'notice' && (

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, User, LogIn, ArrowLeft, ShieldCheck } from 'lucide-react';
-import { auth, signInWithEmailAndPassword } from '../firebase';
+import { auth, signInWithEmailAndPassword, sendPasswordResetEmail } from '../firebase';
 
 interface LoginProps {
   onLogin: () => void;
@@ -21,8 +21,21 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
       await signInWithEmailAndPassword(auth, email, password);
       onLogin();
     } catch (err: any) {
-      console.error(err);
-      setError(lang === 'bn' ? 'লগইন ব্যর্থ হয়েছে!' : 'Login failed!');
+      console.error("Login Error Details:", err);
+      setError(lang === 'bn' ? `লগইন ব্যর্থ হয়েছে: ${err.message}` : `Login failed: ${err.message}`);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError(lang === 'bn' ? 'দয়া করে ইমেইল দিন' : 'Please enter your email');
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setError(lang === 'bn' ? 'পাসওয়ার্ড রিসেট ইমেইল পাঠানো হয়েছে' : 'Password reset email sent');
+    } catch (err: any) {
+      setError(lang === 'bn' ? `রিসেট ব্যর্থ: ${err.message}` : `Reset failed: ${err.message}`);
     }
   };
 
@@ -72,6 +85,13 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
             className="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black py-6 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-4 uppercase tracking-[0.25em] text-sm active:scale-[0.97] hover:scale-[1.02] mt-4"
           >
             {lang === 'bn' ? 'লগইন করুন' : 'Sign in'} <LogIn size={20} />
+          </button>
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="w-full text-slate-500 text-xs font-bold uppercase tracking-widest hover:text-white"
+          >
+            {lang === 'bn' ? 'পাসওয়ার্ড ভুলে গেছেন?' : 'Forgot Password?'}
           </button>
         </form>
         

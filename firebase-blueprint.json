@@ -22,7 +22,6 @@
         "showClock": { "type": "boolean" },
         "showNotice": { "type": "boolean" },
         "showWork": { "type": "boolean" },
-        "showProducts": { "type": "boolean" },
         "socialLinks": {
           "type": "array",
           "items": {
@@ -73,40 +72,6 @@
           "properties": {
             "text": { "type": "string" },
             "updatedAt": { "type": "string" }
-          }
-        },
-        "products": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": { "type": "string" },
-              "name": { "type": "string" },
-              "amount": { "type": "string" },
-              "currency": { "type": "string" },
-              "description": { "type": "string" },
-              "images": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            }
-          }
-        },
-        "orders": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": { "type": "string" },
-              "productId": { "type": "string" },
-              "productName": { "type": "string" },
-              "productImage": { "type": "string" },
-              "customerName": { "type": "string" },
-              "customerContact": { "type": "string" },
-              "customerCountry": { "type": "string" },
-              "timestamp": { "type": "string" },
-              "status": { "type": "string", "enum": ["pending", "processing", "shipped", "completed", "cancelled"] }
-            }
           }
         }
       }

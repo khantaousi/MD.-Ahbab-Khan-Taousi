@@ -1,8 +1,33 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == "khantaousi@gmail.com";
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // OTPs are private to the user
+    match /otps/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Portfolio data is public read, authenticated write
+    match /portfolio/{documentId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    
+    // Default deny
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

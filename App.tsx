@@ -7,7 +7,7 @@ import Login from './components/Login';
 import { INITIAL_DATA, TRANSLATIONS } from './constants';
 import { PortfolioData } from './types';
 import { Loader2 } from 'lucide-react';
-import { auth, db, signInVisitor, handleFirestoreError, OperationType } from './firebase';
+import { auth, db, handleFirestoreError, OperationType } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 
@@ -38,18 +38,10 @@ const App: React.FC = () => {
         } else {
           setIsLoggedIn(false);
         }
-        setIsAuthReady(true);
       } else {
         setIsLoggedIn(false);
-        // Sign in anonymously for visitors to read data
-        try {
-          await signInVisitor();
-        } catch (e) {
-          console.error("Anonymous auth failed:", e);
-          setIsAuthReady(true); // Fallback to load app anyway
-        }
-        // The onAuthStateChanged will fire again with the new anonymous user
       }
+      setIsAuthReady(true);
     });
 
     return () => unsubscribe();

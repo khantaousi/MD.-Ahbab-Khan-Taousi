@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, User, LogIn, ArrowLeft, ShieldCheck } from 'lucide-react';
-import { auth, googleProvider } from '../firebase';
+import { auth, googleProvider, signInWithEmailAndPassword } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 
 interface LoginProps {
@@ -13,6 +13,19 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
   const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      onLogin();
+    } catch (err: any) {
+      console.error(err);
+      setError(lang === 'bn' ? 'লগইন ব্যর্থ হয়েছে!' : 'Login failed!');
+    }
+  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -48,19 +61,44 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
         </div>
 
         {/* Login Form */}
-        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-700 delay-150">
+        <form onSubmit={handleEmailLogin} className="space-y-8 animate-in slide-in-from-bottom-4 duration-700 delay-150">
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 py-4 rounded-2xl animate-shake">
                 <p className="text-red-400 text-xs font-bold text-center uppercase tracking-widest">{error}</p>
             </div>
           )}
 
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-slate-900/50 border border-white/10 text-white p-4 rounded-2xl"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-slate-900/50 border border-white/10 text-white p-4 rounded-2xl"
+          />
+
           <button
-            onClick={handleGoogleLogin}
+            type="submit"
             className="w-full bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-black py-6 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-4 uppercase tracking-[0.25em] text-sm active:scale-[0.97] hover:scale-[1.02] mt-4"
           >
-            {lang === 'bn' ? 'গুগল দিয়ে লগইন করুন' : 'Sign in with Google'} <LogIn size={20} />
+            {lang === 'bn' ? 'লগইন করুন' : 'Sign in'} <LogIn size={20} />
           </button>
+        </form>
+        
+        <div className="mt-8 text-center">
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Or</p>
+            <button
+                onClick={handleGoogleLogin}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-white font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-4 uppercase tracking-[0.25em] text-xs"
+            >
+                {lang === 'bn' ? 'গুগল দিয়ে লগইন করুন' : 'Sign in with Google'}
+            </button>
         </div>
         
         <div className="mt-12 text-center">

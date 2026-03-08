@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInAnonymously } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import firebaseConfig from './firebase-applet-config.json';
 
@@ -59,8 +59,4 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-export const signInVisitor = async () => {
-  if (!auth.currentUser) {
-    await signInAnonymously(auth);
-  }
-};
+export { signInWithEmailAndPassword };

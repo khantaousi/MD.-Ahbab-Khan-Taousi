@@ -1,9 +1,10 @@
 {
-  "apiKey": "AIzaSyD8Nw4Y3LH63yBx3CgC45o8imaSrrRK57Q",
-  "authDomain": "ahbabs-web.firebaseapp.com",
-  "projectId": "ahbabs-web",
-  "appId": "1:330897028316:web:cd0c6c592dd756e9edb019",
-  "storageBucket": "ahbabs-web.firebasestorage.app",
-  "messagingSenderId": "330897028316",
-  "measurementId": "G-ZC993M9XLN"
+  "projectId": "gen-lang-client-0340253122",
+  "appId": "1:453872486411:web:1842bce6cef25c4e5cdf0e",
+  "apiKey": "AIzaSyBloYDgf--7C-0MWbaqAHiHOANTjsMUQJI",
+  "authDomain": "gen-lang-client-0340253122.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-657781cf-4128-4922-9751-d0bbec67a111",
+  "storageBucket": "gen-lang-client-0340253122.firebasestorage.app",
+  "messagingSenderId": "453872486411",
+  "measurementId": "G-42YHBCCCN7"
 }

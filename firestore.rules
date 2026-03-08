@@ -1,66 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ===============================================================
-    // Assumed Data Model
-    // ===============================================================
-    //
-    // Collection: portfolio
-    // Document ID: global
-    // Fields:
-    //   - name: string
-    //   - title: string
-    //   - bio: string
-    //   - currentWork: string
-    //   - profileImage: string
-    //   - aboutText: string
-    //   - email: string
-    //   - phone: string
-    //   - theme: string
-    //   - showAbout: boolean
-    //   - showSkills: boolean
-    //   - showBlog: boolean
-    //   - showGallery: boolean
-    //   - showContact: boolean
-    //   - showClock: boolean
-    //   - showNotice: boolean
-    //   - showWork: boolean
-    //   - showProducts: boolean
-    //   - socialLinks: list
-    //   - projects: list
-    //   - gallery: list
-    //   - skills: list
-    //   - notice: map
-    //   - products: list
-    //   - orders: list
-    //
-    // ===============================================================
-
-    // Check if the user is authenticated
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    // Check if the user is the admin
-    function isAdmin() {
-      return isAuthenticated() && request.auth.token.email == "khantaousi@gmail.com" && request.auth.token.email_verified == true;
-    }
-
-    // Check if a visitor is only appending a new order
-    function isVisitorAppendingOrder() {
-      let diff = request.resource.data.diff(resource.data);
-      let oldSize = ('orders' in resource.data) ? resource.data.orders.size() : 0;
-      let newSize = ('orders' in request.resource.data) ? request.resource.data.orders.size() : 0;
-      return diff.affectedKeys().hasOnly(['orders']) && newSize == oldSize + 1;
-    }
-
-    match /portfolio/{documentId} {
-      // Allow anyone to read the portfolio
-      allow read: if true;
-      
-      // Admin can do anything. Visitors can only append to orders.
-      allow create, delete: if isAdmin();
-      allow update: if isAdmin() || (isAuthenticated() && isVisitorAppendingOrder());
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }

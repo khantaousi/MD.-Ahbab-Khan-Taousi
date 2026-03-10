@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PortfolioData, Project, Skill, SocialLink, GalleryItem, JobExperience } from '../types';
-import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
+import { THEME_OPTIONS, LAYOUT_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
 import { auth } from '../firebase';
 import { 
   Save, LogOut, Plus, Trash2, Camera, Link as LinkIcon, 
@@ -29,6 +29,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   const currentThemeColor = THEME_OPTIONS.find(th => th.id === formData.theme)?.color || '#0ea5e9';
+
+  const themeConfig = {
+    neon: { accent: '#0ea5e9', gradient: 'radial-gradient(at 0% 0%, hsla(200,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(210,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(220,100%,6%,1) 0, transparent 50%)' },
+    gold: { accent: '#d4af37', gradient: 'radial-gradient(at 0% 0%, hsla(45,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(35,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(40,100%,6%,1) 0, transparent 50%)' },
+    rose: { accent: '#e11d48', gradient: 'radial-gradient(at 0% 0%, hsla(340,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(330,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(345,100%,6%,1) 0, transparent 50%)' },
+    emerald: { accent: '#10b981', gradient: 'radial-gradient(at 0% 0%, hsla(150,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(160,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(155,100%,6%,1) 0, transparent 50%)' }
+  }[formData.theme || 'neon'];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -207,7 +214,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
         </div>
       </header>
 
-      <div className="flex-1 max-w-7xl w-full mx-auto p-6 grid md:grid-cols-[260px_1fr] gap-8">
+      <div className="flex-1 max-w-[1600px] w-full mx-auto p-6 grid lg:grid-cols-[240px_1fr_300px] gap-6">
         <aside className="glass rounded-[32px] p-4 border border-white/10 space-y-1.5 shadow-3xl h-fit sticky top-28">
             {[
               { id: 'basic', label: t.adminBasic, icon: <Info size={16} /> },
@@ -258,19 +265,37 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                   </div>
                </div>
 
-               <div className="pt-6 border-t border-white/5">
-                  <h3 className="text-sm font-black uppercase tracking-widest mb-6">{t.adminTheme}</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {THEME_OPTIONS.map(theme => (
-                      <button 
-                        key={theme.id} 
-                        onClick={() => { setFormData(prev => ({ ...prev, theme: theme.id as any })); setHasUnsavedChanges(true); }}
-                        className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${formData.theme === theme.id ? 'border-white bg-white/10' : 'border-white/5 bg-slate-900/50'}`}
-                      >
-                        <div className="w-6 h-6 rounded-full" style={{ backgroundColor: theme.color }}></div>
-                        <span className="text-[10px] font-black uppercase tracking-tighter">{theme.name}</span>
-                      </button>
-                    ))}
+               <div className="pt-6 border-t border-white/5 space-y-8">
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-widest mb-6">{t.adminTheme}</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {THEME_OPTIONS.map(theme => (
+                        <button 
+                          key={theme.id} 
+                          onClick={() => { setFormData(prev => ({ ...prev, theme: theme.id as any })); setHasUnsavedChanges(true); }}
+                          className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${formData.theme === theme.id ? 'border-white bg-white/10' : 'border-white/5 bg-slate-900/50'}`}
+                        >
+                          <div className="w-6 h-6 rounded-full" style={{ backgroundColor: theme.color }}></div>
+                          <span className="text-[10px] font-black uppercase tracking-tighter">{theme.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-widest mb-6">Web Layout Style</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {LAYOUT_OPTIONS.map(layout => (
+                        <button 
+                          key={layout.id} 
+                          onClick={() => { setFormData(prev => ({ ...prev, layout: layout.id as any })); setHasUnsavedChanges(true); }}
+                          className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${formData.layout === layout.id ? 'border-white bg-white/10' : 'border-white/5 bg-slate-900/50'}`}
+                        >
+                          <Layout size={24} className={formData.layout === layout.id ? 'text-white' : 'text-slate-500'} />
+                          <span className="text-[10px] font-black uppercase tracking-tighter">{layout.name}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                </div>
             </div>
@@ -605,6 +630,56 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
             </div>
           )}
         </main>
+
+        {/* Live Preview Pane */}
+        <aside className="hidden lg:block sticky top-28 h-fit">
+          <div className="glass rounded-[32px] p-4 border border-white/10 shadow-3xl flex flex-col gap-4">
+            <div className="flex items-center justify-between px-2">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live Preview</h3>
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: themeConfig.accent }}></span>
+                <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: themeConfig.accent }}></span>
+              </span>
+            </div>
+            
+            <div 
+              className={`preview-container layout-${formData.layout || 'default'} w-full aspect-[9/16] rounded-2xl overflow-hidden relative flex flex-col`} 
+              style={formData.layout === 'default' ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : {}}
+            >
+              {/* Navbar */}
+              <div className="glass h-10 flex items-center px-4 border-b border-white/5 shrink-0 z-10">
+                <span className="font-black text-xs" style={{ color: themeConfig.accent }}>{formData.name || 'Name'}.</span>
+              </div>
+              
+              {/* Content */}
+              <div className={`flex-1 flex ${formData.layout === 'split' ? 'flex-col' : 'flex-col items-center text-center'} p-4 gap-4 overflow-hidden relative`}>
+                {formData.layout === 'split' ? (
+                  <>
+                    <div className="flex-1 flex flex-col justify-center z-10">
+                      <h1 className="text-xl font-black text-white leading-tight mb-2">{t.heroIam} <br/><span style={{ color: themeConfig.accent }}>{formData.name || 'Name'}</span></h1>
+                      <p className="text-[8px] text-slate-400 italic opacity-80 mb-4 line-clamp-2">{formData.title || 'Title'}</p>
+                      <div className="btn-preview px-4 py-2 rounded-full w-fit font-black text-[8px] uppercase tracking-widest" style={{ backgroundColor: themeConfig.accent, color: '#000' }}>{t.heroEmailBtn}</div>
+                    </div>
+                    <div className="absolute right-0 top-0 bottom-0 w-1/2">
+                      <img src={formData.profileImage} className="w-full h-full object-cover" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 shrink-0 mt-4 z-10">
+                      <img src={formData.profileImage} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="z-10 flex flex-col items-center">
+                      <h1 className="text-xl font-black text-white leading-tight mb-2">{t.heroIam} <br/><span style={{ color: themeConfig.accent }}>{formData.name || 'Name'}</span></h1>
+                      <p className="text-[8px] text-slate-400 italic opacity-80 mb-4 line-clamp-2">{formData.title || 'Title'}</p>
+                      <div className="btn-preview px-4 py-2 rounded-full w-fit font-black text-[8px] uppercase tracking-widest" style={{ backgroundColor: themeConfig.accent, color: '#000' }}>{t.heroEmailBtn}</div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
 
       <style>{`
@@ -613,6 +688,54 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
         .shadow-3xl { box-shadow: 0 40px 100px -20px rgba(0,0,0,0.7); }
         .glass { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(24px); }
         input, textarea, select { transition: all 0.2s ease; }
+
+        /* PREVIEW STYLES */
+        .preview-container.layout-brutalist {
+          background-color: #f4f4f0;
+          color: #111;
+          font-family: 'Space Grotesk', system-ui, sans-serif;
+        }
+        .preview-container.layout-brutalist .glass {
+          background: #fff;
+          backdrop-filter: none;
+          border-bottom: 2px solid #111;
+        }
+        .preview-container.layout-brutalist h1 { color: #111; text-transform: uppercase; letter-spacing: -0.05em; }
+        .preview-container.layout-brutalist p { color: #333; }
+        .preview-container.layout-brutalist .btn-preview {
+          border-radius: 0 !important;
+          border: 2px solid #111;
+          box-shadow: 2px 2px 0px 0px #111;
+          background: #fff;
+          color: #111 !important;
+        }
+        .preview-container.layout-brutalist img {
+          border-radius: 0 !important;
+          border: 2px solid #111;
+        }
+
+        .preview-container.layout-minimal {
+          background-color: #fafafa;
+          color: #333;
+          font-family: 'Inter', system-ui, sans-serif;
+        }
+        .preview-container.layout-minimal .glass {
+          background: transparent;
+          backdrop-filter: none;
+          border: none;
+        }
+        .preview-container.layout-minimal h1 { color: #111; font-weight: 300; letter-spacing: -0.02em; }
+        .preview-container.layout-minimal p { color: #666; }
+        .preview-container.layout-minimal img { border-radius: 12px !important; filter: grayscale(20%); }
+
+        .preview-container.layout-split {
+          background-color: #050505;
+          color: #fff;
+        }
+        .preview-container.layout-split img {
+          border-radius: 0 !important;
+          border: none;
+        }
       `}</style>
     </div>
   );

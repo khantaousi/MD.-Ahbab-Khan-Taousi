@@ -8,6 +8,13 @@ export const THEME_OPTIONS = [
   { id: 'emerald', name: 'Nordic Forest', color: '#10b981' }
 ];
 
+export const LAYOUT_OPTIONS = [
+  { id: 'default', name: 'Standard Flow' },
+  { id: 'minimal', name: 'Clean Minimal' },
+  { id: 'brutalist', name: 'Neo Brutalist' },
+  { id: 'split', name: 'Split Screen' }
+];
+
 export const INITIAL_DATA: PortfolioData = {
   name: "MD Ahbab Khan",
   title: "Professional Web Developer & Creative Designer",
@@ -18,6 +25,7 @@ export const INITIAL_DATA: PortfolioData = {
   email: "khantaousi@gmail.com",
   phone: "01518934191",
   theme: 'neon',
+  layout: 'default',
   showAbout: true,
   showSkills: true,
   showBlog: true,

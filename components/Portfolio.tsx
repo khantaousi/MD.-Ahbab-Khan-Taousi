@@ -133,8 +133,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
     }).format(date);
   };
 
+  const layout = data.layout || 'default';
+
   return (
-    <div className="min-h-screen transition-all duration-1000 selection:bg-white/10" style={{ backgroundColor: '#020617', backgroundImage: themeConfig.gradient }}>
+    <div className={`min-h-screen transition-all duration-1000 selection:bg-white/10 layout-${layout}`} style={layout === 'default' ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : {}}>
       {/* Lightbox Modal: Profile */}
       {isProfileOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setIsProfileOpen(false)}>
@@ -429,6 +431,114 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         .marquee-wrapper:hover { animation-play-state: paused; }
         .shadow-3xl { box-shadow: 0 50px 120px -30px rgba(0,0,0,0.8); }
         .glass { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(24px); }
+
+        /* BRUTALIST LAYOUT */
+        .layout-brutalist {
+          background-color: #f4f4f0;
+          color: #111;
+          font-family: 'Space Grotesk', system-ui, sans-serif;
+        }
+        .layout-brutalist .glass {
+          background: #fff;
+          backdrop-filter: none;
+          border: 4px solid #111;
+          border-radius: 0;
+          box-shadow: 8px 8px 0px 0px #111;
+        }
+        .layout-brutalist h1, .layout-brutalist h2, .layout-brutalist h3 {
+          color: #111;
+          text-transform: uppercase;
+          letter-spacing: -0.05em;
+        }
+        .layout-brutalist p, .layout-brutalist span, .layout-brutalist a {
+          color: #333;
+        }
+        .layout-brutalist button, .layout-brutalist a.px-12 {
+          border-radius: 0 !important;
+          border: 3px solid #111;
+          box-shadow: 4px 4px 0px 0px #111;
+          background: #fff;
+          color: #111 !important;
+        }
+        .layout-brutalist img {
+          border-radius: 0 !important;
+          border: 4px solid #111;
+        }
+        .layout-brutalist .rounded-full, .layout-brutalist .rounded-2xl, .layout-brutalist .rounded-\[32px\], .layout-brutalist .rounded-\[48px\] {
+          border-radius: 0 !important;
+        }
+        .layout-brutalist .text-white { color: #111 !important; }
+        .layout-brutalist .bg-white\/5 { background-color: #fff !important; border: 2px solid #111 !important; }
+        .layout-brutalist .border-white\/10 { border-color: #111 !important; }
+
+        /* MINIMAL LAYOUT */
+        .layout-minimal {
+          background-color: #fafafa;
+          color: #333;
+          font-family: 'Inter', system-ui, sans-serif;
+        }
+        .layout-minimal .glass {
+          background: transparent;
+          backdrop-filter: none;
+          border: none;
+          box-shadow: none;
+        }
+        .layout-minimal h1, .layout-minimal h2, .layout-minimal h3 {
+          color: #111;
+          font-weight: 300;
+          letter-spacing: -0.02em;
+        }
+        .layout-minimal p, .layout-minimal span, .layout-minimal a {
+          color: #666;
+        }
+        .layout-minimal img {
+          border-radius: 16px !important;
+          filter: grayscale(20%);
+        }
+        .layout-minimal .border-white\/10, .layout-minimal .border-white\/5 {
+          border-color: #eaeaea !important;
+        }
+        .layout-minimal .bg-white\/5 {
+          background-color: #fff !important;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+        .layout-minimal .text-white { color: #111 !important; }
+        .layout-minimal .bg-slate-900\/60, .layout-minimal .bg-slate-900 {
+          background-color: #fff !important;
+        }
+        .layout-minimal .shadow-3xl { box-shadow: none !important; }
+
+        /* SPLIT LAYOUT */
+        .layout-split {
+          background-color: #050505;
+          color: #fff;
+        }
+        @media (min-width: 1024px) {
+          .layout-split header > div {
+            max-width: 100%;
+            padding: 0;
+            gap: 0;
+          }
+          .layout-split header .flex-1 {
+            padding: 4rem 6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+          .layout-split header .relative.group {
+            width: 50vw;
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            padding: 0;
+            margin: -6rem -3rem -6rem 0; /* Negate padding */
+          }
+          .layout-split header img {
+            border-radius: 0 !important;
+            border: none;
+            height: 100%;
+          }
+        }
       `}</style>
     </div>
   );

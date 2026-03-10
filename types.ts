@@ -62,6 +62,7 @@ export interface PortfolioData {
   email: string;
   phone: string;
   theme: 'neon' | 'gold' | 'rose' | 'emerald';
+  layout: 'default' | 'minimal' | 'brutalist' | 'split';
   // Visibility Controls
   showAbout: boolean;
   showSkills: boolean;

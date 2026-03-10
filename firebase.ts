@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import firebaseConfig from './firebase-applet-config.json';
 
@@ -58,4 +58,4 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
-export { signInWithEmailAndPassword, sendPasswordResetEmail, doc, setDoc, getDoc, updateDoc };
+export { signInWithEmailAndPassword, doc, setDoc, getDoc, updateDoc };

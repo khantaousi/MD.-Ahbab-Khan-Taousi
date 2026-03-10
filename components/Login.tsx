@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, User, LogIn, ArrowLeft, ShieldCheck } from 'lucide-react';
-import { auth, signInWithEmailAndPassword, sendPasswordResetEmail } from '../firebase';
+import { auth, signInWithEmailAndPassword } from '../firebase';
 
 interface LoginProps {
   onLogin: () => void;
@@ -32,18 +32,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setError(lang === 'bn' ? 'দয়া করে ইমেইল দিন' : 'Please enter your email');
-      return;
-    }
-    try {
-      await sendPasswordResetEmail(auth, email);
-      setError(lang === 'bn' ? 'পাসওয়ার্ড রিসেট ইমেইল পাঠানো হয়েছে' : 'Password reset email sent');
-    } catch (err: any) {
-      setError(lang === 'bn' ? `রিসেট ব্যর্থ: ${err.message}` : `Reset failed: ${err.message}`);
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
@@ -92,13 +80,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
           >
             {lang === 'bn' ? 'লগইন করুন' : 'Sign in'} <LogIn size={20} />
           </button>
-          <button
-            type="button"
-            onClick={handleForgotPassword}
-            className="w-full text-slate-500 text-xs font-bold uppercase tracking-widest hover:text-white"
-          >
-            {lang === 'bn' ? 'পাসওয়ার্ড ভুলে গেছেন?' : 'Forgot Password?'}
-          </button>
+
         </form>
         
         <div className="mt-12 text-center">

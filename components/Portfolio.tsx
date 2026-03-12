@@ -88,6 +88,8 @@ import { db, handleFirestoreError, OperationType } from '../firebase';
 const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
   const [asyncError, setAsyncError] = useState<Error | null>(null);
 
   if (asyncError) {
@@ -143,6 +145,40 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
            <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"><X size={32} /></button>
            <div className="relative max-w-[min(90vw,650px)] w-full aspect-square p-3 bg-white/5 border border-white/10 rounded-full overflow-hidden shadow-3xl" onClick={(e) => e.stopPropagation()}>
               <img src={data.profileImage} className="w-full h-full object-cover rounded-full border-[6px] border-slate-950 shadow-inner" alt={data.name} />
+           </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal: General Image */}
+      {selectedImage && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setSelectedImage(null)}>
+           <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"><X size={32} /></button>
+           <div className="relative max-w-[90vw] max-h-[90vh] p-3 bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-3xl" onClick={(e) => e.stopPropagation()}>
+              <img src={selectedImage} className="w-full h-full max-h-[85vh] object-contain rounded-2xl" alt="Enlarged view" />
+           </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal: Blog Post */}
+      {selectedBlog && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setSelectedBlog(null)}>
+           <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"><X size={32} /></button>
+           <div className="relative w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-white/10 rounded-[32px] overflow-hidden shadow-3xl flex flex-col cursor-default" onClick={(e) => e.stopPropagation()}>
+              <div className="w-full h-64 sm:h-80 shrink-0 relative cursor-zoom-in" onClick={() => setSelectedImage(selectedBlog.image)}>
+                <img src={selectedBlog.image} className="w-full h-full object-cover" alt={selectedBlog.title} />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
+              </div>
+              <div className="p-8 sm:p-12 overflow-y-auto flex-1 scrollbar-hide">
+                <h2 className="text-3xl sm:text-4xl font-black mb-6 text-white">{selectedBlog.title}</h2>
+                <div className="text-slate-300 text-base sm:text-lg leading-relaxed whitespace-pre-wrap opacity-90">
+                  {selectedBlog.description}
+                </div>
+                {selectedBlog.link && selectedBlog.link !== '#' && (
+                  <a href={selectedBlog.link} target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95 text-slate-950" style={{ backgroundColor: themeConfig.accent }}>
+                    {t.blogReadMore} <ExternalLink size={14} />
+                  </a>
+                )}
+              </div>
            </div>
         </div>
       )}
@@ -309,7 +345,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             <h2 className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase"><ImageIcon size={40} style={{ color: themeConfig.accent }} /> {t.galleryHeader}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {data.gallery.map((item) => (
-                <div key={item.id} className="group relative aspect-square overflow-hidden rounded-[32px] border border-white/10 shadow-3xl bg-slate-900 hover:border-white/30 transition-all hover:-translate-y-2">
+                <div key={item.id} className="group relative aspect-square overflow-hidden rounded-[32px] border border-white/10 shadow-3xl bg-slate-900 hover:border-white/30 transition-all hover:-translate-y-2 cursor-zoom-in" onClick={() => setSelectedImage(item.image)}>
                   <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 group-hover:brightness-110" />
                   <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-all duration-700 flex flex-col justify-end p-8 backdrop-blur-[2px]">
                      <h3 className="text-lg font-black text-white mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{item.title}</h3>
@@ -330,15 +366,15 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             <div className="grid md:grid-cols-3 gap-10">
               {data.projects.map((p) => (
                 <div key={p.id} className="group glass rounded-[32px] overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-700 flex flex-col h-full shadow-3xl hover:-translate-y-2">
-                  <div className="aspect-video overflow-hidden">
+                  <div className="aspect-video overflow-hidden cursor-zoom-in" onClick={() => setSelectedImage(p.image)}>
                     <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 group-hover:brightness-110" />
                   </div>
                   <div className="p-8 flex flex-col flex-1">
                     <h3 className="text-xl font-black mb-3 text-white group-hover:text-sky-400 transition-colors">{p.title}</h3>
                     <p className="text-slate-400 mb-8 flex-1 text-sm opacity-70 leading-relaxed line-clamp-3">{p.description}</p>
-                    <a href={p.link} target="_blank" rel="noreferrer" className="font-black text-[9px] uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all w-fit group/btn hover:scale-105 active:scale-95 hover:brightness-125" style={{ color: themeConfig.accent }}>
+                    <button onClick={() => setSelectedBlog(p)} className="font-black text-[9px] uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all w-fit group/btn hover:scale-105 active:scale-95 hover:brightness-125" style={{ color: themeConfig.accent }}>
                       {t.blogReadMore} <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}

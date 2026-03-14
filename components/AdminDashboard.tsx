@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { PortfolioData, Project, Skill, SocialLink, GalleryItem, JobExperience } from '../types';
 import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
 import { auth } from '../firebase';
-import { updatePassword } from 'firebase/auth';
+import { updatePassword, updateEmail } from 'firebase/auth';
 import { 
   Save, LogOut, Plus, Trash2, Camera, Link as LinkIcon, 
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
@@ -10,6 +10,7 @@ import {
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
   Phone, Mail, Sparkles, Lock
 } from 'lucide-react';
+import ProfileImageUploader from './ProfileImageUploader';
 
 interface AdminDashboardProps {
   data: PortfolioData;
@@ -33,6 +34,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordStatus, setPasswordStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [passwordError, setPasswordError] = useState('');
+
+  const [newEmail, setNewEmail] = useState('');
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [emailError, setEmailError] = useState('');
   
   const currentThemeColor = THEME_OPTIONS.find(th => th.id === formData.theme)?.color || '#0ea5e9';
 
@@ -78,6 +83,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const handleLogoutClick = async () => {
     await auth.signOut();
     onLogout();
+  };
+
+  const handleEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmail || !newEmail.includes('@')) {
+      setEmailError(lang === 'bn' ? 'সঠিক ইমেইল দিন' : 'Please enter a valid email');
+      setEmailStatus('error');
+      return;
+    }
+
+    setEmailStatus('saving');
+    try {
+      if (auth.currentUser) {
+        await updateEmail(auth.currentUser, newEmail);
+        setEmailStatus('success');
+        setNewEmail('');
+        setTimeout(() => setEmailStatus('idle'), 3000);
+      }
+    } catch (error: any) {
+      setEmailError(error.message);
+      setEmailStatus('error');
+    }
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -134,13 +161,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
 
   // Skill Actions
   const addSkill = () => {
-    const newSkill: Skill = { id: Date.now().toString(), name: "New Skill" };
+    const newSkill: Skill = { id: Date.now().toString(), name: "New Skill", proficiency: 80 };
     setFormData(prev => ({ ...prev, skills: [...(prev.skills || []), newSkill] }));
     setHasUnsavedChanges(true);
   };
 
-  const updateSkill = (id: string, name: string) => {
-    setFormData(prev => ({ ...prev, skills: (prev.skills || []).map(s => s.id === id ? { ...s, name } : s) }));
+  const updateSkill = (id: string, field: keyof Skill, value: string | number) => {
+    setFormData(prev => ({ ...prev, skills: (prev.skills || []).map(s => s.id === id ? { ...s, [field]: value } : s) }));
     setHasUnsavedChanges(true);
   };
 
@@ -276,9 +303,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
             <div className="space-y-8 animate-in fade-in">
                <h2 className="text-2xl font-black">{t.adminBasic}</h2>
                <div className="flex flex-col lg:flex-row gap-10">
-                  <div className="w-full lg:w-56 h-56 rounded-[40px] overflow-hidden relative group shrink-0 border border-white/10">
-                    <img src={formData.profileImage} className="w-full h-full object-cover" />
-                    <label className="absolute inset-0 flex items-center justify-center bg-slate-950/70 opacity-0 group-hover:opacity-100 cursor-pointer transition-all"><Camera size={32} className="text-white" /><input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'profile')} /></label>
+                  <div className="w-full lg:w-auto shrink-0">
+                    <ProfileImageUploader 
+                      currentImage={formData.profileImage} 
+                      onImageUpdate={(base64) => {
+                        setFormData(prev => ({ ...prev, profileImage: base64 }));
+                        setHasUnsavedChanges(true);
+                      }} 
+                      t={t} 
+                    />
                   </div>
                   <div className="flex-1 space-y-5">
                     <div className="space-y-2">
@@ -334,6 +367,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                  <VisibilityToggle label={t.visLabelJobExperience} field="showJobExperience" />
                  <VisibilityToggle label={t.visLabelLiveChat} field="showLiveChat" />
                  <VisibilityToggle label={t.visLabelEvent} field="showEventSection" />
+                 <VisibilityToggle label={lang === 'bn' ? 'স্কিল চার্ট দেখান' : 'Show Skills Chart'} field="showSkillsChart" />
                </div>
             </div>
           )}
@@ -347,17 +381,37 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                     <Plus size={14} className="inline mr-1" /> {t.adminNewSkill}
                   </button>
                </div>
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+               <div className="grid grid-cols-1 gap-4">
                   {formData.skills.map(skill => (
-                    <div key={skill.id} className="bg-white/5 p-4 rounded-2xl flex items-center gap-3 border border-white/5 focus-within:border-cyan-500/30 transition-all">
-                       <Code size={18} style={{ color: currentThemeColor }} />
-                       <input 
-                         value={skill.name} 
-                         onChange={(e) => updateSkill(skill.id, e.target.value)} 
-                         className="flex-1 bg-transparent border-none outline-none font-bold text-sm" 
-                         placeholder="Skill name" 
+                    <div key={skill.id} className="bg-white/5 p-6 rounded-[32px] border border-white/5 focus-within:border-cyan-500/30 transition-all space-y-4">
+                       <div className="flex items-center gap-4">
+                         <Code size={18} style={{ color: currentThemeColor }} />
+                         <input 
+                           value={skill.name} 
+                           onChange={(e) => updateSkill(skill.id, 'name', e.target.value)} 
+                           className="flex-1 bg-transparent border-none outline-none font-black text-base" 
+                           placeholder="Skill name" 
+                         />
+                         <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-xl border border-white/10">
+                           <input 
+                             type="number" 
+                             value={skill.proficiency || 80} 
+                             onChange={(e) => updateSkill(skill.id, 'proficiency', parseInt(e.target.value))} 
+                             className="w-10 bg-transparent outline-none text-xs text-center font-bold" 
+                             placeholder="%" 
+                             min="0" 
+                             max="100"  
+                           />
+                           <span className="text-[10px] font-black opacity-40">%</span>
+                         </div>
+                         <button onClick={() => removeSkill(skill.id)} className="text-red-500/50 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>
+                       </div>
+                       <textarea 
+                         value={skill.description || ''} 
+                         onChange={(e) => updateSkill(skill.id, 'description', e.target.value)} 
+                         className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-cyan-500/20 resize-none h-20" 
+                         placeholder="Brief description of your expertise in this skill..." 
                        />
-                       <button onClick={() => removeSkill(skill.id)} className="text-red-500/50 hover:text-red-500 p-2"><Trash2 size={16} /></button>
                     </div>
                   ))}
                </div>
@@ -650,9 +704,54 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
           {/* 12. Security Settings */}
           {activeTab === 'security' && (
             <div className="space-y-8 animate-in fade-in">
-               <h2 className="text-2xl font-black">{lang === 'bn' ? 'পাসওয়ার্ড পরিবর্তন' : 'Security Settings'}</h2>
-               <div className="max-w-md space-y-6">
-                 <form onSubmit={handlePasswordChange} className="space-y-6">
+               <h2 className="text-2xl font-black">{lang === 'bn' ? 'নিরাপত্তা সেটিংস' : 'Security Settings'}</h2>
+               
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                 {/* Email Change */}
+                 <div className="space-y-6">
+                   <h3 className="text-xl font-bold">{lang === 'bn' ? 'ইমেইল পরিবর্তন' : 'Change Email'}</h3>
+                   <form onSubmit={handleEmailChange} className="space-y-6">
+                     {emailStatus === 'success' && (
+                       <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl flex items-center gap-3">
+                         <CheckCircle2 className="text-green-400" size={20} />
+                         <p className="text-green-400 text-xs font-bold uppercase tracking-widest">
+                           {lang === 'bn' ? 'ইমেইল সফলভাবে পরিবর্তন করা হয়েছে' : 'Email changed successfully'}
+                         </p>
+                       </div>
+                     )}
+                     {emailStatus === 'error' && (
+                       <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex items-center gap-3">
+                         <AlertCircle className="text-red-400" size={20} />
+                         <p className="text-red-400 text-xs font-bold uppercase tracking-widest">{emailError}</p>
+                       </div>
+                     )}
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                          {lang === 'bn' ? 'নতুন ইমেইল' : 'New Email'}
+                        </label>
+                        <input 
+                          type="email"
+                          value={newEmail} 
+                          onChange={(e) => setNewEmail(e.target.value)} 
+                          className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                          placeholder="new@example.com" 
+                          required
+                        />
+                     </div>
+                     <button 
+                       type="submit" 
+                       disabled={emailStatus === 'saving' || !newEmail}
+                       className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                     >
+                       {emailStatus === 'saving' ? (lang === 'bn' ? 'সংরক্ষণ করা হচ্ছে...' : 'Saving...') : (lang === 'bn' ? 'ইমেইল পরিবর্তন করুন' : 'Update Email')}
+                     </button>
+                   </form>
+                 </div>
+
+                 {/* Password Change */}
+                 <div className="space-y-6">
+                   <h3 className="text-xl font-bold">{lang === 'bn' ? 'পাসওয়ার্ড পরিবর্তন' : 'Change Password'}</h3>
+                   <form onSubmit={handlePasswordChange} className="space-y-6">
                    {passwordStatus === 'success' && (
                      <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl flex items-center gap-3">
                        <CheckCircle2 className="text-green-400" size={20} />
@@ -702,6 +801,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                      {passwordStatus === 'saving' ? (lang === 'bn' ? 'আপডেট হচ্ছে...' : 'Updating...') : (lang === 'bn' ? 'পাসওয়ার্ড আপডেট করুন' : 'Update Password')}
                    </button>
                  </form>
+                 </div>
                </div>
             </div>
           )}

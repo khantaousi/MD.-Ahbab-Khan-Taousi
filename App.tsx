@@ -22,6 +22,9 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<'en' | 'bn'>(() => {
     return (localStorage.getItem('app_lang') as 'en' | 'bn') || 'en';
   });
+  const [isLightMode] = useState(() => {
+    return localStorage.getItem('theme_mode') === 'light';
+  });
   const [asyncError, setAsyncError] = useState<Error | null>(null);
 
   if (asyncError) {
@@ -110,7 +113,7 @@ const App: React.FC = () => {
 
   if (isLoading || !isAuthReady) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-6 text-cyan-400">
+      <div className={`min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-6 text-cyan-400 ${isLightMode ? 'theme-light' : ''}`}>
         <Loader2 className="animate-spin" size={48} />
         <p className="font-black uppercase tracking-[0.3em] text-xs animate-pulse">
           {t.syncLoading}

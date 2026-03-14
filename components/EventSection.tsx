@@ -11,6 +11,14 @@ const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, the
     }
   };
 
+  const getDecorativeAnimationClass = () => {
+    switch (animationType) {
+      case 'float': return 'animate-float-subtle';
+      case 'pulse': return 'animate-pulse-subtle';
+      default: return '';
+    }
+  };
+
   const renderThemeIcon = () => {
     if (theme === 'islamic') {
       return (
@@ -18,10 +26,10 @@ const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, the
           <div className={`absolute inset-0 flex items-center justify-center ${getAnimationClass()}`}>
             <Moon size={80} className="text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" fill="currentColor" />
           </div>
-          <div className="absolute -top-2 -right-4 animate-bounce" style={{ animationDuration: '3s' }}>
+          <div className={`absolute -top-2 -right-4 ${getDecorativeAnimationClass()}`} style={{ animationDuration: '3s' }}>
             <Star size={24} className="text-yellow-200 drop-shadow-[0_0_10px_rgba(253,224,71,0.6)]" fill="currentColor" />
           </div>
-          <div className="absolute bottom-0 -left-2 animate-bounce" style={{ animationDuration: '4s' }}>
+          <div className={`absolute bottom-0 -left-2 ${getDecorativeAnimationClass()}`} style={{ animationDuration: '4s' }}>
             <Star size={16} className="text-yellow-100 drop-shadow-[0_0_8px_rgba(253,224,71,0.4)]" fill="currentColor" />
           </div>
         </div>
@@ -34,10 +42,10 @@ const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, the
           <div className={`absolute inset-0 flex items-center justify-center ${getAnimationClass()}`}>
             <PartyPopper size={80} className="text-pink-500 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]" />
           </div>
-          <div className="absolute -top-4 -right-4 animate-bounce" style={{ animationDuration: '2s' }}>
+          <div className={`absolute -top-4 -right-4 ${getDecorativeAnimationClass()}`} style={{ animationDuration: '2s' }}>
             <Sparkles size={24} className="text-yellow-400" fill="currentColor" />
           </div>
-          <div className="absolute bottom-0 -left-4 animate-bounce" style={{ animationDuration: '3s' }}>
+          <div className={`absolute bottom-0 -left-4 ${getDecorativeAnimationClass()}`} style={{ animationDuration: '3s' }}>
             <Sparkles size={20} className="text-cyan-400" fill="currentColor" />
           </div>
         </div>
@@ -62,7 +70,7 @@ const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, the
           <div className={`absolute inset-0 flex items-center justify-center ${getAnimationClass()}`}>
             <Moon size={80} className="text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" fill="currentColor" />
           </div>
-          <div className="absolute -top-2 -right-4 animate-bounce" style={{ animationDuration: '3s' }}>
+          <div className={`absolute -top-2 -right-4 ${getDecorativeAnimationClass()}`} style={{ animationDuration: '3s' }}>
             <Star size={24} className="text-yellow-200 drop-shadow-[0_0_10px_rgba(253,224,71,0.6)]" fill="currentColor" />
           </div>
         </div>
@@ -116,6 +124,20 @@ const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, the
         }
         .animate-float {
           animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float-subtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        .animate-float-subtle {
+          animation: float-subtle 3s ease-in-out infinite;
+        }
+        @keyframes pulse-subtle {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.2); opacity: 1; }
+        }
+        .animate-pulse-subtle {
+          animation: pulse-subtle 2s ease-in-out infinite;
         }
         @keyframes shimmer {
           0% { background-position: 0% 50%; }

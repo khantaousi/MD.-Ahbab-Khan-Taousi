@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { PortfolioData } from '../types';
 import { 
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
-  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2
+  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2, Sun, Moon
 } from 'lucide-react';
 import Chat from './Chat';
 import EventSection from './EventSection';
@@ -85,12 +85,21 @@ const DigitalClock: React.FC<{ label: string; lang: string; accentColor: string 
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 
+import SkillsChart from './SkillsChart';
+
 const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
+  const [isLightMode, setIsLightMode] = useState(() => {
+    return localStorage.getItem('theme_mode') === 'light';
+  });
   const [asyncError, setAsyncError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('theme_mode', isLightMode ? 'light' : 'dark');
+  }, [isLightMode]);
 
   if (asyncError) {
     throw asyncError;
@@ -138,7 +147,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   const layout = data.layout || 'default';
 
   return (
-    <div className={`min-h-screen transition-all duration-1000 selection:bg-white/10 layout-${layout}`} style={layout === 'default' ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : {}}>
+    <div className={`min-h-screen transition-all duration-1000 selection:bg-white/10 layout-${layout} ${isLightMode ? 'theme-light' : ''}`} style={layout === 'default' && !isLightMode ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : (isLightMode ? { backgroundColor: '#f8fafc' } : {})}>
       {/* Lightbox Modal: Profile */}
       {isProfileOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setIsProfileOpen(false)}>
@@ -196,6 +205,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 {data.showGallery && <a href="#gallery" onClick={(e) => scrollToSection(e, 'gallery')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navGallery}</a>}
                 {data.showBlog && <a href="#blog" onClick={(e) => scrollToSection(e, 'blog')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navBlog}</a>}
               </div>
+              <button onClick={() => setIsLightMode(!isLightMode)} className="bg-white/5 border border-white/10 p-2 rounded-full hover:bg-white/10 transition-all text-slate-300 hover:text-white" aria-label="Toggle Theme">
+                {isLightMode ? <Moon size={14} /> : <Sun size={14} />}
+              </button>
               <button onClick={() => setLang(lang === 'en' ? 'bn' : 'en')} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-black hover:bg-white/10 transition-all">{lang.toUpperCase()}</button>
               <Link to="/login" className="w-10 h-10 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110" style={{ backgroundColor: themeConfig.accent, color: '#000' }}><User size={16} /></Link>
             </div>
@@ -289,11 +301,36 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
               {data.skills.map((s) => (
-                <div key={s.id} className="bg-slate-900/60 p-5 rounded-2xl border border-white/10 text-center group hover:bg-white/10 hover:border-white/30 hover:scale-110 hover:-translate-y-1 transition-all shadow-xl cursor-default">
+                <div key={s.id} className="relative bg-slate-900/60 p-5 rounded-2xl border border-white/10 text-center group hover:bg-white/10 hover:border-white/30 hover:scale-110 hover:-translate-y-1 transition-all shadow-xl cursor-default">
                   <p className="font-black text-[10px] uppercase tracking-[0.2em]" style={{ color: themeConfig.accent }}>{s.name}</p>
+                  
+                  {/* Tooltip */}
+                  {(s.proficiency || s.description) && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 p-4 bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 pointer-events-none">
+                      <div className="space-y-2">
+                        {s.proficiency !== undefined && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">Proficiency</span>
+                            <span className="text-[10px] font-black" style={{ color: themeConfig.accent }}>{s.proficiency}%</span>
+                          </div>
+                        )}
+                        {s.proficiency !== undefined && (
+                          <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full transition-all duration-1000" style={{ width: `${s.proficiency}%`, backgroundColor: themeConfig.accent }} />
+                          </div>
+                        )}
+                        {s.description && (
+                          <p className="text-[10px] text-slate-400 leading-relaxed text-left pt-1 border-t border-white/5">{s.description}</p>
+                        )}
+                      </div>
+                      {/* Arrow */}
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900/95" />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
+            {data.showSkillsChart && <SkillsChart skills={data.skills} color={themeConfig.accent} />}
           </div>
         </section>
       )}

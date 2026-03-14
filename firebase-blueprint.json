@@ -24,6 +24,8 @@
         "showWork": { "type": "boolean" },
         "showJobExperience": { "type": "boolean" },
         "showLiveChat": { "type": "boolean" },
+        "showEventSection": { "type": "boolean" },
+        "showSkillsChart": { "type": "boolean" },
         "socialLinks": {
           "type": "array",
           "items": {
@@ -65,7 +67,9 @@
             "type": "object",
             "properties": {
               "id": { "type": "string" },
-              "name": { "type": "string" }
+              "name": { "type": "string" },
+              "proficiency": { "type": "number" },
+              "description": { "type": "string" }
             }
           }
         },

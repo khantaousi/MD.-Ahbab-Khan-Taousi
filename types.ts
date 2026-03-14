@@ -23,6 +23,8 @@ export interface GalleryItem {
 export interface Skill {
   id: string;
   name: string;
+  proficiency?: number;
+  description?: string;
 }
 
 export interface SocialLink {
@@ -75,6 +77,7 @@ export interface PortfolioData {
   showJobExperience: boolean;
   showLiveChat: boolean;
   showEventSection: boolean;
+  showSkillsChart: boolean;
   whatsappNumber: string;
   socialLinks: SocialLink[];
   projects: Project[];

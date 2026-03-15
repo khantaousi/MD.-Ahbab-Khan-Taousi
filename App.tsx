@@ -6,7 +6,6 @@ import AdminDashboard from './components/AdminDashboard';
 import Login from './components/Login';
 import { INITIAL_DATA, TRANSLATIONS } from './constants';
 import { PortfolioData } from './types';
-import { Loader2 } from 'lucide-react';
 import { auth, db, handleFirestoreError, OperationType } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
@@ -113,9 +112,16 @@ const App: React.FC = () => {
 
   if (isLoading || !isAuthReady) {
     return (
-      <div className={`min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-6 text-cyan-400 ${isLightMode ? 'theme-light' : ''}`}>
-        <Loader2 className="animate-spin" size={48} />
-        <p className="font-black uppercase tracking-[0.3em] text-xs animate-pulse">
+      <div className={`min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-8 ${isLightMode ? 'theme-light' : ''}`}>
+        <div className="relative flex items-center justify-center w-24 h-24">
+          <div className="absolute inset-0 border-4 border-slate-800 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-cyan-400 rounded-full border-t-transparent animate-spin"></div>
+          <div className="absolute inset-3 border-4 border-slate-800 rounded-full"></div>
+          <div className="absolute inset-3 border-4 border-emerald-400 rounded-full border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+          <div className="absolute inset-6 border-4 border-slate-800 rounded-full"></div>
+          <div className="absolute inset-6 border-4 border-rose-400 rounded-full border-l-transparent animate-spin" style={{ animationDuration: '2s' }}></div>
+        </div>
+        <p className="font-black uppercase tracking-[0.4em] text-xs text-cyan-400 animate-pulse">
           {t.syncLoading}
         </p>
       </div>

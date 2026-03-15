@@ -12,7 +12,8 @@ export const LAYOUT_OPTIONS = [
   { id: 'default', name: 'Standard Flow' },
   { id: 'minimal', name: 'Clean Minimal' },
   { id: 'brutalist', name: 'Neo Brutalist' },
-  { id: 'split', name: 'Split Screen' }
+  { id: 'split', name: 'Split Screen' },
+  { id: 'classic', name: 'Classic' }
 ];
 
 export const CURRENCY_SYMBOLS = [
@@ -38,17 +39,18 @@ export const INITIAL_DATA: PortfolioData = {
   showBlog: true,
   showGallery: true,
   showContact: true,
-  showClock: false,
+  showClock: true,
   showNotice: true,
   showWork: true,
   showJobExperience: true,
   showLiveChat: true,
-  showEventSection: false,
+  showEventSection: true,
   showSkillsChart: true,
   whatsappNumber: "+8801518934191",
   notice: {
     text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
+    speed: 45
   },
   event: {
     title: "EID MUBARAK",
@@ -70,9 +72,23 @@ export const INITIAL_DATA: PortfolioData = {
   projects: [
     {
       id: "1",
-      title: "Portfolio CMS Development",
-      description: "A professional management system for personal portfolios with cloud storage integration.",
-      image: "https://picsum.photos/600/400?random=1",
+      title: "Pohela Boishakh: The Bengali New Year",
+      description: "A vibrant celebration of the Bengali New Year, marked by colorful processions (Mangal Shobhajatra), traditional music, and festive foods like Panta Ilish.",
+      image: "https://picsum.photos/seed/boishakh/600/400",
+      link: "#"
+    },
+    {
+      id: "2",
+      title: "The Art of Rickshaw Painting",
+      description: "Rickshaw art is a unique and colorful folk art of Bangladesh, featuring intricate motifs, film stars, and rural landscapes painted on cycle rickshaws.",
+      image: "https://picsum.photos/seed/rickshaw/600/400",
+      link: "#"
+    },
+    {
+      id: "3",
+      title: "Jamdani: The Woven Heritage",
+      description: "Jamdani is a fine muslin textile woven by hand, recognized as an Intangible Cultural Heritage of Humanity by UNESCO, representing centuries of Bengali craftsmanship.",
+      image: "https://picsum.photos/seed/jamdani/600/400",
       link: "#"
     }
   ],
@@ -94,6 +110,7 @@ export const INITIAL_DATA: PortfolioData = {
 
 export const TRANSLATIONS = {
   en: {
+    navHome: "Home",
     navAbout: "About",
     navBlog: "Blog",
     navGallery: "Gallery",
@@ -175,6 +192,7 @@ export const TRANSLATIONS = {
     noticePublished: "Broadcasted"
   },
   bn: {
+    navHome: "হোম",
     navAbout: "পরিচয়",
     navBlog: "ব্লগ",
     navGallery: "গ্যালারি",

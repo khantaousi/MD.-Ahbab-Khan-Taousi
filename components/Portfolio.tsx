@@ -108,7 +108,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   
   const theme = data.theme || 'neon';
   const themeConfig = {
-    neon: { accent: '#0ea5e9', gradient: 'none' },
+    neon: { accent: '#0ea5e9', gradient: 'radial-gradient(at 0% 0%, hsla(200,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(210,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(220,100%,6%,1) 0, transparent 50%)' },
     gold: { accent: '#d4af37', gradient: 'radial-gradient(at 0% 0%, hsla(45,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(35,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(40,100%,6%,1) 0, transparent 50%)' },
     rose: { accent: '#e11d48', gradient: 'radial-gradient(at 0% 0%, hsla(340,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(330,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(345,100%,6%,1) 0, transparent 50%)' },
     emerald: { accent: '#10b981', gradient: 'radial-gradient(at 0% 0%, hsla(150,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(160,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(155,100%,6%,1) 0, transparent 50%)' }
@@ -116,6 +116,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
+    if (id === 'top') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     const element = document.getElementById(id);
     if (element) { 
       const yOffset = -80; 
@@ -148,7 +152,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   const layout = data.layout || 'default';
 
   return (
-    <div className={`min-h-screen transition-all duration-1000 selection:bg-white/10 layout-${layout} ${isLightMode ? 'theme-light' : ''}`} style={layout === 'default' && !isLightMode ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : (isLightMode ? { backgroundColor: '#f8fafc' } : {})}>
+    <div className={`min-h-screen transition-all duration-1000 selection:bg-white/10 layout-${layout} ${isLightMode ? 'theme-light' : ''}`} style={(layout === 'default' || layout === 'classic') && !isLightMode ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : (isLightMode ? { backgroundColor: '#f8fafc' } : {})}>
       <Helmet>
         <title>{data.seo?.metaTitle || `${data.name} | ${data.title}`}</title>
         <meta name="description" content={data.seo?.metaDescription || data.bio} />
@@ -203,14 +207,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       <nav className="fixed top-0 w-full z-50 glass border-b border-white/5 h-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 h-full flex justify-between items-center">
             <div className="flex items-center gap-6">
-              <a href="#" className="text-xl font-black tracking-tighter hover:scale-105 transition-all" style={{ color: themeConfig.accent }}>{data.name}<span className="text-white">.</span></a>
+              <a href="#" onClick={(e) => scrollToSection(e, 'top')} className="text-xl font-black tracking-tighter hover:scale-105 transition-all" style={{ color: themeConfig.accent }}>{data.name}<span className="text-white">.</span></a>
               {data.showClock && <div className="hidden lg:block"><DigitalClock label={t.clockLabel} lang={lang} accentColor={themeConfig.accent} /></div>}
             </div>
             <div className="flex gap-4 items-center">
               <div className="hidden md:flex gap-6">
+                <a href="#" onClick={(e) => scrollToSection(e, 'top')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navHome}</a>
                 {data.showAbout && <a href="#about" onClick={(e) => scrollToSection(e, 'about')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navAbout}</a>}
                 {data.showGallery && <a href="#gallery" onClick={(e) => scrollToSection(e, 'gallery')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navGallery}</a>}
                 {data.showBlog && <a href="#blog" onClick={(e) => scrollToSection(e, 'blog')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navBlog}</a>}
+                {data.showContact && <a href="#contact" onClick={(e) => scrollToSection(e, 'contact')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navContact}</a>}
               </div>
               <button onClick={() => setIsLightMode(!isLightMode)} className="bg-white/5 border border-white/10 p-2 rounded-full hover:bg-white/10 transition-all text-slate-300 hover:text-white" aria-label="Toggle Theme">
                 {isLightMode ? <Moon size={14} /> : <Sun size={14} />}
@@ -352,9 +358,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {data.jobExperiences.map((job) => (
                 <div key={job.id} className="glass p-8 rounded-[32px] border border-white/10 flex flex-col gap-6 items-start hover:border-white/30 transition-all h-full">
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 shrink-0">
+                  <a href={job.website} target="_blank" rel="noreferrer" className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 shrink-0 block hover:opacity-80 transition-opacity">
                     <img src={job.logoUrl} alt={job.companyName} className="w-full h-full object-cover" />
-                  </div>
+                  </a>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
                       <a href={job.website} target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity">
@@ -507,7 +513,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
           100% { background-position: 100% 0; }
         }
         @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .marquee-wrapper { animation: marquee 35s linear infinite; display: flex; }
+        .marquee-wrapper { animation: marquee ${data.notice?.speed || 45}s linear infinite; display: flex; }
         .marquee-wrapper:hover { animation-play-state: paused; }
         .shadow-3xl { box-shadow: 0 50px 120px -30px rgba(0,0,0,0.8); }
         .glass { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(24px); }
@@ -618,6 +624,54 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
             border: none;
             height: 100%;
           }
+        }
+
+        /* CLASSIC LAYOUT */
+        .layout-classic {
+          background-color: #f1f5f9;
+          color: #1e293b;
+          font-family: 'Inter', system-ui, sans-serif;
+        }
+        .layout-classic .glass {
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .layout-classic h1, .layout-classic h2, .layout-classic h3 {
+          color: #0f172a;
+          font-weight: 800;
+        }
+        .layout-classic p, .layout-classic span, .layout-classic a {
+          color: #475569;
+        }
+        .layout-classic .text-white { color: #0f172a !important; }
+        .layout-classic .bg-white\/5 {
+          background-color: #ffffff !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        .layout-classic .border-white\/10, .layout-classic .border-white\/5 {
+          border-color: #e2e8f0 !important;
+        }
+        .layout-classic .bg-slate-900\/60, .layout-classic .bg-slate-900 {
+          background-color: #ffffff !important;
+          border: 1px solid #e2e8f0 !important;
+        }
+        .layout-classic .shadow-3xl {
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        }
+        .layout-classic .rounded-full, .layout-classic .rounded-2xl, .layout-classic .rounded-\[32px\], .layout-classic .rounded-\[48px\] {
+          border-radius: 12px !important;
+        }
+        .layout-classic .marquee-wrapper p {
+          color: #1e293b !important;
+        }
+        .layout-classic nav a, .layout-classic nav button {
+          color: #475569 !important;
+        }
+        .layout-classic nav a:hover, .layout-classic nav button:hover {
+          color: #0f172a !important;
         }
       `}</style>
     </div>

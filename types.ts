@@ -36,6 +36,7 @@ export interface SocialLink {
 export interface Notice {
   text: string;
   updatedAt: string;
+  speed?: number;
 }
 
 export interface JobExperience {

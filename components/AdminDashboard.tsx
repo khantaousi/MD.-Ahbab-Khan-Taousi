@@ -475,13 +475,30 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                     onChange={(e) => {
                       setFormData(prev => ({ 
                         ...prev, 
-                        notice: { text: e.target.value, updatedAt: new Date().toISOString() } 
+                        notice: { ...prev.notice, text: e.target.value, updatedAt: new Date().toISOString() } 
                       }));
                       setHasUnsavedChanges(true);
                     }} 
                     className="w-full bg-slate-900 border border-white/10 rounded-2xl px-6 py-5 font-bold text-sm focus:border-cyan-500/50 outline-none h-44 resize-none" 
                     placeholder="Enter urgent update or welcome message..." 
                   />
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Scroll Speed (Seconds)</label>
+                     <input 
+                       type="number" 
+                       value={formData.notice?.speed || 45} 
+                       onChange={(e) => {
+                         setFormData(prev => ({ 
+                           ...prev, 
+                           notice: { ...prev.notice, speed: Number(e.target.value) } 
+                         }));
+                         setHasUnsavedChanges(true);
+                       }} 
+                       className="w-full bg-slate-900 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                       placeholder="45" 
+                     />
+                     <p className="text-[9px] text-slate-500 uppercase tracking-widest">Recommended: 35 to 50 (Higher number = Slower speed)</p>
+                  </div>
                   <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
                      <Clock size={12} />
                      {t.noticePublished}: {formData.notice?.updatedAt ? new Date(formData.notice.updatedAt).toLocaleString() : 'N/A'}

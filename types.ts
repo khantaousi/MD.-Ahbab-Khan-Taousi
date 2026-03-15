@@ -54,6 +54,13 @@ export interface EventData {
   theme: 'auto' | 'islamic' | 'party' | 'minimal';
 }
 
+export interface SEOData {
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string;
+  favicon?: string;
+}
+
 export interface PortfolioData {
   name: string;
   title: string;
@@ -86,6 +93,7 @@ export interface PortfolioData {
   jobExperiences: JobExperience[];
   notice: Notice;
   event: EventData;
+  seo: SEOData;
 }
 
 export interface AuthState {

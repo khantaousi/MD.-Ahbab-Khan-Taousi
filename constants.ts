@@ -48,6 +48,12 @@ export const INITIAL_DATA: PortfolioData = {
     animationType: "float",
     theme: "islamic"
   },
+  seo: {
+    metaTitle: "MD Ahbab Khan | Professional Web Developer",
+    metaDescription: "Official portfolio of MD Ahbab Khan, a professional web developer and creative designer specializing in modern web applications.",
+    metaKeywords: "MD Ahbab Khan, Web Developer, Portfolio, React Developer, Full Stack Developer",
+    favicon: "https://picsum.photos/seed/favicon/32/32"
+  },
   socialLinks: [
     { id: "1", platform: "GitHub", url: "https://github.com" },
     { id: "2", platform: "LinkedIn", url: "https://linkedin.com" },
@@ -130,6 +136,7 @@ export const TRANSLATIONS = {
     adminContact: "Contact Settings",
     adminJobExperience: "Job Experience",
     adminEvent: "Event Banner",
+    adminSEO: "SEO Settings",
     adminDeploy: "Cloud Core",
     adminSave: "Sync Changes",
     adminSaving: "Syncing...",
@@ -210,6 +217,7 @@ export const TRANSLATIONS = {
     adminContact: "যোগাযোগ সেটিংস",
     adminJobExperience: "কাজের অভিজ্ঞতা",
     adminEvent: "ইভেন্ট ব্যানার",
+    adminSEO: "এসইও সেটিংস",
     adminSave: "লাইভ আপডেট",
     adminSaving: "আপডেট হচ্ছে...",
     adminSaved: "আপডেট হয়েছে!",

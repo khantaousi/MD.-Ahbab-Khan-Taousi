@@ -26,7 +26,7 @@ const SOCIAL_PLATFORMS = [
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogout, lang, t }) => {
   const [formData, setFormData] = useState<PortfolioData>(data);
-  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event' | 'security'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event' | 'security' | 'seo'>('basic');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
@@ -49,6 +49,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
 
   const handleToggle = (name: keyof PortfolioData) => {
     setFormData(prev => ({ ...prev, [name]: !prev[name] }));
+    setHasUnsavedChanges(true);
+  };
+
+  const handleSEOChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      seo: { ...prev.seo, [name]: value }
+    }));
     setHasUnsavedChanges(true);
   };
 
@@ -288,7 +297,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
               { id: 'skills', label: t.adminSkills, icon: <Layout size={16} /> },
               { id: 'jobExperience', label: t.adminJobExperience, icon: <Briefcase size={16} /> },
               { id: 'event', label: t.adminEvent, icon: <Sparkles size={16} /> },
-              { id: 'security', label: lang === 'bn' ? 'পাসওয়ার্ড পরিবর্তন' : 'Security', icon: <Lock size={16} /> },
+              { id: 'seo', label: t.adminSEO || (lang === 'bn' ? 'এসইও সেটিংস' : 'SEO Settings'), icon: <Cloud size={16} /> },
+              { id: 'security', label: lang === 'bn' ? 'নিরাপত্তা সেটিংস' : 'Security Settings', icon: <Lock size={16} /> },
             ].map((tab) => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all text-[9px] font-black uppercase tracking-widest ${activeTab === tab.id ? 'text-slate-950 shadow-lg' : 'text-slate-500 hover:text-white hover:bg-white/5'}`} style={activeTab === tab.id ? { backgroundColor: currentThemeColor } : {}}>
                 {tab.icon} {tab.label}
@@ -697,6 +707,66 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                       </select>
                    </div>
                  </div>
+               </div>
+            </div>
+          )}
+
+          {/* 11. SEO Settings */}
+          {activeTab === 'seo' && (
+            <div className="space-y-8 animate-in fade-in">
+               <h2 className="text-2xl font-black">{t.adminSEO || (lang === 'bn' ? 'এসইও সেটিংস' : 'SEO Settings')}</h2>
+               <div className="space-y-6">
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Title</label>
+                     <input 
+                       name="metaTitle" 
+                       value={formData.seo?.metaTitle || ''} 
+                       onChange={handleSEOChange} 
+                       className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                       placeholder="Meta Title" 
+                     />
+                     <p className="text-[9px] text-slate-500 uppercase tracking-widest">Recommended: 50-60 characters</p>
+                  </div>
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Description</label>
+                     <textarea 
+                       name="metaDescription" 
+                       value={formData.seo?.metaDescription || ''} 
+                       onChange={handleSEOChange} 
+                       className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" 
+                       placeholder="Meta Description" 
+                     />
+                     <p className="text-[9px] text-slate-500 uppercase tracking-widest">Recommended: 150-160 characters</p>
+                  </div>
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Keywords</label>
+                     <input 
+                       name="metaKeywords" 
+                       value={formData.seo?.metaKeywords || ''} 
+                       onChange={handleSEOChange} 
+                       className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                       placeholder="Keywords (comma separated)" 
+                     />
+                  </div>
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Favicon URL</label>
+                     <div className="flex gap-4">
+                        <div className="w-14 h-14 bg-slate-900 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+                           {formData.seo?.favicon ? (
+                              <img src={formData.seo.favicon} className="w-full h-full object-contain" alt="Favicon Preview" />
+                           ) : (
+                              <Globe size={20} className="text-slate-700" />
+                           )}
+                        </div>
+                        <input 
+                          name="favicon" 
+                          value={formData.seo?.favicon || ''} 
+                          onChange={handleSEOChange} 
+                          className="flex-1 bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                          placeholder="https://example.com/favicon.ico" 
+                        />
+                     </div>
+                  </div>
                </div>
             </div>
           )}

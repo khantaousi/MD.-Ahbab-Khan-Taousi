@@ -93,6 +93,15 @@
             "text": { "type": "string" },
             "updatedAt": { "type": "string" }
           }
+        },
+        "seo": {
+          "type": "object",
+          "properties": {
+            "metaTitle": { "type": "string" },
+            "metaDescription": { "type": "string" },
+            "metaKeywords": { "type": "string" },
+            "favicon": { "type": "string" }
+          }
         }
       }
     }

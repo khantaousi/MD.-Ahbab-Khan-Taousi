@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { PortfolioData } from '../types';
 import { 
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
@@ -148,6 +149,12 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
 
   return (
     <div className={`min-h-screen transition-all duration-1000 selection:bg-white/10 layout-${layout} ${isLightMode ? 'theme-light' : ''}`} style={layout === 'default' && !isLightMode ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : (isLightMode ? { backgroundColor: '#f8fafc' } : {})}>
+      <Helmet>
+        <title>{data.seo?.metaTitle || `${data.name} | ${data.title}`}</title>
+        <meta name="description" content={data.seo?.metaDescription || data.bio} />
+        {data.seo?.metaKeywords && <meta name="keywords" content={data.seo.metaKeywords} />}
+        {data.seo?.favicon && <link rel="icon" href={data.seo.favicon} />}
+      </Helmet>
       {/* Lightbox Modal: Profile */}
       {isProfileOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setIsProfileOpen(false)}>

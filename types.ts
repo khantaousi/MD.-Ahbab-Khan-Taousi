@@ -61,6 +61,18 @@ export interface SEOData {
   favicon?: string;
 }
 
+export type OrderStatus = 'pending' | 'completed' | 'cancelled';
+
+export interface Order {
+  id: string;
+  customerName: string;
+  contact: string;
+  country: string;
+  productTitle: string;
+  status: OrderStatus;
+  timestamp: string;
+}
+
 export interface PortfolioData {
   name: string;
   title: string;
@@ -71,7 +83,7 @@ export interface PortfolioData {
   email: string;
   phone: string;
   theme: 'neon' | 'gold' | 'rose' | 'emerald';
-  layout: 'default' | 'minimal' | 'brutalist' | 'split';
+  layout: 'default' | 'minimal' | 'brutalist' | 'split' | 'classic';
   // Visibility Controls
   showAbout: boolean;
   showSkills: boolean;
@@ -91,6 +103,7 @@ export interface PortfolioData {
   gallery: GalleryItem[];
   skills: Skill[];
   jobExperiences: JobExperience[];
+  orders?: Order[];
   notice: Notice;
   event: EventData;
   seo: SEOData;

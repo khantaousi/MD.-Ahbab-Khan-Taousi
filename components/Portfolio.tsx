@@ -108,7 +108,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   
   const theme = data.theme || 'neon';
   const themeConfig = {
-    neon: { accent: '#0ea5e9', gradient: 'radial-gradient(at 0% 0%, hsla(200,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(210,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(220,100%,6%,1) 0, transparent 50%)' },
+    neon: { accent: '#0ea5e9', gradient: 'none' },
     gold: { accent: '#d4af37', gradient: 'radial-gradient(at 0% 0%, hsla(45,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(35,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(40,100%,6%,1) 0, transparent 50%)' },
     rose: { accent: '#e11d48', gradient: 'radial-gradient(at 0% 0%, hsla(340,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(330,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(345,100%,6%,1) 0, transparent 50%)' },
     emerald: { accent: '#10b981', gradient: 'radial-gradient(at 0% 0%, hsla(150,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(160,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(155,100%,6%,1) 0, transparent 50%)' }

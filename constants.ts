@@ -15,6 +15,13 @@ export const LAYOUT_OPTIONS = [
   { id: 'split', name: 'Split Screen' }
 ];
 
+export const CURRENCY_SYMBOLS = [
+  { label: 'BDT (৳)', value: '৳' },
+  { label: 'USD ($)', value: '$' },
+  { label: 'EUR (€)', value: '€' },
+  { label: 'GBP (£)', value: '£' }
+];
+
 export const INITIAL_DATA: PortfolioData = {
   name: "MD Ahbab Khan",
   title: "Professional Web Developer & Creative Designer",
@@ -31,12 +38,13 @@ export const INITIAL_DATA: PortfolioData = {
   showBlog: true,
   showGallery: true,
   showContact: true,
-  showClock: true,
+  showClock: false,
   showNotice: true,
   showWork: true,
   showJobExperience: true,
   showLiveChat: true,
-  showEventSection: true,
+  showEventSection: false,
+  showSkillsChart: true,
   whatsappNumber: "+8801518934191",
   notice: {
     text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",

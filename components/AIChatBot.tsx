@@ -7,6 +7,7 @@ import { PortfolioData } from '../types';
 interface AIChatBotProps {
   accentColor: string;
   data: PortfolioData;
+  isLightMode?: boolean;
 }
 
 interface Message {
@@ -15,7 +16,7 @@ interface Message {
   text: string;
 }
 
-const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data }) => {
+const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data, isLightMode = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -125,22 +126,22 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data }) => {
 
       {/* Chat Window */}
       <div
-        className={`fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[500px] max-h-[80vh] bg-slate-900 border border-white/10 rounded-2xl shadow-2xl flex flex-col z-[100] transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}`}
+        className={`fixed bottom-6 right-6 w-[350px] sm:w-[400px] h-[500px] max-h-[80vh] ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-white/10'} border rounded-2xl shadow-2xl flex flex-col z-[100] transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'}`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10 bg-slate-800/50 rounded-t-2xl">
+        <div className={`flex items-center justify-between p-4 border-b ${isLightMode ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-slate-800/50'} rounded-t-2xl`}>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: accentColor, color: '#000' }}>
               <Bot size={18} />
             </div>
             <div>
-              <h3 className="font-bold text-white text-sm">AI Assistant</h3>
-              <p className="text-xs text-slate-400">Ask about {data.name}</p>
+              <h3 className={`font-bold text-sm ${isLightMode ? 'text-slate-900' : 'text-white'}`}>AI Assistant</h3>
+              <p className={`text-xs ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Ask about {data.name}</p>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-slate-400 hover:text-white transition-colors p-1"
+            className={`${isLightMode ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'} transition-colors p-1`}
             aria-label="Close Chat"
           >
             <X size={20} />
@@ -158,11 +159,13 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data }) => {
                 className={`max-w-[85%] rounded-2xl px-4 py-2 ${
                   msg.role === 'user'
                     ? 'bg-blue-600 text-white rounded-br-sm'
-                    : 'bg-slate-800 text-slate-200 border border-white/5 rounded-bl-sm'
+                    : isLightMode
+                      ? 'bg-slate-100 text-slate-800 border border-slate-200 rounded-bl-sm'
+                      : 'bg-slate-800 text-slate-200 border border-white/5 rounded-bl-sm'
                 }`}
               >
                 {msg.role === 'model' ? (
-                  <div className="markdown-body prose prose-invert prose-sm max-w-none">
+                  <div className={`markdown-body prose prose-sm max-w-none ${isLightMode ? '' : 'prose-invert'}`}>
                     <Markdown>{msg.text}</Markdown>
                   </div>
                 ) : (
@@ -173,9 +176,9 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data }) => {
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-slate-800 border border-white/5 rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2">
-                <Loader2 size={16} className="animate-spin text-slate-400" />
-                <span className="text-xs text-slate-400">Thinking...</span>
+              <div className={`${isLightMode ? 'bg-slate-100 border-slate-200' : 'bg-slate-800 border-white/5'} border rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2`}>
+                <Loader2 size={16} className={`animate-spin ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`} />
+                <span className={`text-xs ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Thinking...</span>
               </div>
             </div>
           )}
@@ -183,14 +186,14 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data }) => {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-white/10 bg-slate-800/30 rounded-b-2xl">
+        <div className={`p-4 border-t ${isLightMode ? 'border-slate-200 bg-slate-50' : 'border-white/10 bg-slate-800/30'} rounded-b-2xl`}>
           <form onSubmit={handleSubmit} className="flex gap-2">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask a question..."
-              className="flex-1 bg-slate-950 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-white/30 transition-colors"
+              className={`flex-1 border rounded-xl px-4 py-2 text-sm focus:outline-none transition-colors ${isLightMode ? 'bg-white border-slate-200 text-slate-900 focus:border-slate-400' : 'bg-slate-950 border-white/10 text-white focus:border-white/30'}`}
               disabled={isLoading}
             />
             <button

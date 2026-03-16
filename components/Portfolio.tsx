@@ -362,7 +362,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 </div>
               ))}
             </div>
-            {data.showSkillsChart && <SkillsChart skills={data.skills} color={themeConfig.accent} />}
+            {data.showSkillsChart && <SkillsChart skills={data.skills} color={themeConfig.accent} isLightMode={isLightMode} />}
           </div>
         </section>
       )}
@@ -494,7 +494,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </footer>
       )}
 
-      {data.showLiveChat && <AIChatBot accentColor={themeConfig.accent} data={data} />}
+      {data.showLiveChat && <AIChatBot accentColor={themeConfig.accent} data={data} isLightMode={isLightMode} />}
 
       <style>{`
         .flag-wrapper {

@@ -8,9 +8,10 @@ import {
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
-  Phone, Mail, Sparkles, Lock, Globe
+  Phone, Mail, Sparkles, Lock, Globe, BarChart3
 } from 'lucide-react';
 import ProfileImageUploader from './ProfileImageUploader';
+import VisitorAnalytics from './VisitorAnalytics';
 
 interface AdminDashboardProps {
   data: PortfolioData;
@@ -26,7 +27,7 @@ const SOCIAL_PLATFORMS = [
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogout, lang, t }) => {
   const [formData, setFormData] = useState<PortfolioData>(data);
-  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event' | 'security' | 'seo'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event' | 'security' | 'seo' | 'analytics'>('basic');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
@@ -288,6 +289,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
         <aside className="glass rounded-[32px] p-4 border border-white/10 space-y-1.5 shadow-3xl h-fit sticky top-28">
             {[
               { id: 'basic', label: t.adminBasic, icon: <Info size={16} /> },
+              { id: 'analytics', label: lang === 'bn' ? 'অ্যানালিটিক্স' : 'Analytics', icon: <BarChart3 size={16} /> },
               { id: 'visibility', label: t.adminVisibility, icon: <Activity size={16} /> },
               { id: 'contact', label: t.adminContact, icon: <Phone size={16} /> },
               { id: 'notice', label: t.adminNotice, icon: <Bell size={16} /> },
@@ -308,6 +310,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
 
         <main className="glass rounded-[40px] p-8 border border-white/10 shadow-3xl overflow-y-auto max-h-[calc(100vh-140px)] scrollbar-hide">
           
+          {/* Analytics */}
+          {activeTab === 'analytics' && (
+            <VisitorAnalytics currentThemeColor={currentThemeColor} lang={lang} />
+          )}
+
           {/* 1. Basic Identity */}
           {activeTab === 'basic' && (
             <div className="space-y-8 animate-in fade-in">

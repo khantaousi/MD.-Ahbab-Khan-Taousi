@@ -5,9 +5,9 @@ import { Helmet } from 'react-helmet-async';
 import { PortfolioData } from '../types';
 import { 
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
-  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2, Sun, Moon
+  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2, Sun, Moon, MessageCircle
 } from 'lucide-react';
-import Chat from './Chat';
+import AIChatBot from './AIChatBot';
 import EventSection from './EventSection';
 
 interface PortfolioProps {
@@ -83,7 +83,7 @@ const DigitalClock: React.FC<{ label: string; lang: string; accentColor: string 
   );
 };
 
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, collection, addDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 
 import SkillsChart from './SkillsChart';
@@ -101,6 +101,24 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   useEffect(() => {
     localStorage.setItem('theme_mode', isLightMode ? 'light' : 'dark');
   }, [isLightMode]);
+
+  useEffect(() => {
+    const logVisit = async () => {
+      if (!sessionStorage.getItem('visit_logged')) {
+        try {
+          await addDoc(collection(db, 'visits'), {
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            path: window.location.pathname + window.location.hash
+          });
+          sessionStorage.setItem('visit_logged', 'true');
+        } catch (error) {
+          console.error('Failed to log visit:', error);
+        }
+      }
+    };
+    logVisit();
+  }, []);
 
   if (asyncError) {
     throw asyncError;
@@ -136,6 +154,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
     if (p.includes('twitter')) return <Twitter size={18} />;
     if (p.includes('instagram')) return <Instagram size={18} />;
     if (p.includes('youtube')) return <Youtube size={18} />;
+    if (p.includes('whatsapp')) return <MessageCircle size={18} />;
     return <Globe size={18} />;
   };
 
@@ -475,7 +494,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </footer>
       )}
 
-      {data.showLiveChat && <Chat accentColor={themeConfig.accent} whatsappNumber={data.whatsappNumber} />}
+      {data.showLiveChat && <AIChatBot accentColor={themeConfig.accent} data={data} />}
 
       <style>{`
         .flag-wrapper {

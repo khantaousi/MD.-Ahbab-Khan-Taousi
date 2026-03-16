@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, where, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Activity, Users, Clock, Globe } from 'lucide-react';
@@ -22,15 +22,38 @@ const VisitorAnalytics: React.FC<VisitorAnalyticsProps> = ({ currentThemeColor, 
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchVisits = async () => {
+    const fetchAndCleanupVisits = async () => {
       try {
-        const q = query(collection(db, 'visits'), orderBy('timestamp', 'desc'), limit(1000));
+        const now = new Date();
+        // Calculate 7 days ago
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+        // 1. Fetch recent visits (last 7 days)
+        const q = query(
+          collection(db, 'visits'), 
+          where('timestamp', '>=', sevenDaysAgo),
+          orderBy('timestamp', 'desc'), 
+          limit(1000)
+        );
         const querySnapshot = await getDocs(q);
         const fetchedVisits: Visit[] = [];
         querySnapshot.forEach((doc) => {
           fetchedVisits.push({ id: doc.id, ...doc.data() } as Visit);
         });
         setVisits(fetchedVisits);
+
+        // 2. Cleanup old visits (older than 7 days)
+        // We do this asynchronously so it doesn't block the UI
+        const oldQ = query(
+          collection(db, 'visits'),
+          where('timestamp', '<', sevenDaysAgo),
+          limit(500) // limit to avoid massive batch operations at once
+        );
+        const oldSnapshot = await getDocs(oldQ);
+        oldSnapshot.forEach((oldDoc) => {
+          deleteDoc(doc(db, 'visits', oldDoc.id)).catch(console.error);
+        });
+
       } catch (err: any) {
         console.error('Error fetching visits:', err);
         setError(err.message);
@@ -39,7 +62,7 @@ const VisitorAnalytics: React.FC<VisitorAnalyticsProps> = ({ currentThemeColor, 
       }
     };
 
-    fetchVisits();
+    fetchAndCleanupVisits();
   }, []);
 
   if (isLoading) {

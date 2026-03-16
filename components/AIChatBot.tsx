@@ -77,22 +77,19 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data }) => {
       
       Be helpful, concise, and professional. If you don't know the answer based on this information, politely say so and suggest contacting ${data.name} directly.`;
 
-      const chat = ai.chats.create({
+      const conversationHistory = messages.map(msg => 
+        `${msg.role === 'user' ? 'Visitor' : 'Assistant'}: ${msg.text}`
+      ).join('\n\n');
+
+      const prompt = `${conversationHistory}\n\nVisitor: ${userMessage.text}\nAssistant:`;
+
+      const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
+        contents: prompt,
         config: {
           systemInstruction,
         },
       });
-
-      // Send previous messages to establish context
-      for (const msg of messages) {
-        if (msg.role === 'user') {
-          await chat.sendMessage({ message: msg.text });
-        }
-      }
-
-      // Send the new message
-      const response = await chat.sendMessage({ message: userMessage.text });
 
       const modelMessage: Message = {
         id: (Date.now() + 1).toString(),

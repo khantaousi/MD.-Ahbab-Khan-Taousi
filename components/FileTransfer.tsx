@@ -26,6 +26,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   const [speed, setSpeed] = useState<number>(0); // bytes per second
   const [error, setError] = useState<string>('');
   const [attempt, setAttempt] = useState<number>(1);
+  const [copied, setCopied] = useState<boolean>(false);
   
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const dataChannel = useRef<RTCDataChannel | null>(null);
@@ -39,21 +40,24 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   const lastTime = useRef<number>(0);
   const speedInterval = useRef<NodeJS.Timeout | null>(null);
 
-  // Check URL for room ID on mount
+  // Check URL for room ID on mount or open
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const room = params.get('transfer');
-    if (room) {
-      setRoomId(room);
-      setIsSender(false);
-      // Don't auto-join, let user click "Receive"
+    if (isOpen) {
+      const params = new URLSearchParams(window.location.search);
+      const room = params.get('transfer');
+      if (room) {
+        setRoomId(room);
+        setIsSender(false);
+      }
     }
-  }, []);
+  }, [isOpen]);
 
   // Cleanup on unmount or close
   useEffect(() => {
     if (!isOpen) {
       cleanup();
+      setFile(null);
+      setRoomId('');
     }
     return () => { cleanup(); };
   }, [isOpen]);
@@ -84,6 +88,8 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       setProgress(0);
       setSpeed(0);
       setError('');
+      setFile(null);
+      setRoomId('');
     }
   };
 
@@ -498,7 +504,8 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
 
   const copyLink = () => {
     navigator.clipboard.writeText(getShareLink());
-    // Could add a toast here
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (!isOpen) return null;
@@ -612,11 +619,21 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
                   <p className={`text-sm ${textMutedClass}`}>{formatSize(file?.size || 0)}</p>
                 </div>
 
-                <div className="relative inline-block max-w-full">
-                  <a href={getShareLink()} target="_blank" rel="noreferrer" className="text-base sm:text-lg font-mono tracking-tight hover:opacity-80 transition-opacity truncate block" style={{ color: textClass }}>
-                    {getShareLink()}
-                  </a>
-                  <div className="absolute -bottom-1 left-0 w-full h-0.5" style={{ backgroundColor: accentColor }}></div>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1 min-w-0">
+                    <a href={getShareLink()} target="_blank" rel="noreferrer" className="text-base sm:text-lg font-mono tracking-tight hover:opacity-80 transition-opacity truncate block" style={{ color: textClass }}>
+                      {getShareLink()}
+                    </a>
+                    <div className="absolute -bottom-1 left-0 w-full h-0.5" style={{ backgroundColor: accentColor }}></div>
+                  </div>
+                  <button 
+                    onClick={copyLink}
+                    className="p-2 rounded-lg transition-colors hover:bg-current/10 shrink-0"
+                    style={{ color: accentColor }}
+                    title="Copy Link"
+                  >
+                    {copied ? <CheckCircle size={24} /> : <Copy size={24} />}
+                  </button>
                 </div>
 
                 <div className="flex gap-6 items-start">
@@ -650,28 +667,6 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
                     </a>
                   </div>
-                </div>
-
-                <div className="space-y-4 pt-4">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-5 h-5 rounded flex items-center justify-center border transition-colors" style={{ backgroundColor: accentColor, borderColor: accentColor }}>
-                      <CheckCircle size={14} className="text-slate-900" />
-                    </div>
-                    <span className={`text-sm ${textClass}`}>Share with nearby devices</span>
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ml-auto ${isLightMode ? 'bg-slate-200' : 'bg-slate-800'}`}>
-                      <Info size={12} className={textClass} />
-                    </div>
-                  </label>
-                  
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-5 h-5 rounded flex items-center justify-center border transition-colors" style={{ backgroundColor: accentColor, borderColor: accentColor }}>
-                      <CheckCircle size={14} className="text-slate-900" />
-                    </div>
-                    <span className={`text-sm ${textClass}`}>Use fallback when no direct connection can be made</span>
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ml-auto ${isLightMode ? 'bg-slate-200' : 'bg-slate-800'}`}>
-                      <Info size={12} className={textClass} />
-                    </div>
-                  </label>
                 </div>
               </div>
             )}

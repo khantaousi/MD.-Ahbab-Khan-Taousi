@@ -36,6 +36,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   const [attempt, setAttempt] = useState<number>(1);
   const [copied, setCopied] = useState<boolean>(false);
   const [remoteFilesInfo, setRemoteFilesInfo] = useState<{ name: string; size: number }[]>([]);
+  const [receivedBlobUrl, setReceivedBlobUrl] = useState<string | null>(null);
   
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const dataChannel = useRef<RTCDataChannel | null>(null);
@@ -135,6 +136,8 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       setError('');
       setFiles([]);
       setRoomId('');
+      if (receivedBlobUrl) URL.revokeObjectURL(receivedBlobUrl);
+      setReceivedBlobUrl(null);
     }
   };
 
@@ -166,7 +169,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
     return pc;
   };
 
-  const startSender = async (currentAttempt = 1) => {
+  const startSender = async () => {
     if (files.length === 0) {
       setError('Please select at least one item.');
       return;
@@ -176,17 +179,12 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       setConnState('waiting');
       setError('');
       setCurrentFileIndex(0);
+      setAttempt(1);
       
-      let currentRoomId = roomId;
-      let roomRef;
-      
-      if (!currentRoomId) {
-        roomRef = doc(collection(db, 'transfers'));
-        currentRoomId = roomRef.id;
-        setRoomId(currentRoomId);
-      } else {
-        roomRef = doc(db, 'transfers', currentRoomId);
-      }
+      // Always create a new room for a fresh unique link
+      const roomRef = doc(collection(db, 'transfers'));
+      const currentRoomId = roomRef.id;
+      setRoomId(currentRoomId);
       
       const pc = setupPeerConnection();
       
@@ -198,7 +196,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       // Handle ICE candidates
       pc.onicecandidate = async (event) => {
         if (event.candidate) {
-          const callerCandidatesCollection = collection(roomRef, `callerCandidates_${currentAttempt}`);
+          const callerCandidatesCollection = collection(roomRef, 'callerCandidates_1');
           await addDoc(callerCandidatesCollection, event.candidate.toJSON());
         }
       };
@@ -212,7 +210,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
           type: offer.type,
           sdp: offer.sdp,
         },
-        attempt: currentAttempt,
+        attempt: 1,
         createdAt: new Date().toISOString(),
         fileMeta: files.map(f => ({
           name: f.name,
@@ -225,14 +223,14 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       // Listen for Answer
       onSnapshot(roomRef, async (snapshot) => {
         const data = snapshot.data();
-        if (!pc.currentRemoteDescription && data && data.answer && data.attempt === currentAttempt) {
+        if (!pc.currentRemoteDescription && data && data.answer && data.attempt === 1) {
           const rtcSessionDescription = new RTCSessionDescription(data.answer);
           await pc.setRemoteDescription(rtcSessionDescription);
         }
       });
 
       // Listen for remote ICE candidates
-      onSnapshot(collection(roomRef, `calleeCandidates_${currentAttempt}`), (snapshot) => {
+      onSnapshot(collection(roomRef, 'calleeCandidates_1'), (snapshot) => {
         snapshot.docChanges().forEach(async (change) => {
           if (change.type === 'added') {
             let data = change.doc.data();
@@ -527,6 +525,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
     
     const blob = new Blob(receiveBuffer.current, { type: fileMeta.current.type });
     const url = URL.createObjectURL(blob);
+    setReceivedBlobUrl(url);
     
     const a = document.createElement('a');
     a.href = url;
@@ -536,7 +535,6 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
     
     setTimeout(() => {
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     }, 100);
 
     // Check if there are more items
@@ -593,7 +591,12 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   };
 
   const getShareLink = () => {
-    const url = new URL(window.location.href);
+    let origin = window.location.origin;
+    // If we're in the dev environment, try to use the preview (public) URL for sharing
+    if (origin.includes('ais-dev-')) {
+      origin = origin.replace('ais-dev-', 'ais-pre-');
+    }
+    const url = new URL(origin + window.location.pathname);
     url.searchParams.set('transfer', roomId);
     return url.toString();
   };
@@ -672,7 +675,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
             </div>
 
             <button 
-              onClick={() => startSender(1)}
+              onClick={() => startSender()}
               disabled={files.length === 0 || connState !== 'idle'}
               className="w-full py-3 rounded-xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
               style={{ backgroundColor: accentColor, color: '#000' }}
@@ -805,17 +808,39 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
 
             {/* Progress Bar */}
             {(transferState === 'transferring' || transferState === 'completed') && (
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-mono">
-                  <span className={textClass}>{progress}%</span>
-                  <span className={textMutedClass}>{formatSpeed(speed)}</span>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-mono">
+                    <span className={textClass}>{progress}%</span>
+                    <span className={textMutedClass}>{formatSpeed(speed)}</span>
+                  </div>
+                  <div className={`h-2 w-full rounded-full overflow-hidden ${isLightMode ? 'bg-slate-200' : 'bg-slate-800'}`}>
+                    <div 
+                      className="h-full transition-all duration-300 ease-out" 
+                      style={{ width: `${progress}%`, backgroundColor: accentColor }}
+                    />
+                  </div>
                 </div>
-                <div className={`h-2 w-full rounded-full overflow-hidden ${isLightMode ? 'bg-slate-200' : 'bg-slate-800'}`}>
-                  <div 
-                    className="h-full transition-all duration-300 ease-out" 
-                    style={{ width: `${progress}%`, backgroundColor: accentColor }}
-                  />
-                </div>
+
+                {/* Manual Download Button for Receiver */}
+                {!isSender && transferState === 'completed' && receivedBlobUrl && (
+                  <div className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                      <CheckCircle size={24} />
+                    </div>
+                    <div className="text-center">
+                      <p className={`text-sm font-bold ${textClass}`}>Transfer Complete!</p>
+                      <p className={`text-xs ${textMutedClass}`}>If the download didn't start, click below</p>
+                    </div>
+                    <a 
+                      href={receivedBlobUrl} 
+                      download={fileMeta.current?.name || 'download'}
+                      className="w-full py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500 text-white hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Download size={14} /> Download Now
+                    </a>
+                  </div>
+                )}
               </div>
             )}
 
@@ -833,9 +858,6 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
               {isSender && (transferState === 'completed' || transferState === 'failed' || transferState === 'cancelled') && (
                 <button 
                   onClick={() => {
-                    const nextAttempt = attempt + 1;
-                    setAttempt(nextAttempt);
-                    
                     // Reset local state for new transfer
                     if (dataChannel.current) dataChannel.current.close();
                     if (peerConnection.current) peerConnection.current.close();
@@ -846,8 +868,9 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
                     setTransferState('idle');
                     setProgress(0);
                     setSpeed(0);
+                    setAttempt(1);
                     
-                    startSender(nextAttempt);
+                    startSender();
                   }}
                   className="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
                   style={{ backgroundColor: accentColor, color: '#000' }}

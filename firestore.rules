@@ -31,6 +31,11 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
     
+    // WebRTC Signaling data for P2P file transfer
+    match /transfers/{document=**} {
+      allow read, write: if true;
+    }
+    
     // Default deny
     match /{document=**} {
       allow read, write: if false;

@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import AIChatBot from './AIChatBot';
 import EventSection from './EventSection';
+import FileTransfer from './FileTransfer';
+import { Share2 } from 'lucide-react';
 
 interface PortfolioProps {
   data: PortfolioData;
@@ -93,10 +95,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedBlog, setSelectedBlog] = useState<any | null>(null);
+  const [isFileTransferOpen, setIsFileTransferOpen] = useState(false);
   const [isLightMode, setIsLightMode] = useState(() => {
     return localStorage.getItem('theme_mode') === 'light';
   });
   const [asyncError, setAsyncError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('transfer')) {
+      setIsFileTransferOpen(true);
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('theme_mode', isLightMode ? 'light' : 'dark');
@@ -237,6 +247,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 {data.showBlog && <a href="#blog" onClick={(e) => scrollToSection(e, 'blog')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navBlog}</a>}
                 {data.showContact && <a href="#contact" onClick={(e) => scrollToSection(e, 'contact')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navContact}</a>}
               </div>
+              <button onClick={() => setIsFileTransferOpen(true)} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-black hover:bg-white/10 transition-all flex items-center gap-1.5 text-slate-300 hover:text-white" aria-label="File Transfer">
+                <Share2 size={12} style={{ color: themeConfig.accent }} />
+                <span className="hidden sm:inline">File Transfer</span>
+              </button>
               <button onClick={() => setIsLightMode(!isLightMode)} className="bg-white/5 border border-white/10 p-2 rounded-full hover:bg-white/10 transition-all text-slate-300 hover:text-white" aria-label="Toggle Theme">
                 {isLightMode ? <Moon size={14} /> : <Sun size={14} />}
               </button>
@@ -495,6 +509,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       )}
 
       {data.showLiveChat && <AIChatBot accentColor={themeConfig.accent} data={data} isLightMode={isLightMode} />}
+
+      <FileTransfer 
+        isOpen={isFileTransferOpen} 
+        onClose={() => setIsFileTransferOpen(false)} 
+        accentColor={themeConfig.accent} 
+        isLightMode={isLightMode} 
+      />
 
       <style>{`
         .flag-wrapper {

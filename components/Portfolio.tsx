@@ -250,7 +250,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 {data.showBlog && <a href="#blog" onClick={(e) => scrollToSection(e, 'blog')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navBlog}</a>}
                 {data.showContact && <a href="#contact" onClick={(e) => scrollToSection(e, 'contact')} className="text-slate-400 hover:text-white font-bold text-[9px] uppercase tracking-widest transition-colors">{t.navContact}</a>}
               </div>
-              <button onClick={() => setIsFileTransferOpen(true)} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-black hover:bg-white/10 transition-all flex items-center gap-1.5 text-slate-300 hover:text-white" aria-label="File Transfer">
+              <button onClick={() => window.open('https://toffeeshare.com/', '_blank')} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-black hover:bg-white/10 transition-all flex items-center gap-1.5 text-slate-300 hover:text-white" aria-label="File Transfer">
                 <Share2 size={12} style={{ color: themeConfig.accent }} />
                 <span className="hidden sm:inline">File Transfer</span>
               </button>

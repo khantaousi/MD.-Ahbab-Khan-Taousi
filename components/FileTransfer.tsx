@@ -17,7 +17,8 @@ type TransferState = 'idle' | 'transferring' | 'completed' | 'failed' | 'cancell
 const CHUNK_SIZE = 16384; // 16KB chunks for WebRTC
 
 const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColor, isLightMode }) => {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState<number>(0);
   const [roomId, setRoomId] = useState<string>('');
   const [isSender, setIsSender] = useState<boolean>(true);
   const [connState, setConnState] = useState<ConnectionState>('idle');
@@ -34,7 +35,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   const [error, setError] = useState<string>('');
   const [attempt, setAttempt] = useState<number>(1);
   const [copied, setCopied] = useState<boolean>(false);
-  const [remoteFileInfo, setRemoteFileInfo] = useState<{ name: string; size: number } | null>(null);
+  const [remoteFilesInfo, setRemoteFilesInfo] = useState<{ name: string; size: number }[]>([]);
   
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const dataChannel = useRef<RTCDataChannel | null>(null);
@@ -60,7 +61,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
     }
   }, [isOpen]);
 
-  // Fetch file info for receiver and handle sender disconnect
+  // Fetch item info for receiver and handle sender disconnect
   useEffect(() => {
     if (!isSender && roomId && isOpen) {
       const roomRef = doc(db, 'transfers', roomId);
@@ -68,7 +69,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
         if (snapshot.exists()) {
           const data = snapshot.data();
           if (data.fileMeta) {
-            setRemoteFileInfo(data.fileMeta);
+            setRemoteFilesInfo(Array.isArray(data.fileMeta) ? data.fileMeta : [data.fileMeta]);
           }
         } else {
           // Room deleted (sender closed tab or cancelled)
@@ -100,7 +101,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   useEffect(() => {
     if (!isOpen) {
       cleanup();
-      setFile(null);
+      setFiles([]);
       setRoomId('');
     }
     return () => { cleanup(); };
@@ -132,7 +133,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       setProgress(0);
       setSpeed(0);
       setError('');
-      setFile(null);
+      setFiles([]);
       setRoomId('');
     }
   };
@@ -166,14 +167,15 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   };
 
   const startSender = async (currentAttempt = 1) => {
-    if (!file) {
-      setError('Please select a file first.');
+    if (files.length === 0) {
+      setError('Please select at least one item.');
       return;
     }
 
     try {
       setConnState('waiting');
       setError('');
+      setCurrentFileIndex(0);
       
       let currentRoomId = roomId;
       let roomRef;
@@ -212,11 +214,11 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
         },
         attempt: currentAttempt,
         createdAt: new Date().toISOString(),
-        fileMeta: {
-          name: file.name,
-          size: file.size,
-          type: file.type
-        }
+        fileMeta: files.map(f => ({
+          name: f.name,
+          size: f.size,
+          type: f.type
+        }))
       };
       await setDoc(roomRef, roomWithOffer);
 
@@ -324,13 +326,16 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
 
     dc.onopen = () => {
       setConnState('connected');
-      if (isSender && file) {
-        // Send metadata first
+      if (isSender && files.length > 0) {
+        // Send first item metadata
+        const item = files[0];
         const metadata = {
           type: 'metadata',
-          name: file.name,
-          size: file.size,
-          fileType: file.type
+          name: item.name,
+          size: item.size,
+          fileType: item.type,
+          index: 0,
+          total: files.length
         };
         dc.send(JSON.stringify(metadata));
       }
@@ -349,11 +354,34 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
           const msg = JSON.parse(event.data);
           if (msg.type === 'metadata') {
             fileMeta.current = { name: msg.name, size: msg.size, type: msg.fileType };
+            setCurrentFileIndex(msg.index);
+            // Reset receiver state for new item
+            receiveBuffer.current = [];
+            receivedSize.current = 0;
+            startTime.current = 0;
+            setProgress(0);
+            
             // Acknowledge metadata
             dc.send(JSON.stringify({ type: 'ready' }));
           } else if (msg.type === 'ready') {
-            // Receiver is ready, start sending file
-            sendFile();
+            // Receiver is ready, start sending current item
+            sendFile(currentFileIndex);
+          } else if (msg.type === 'next_file') {
+            // Receiver is ready for next item
+            const nextIndex = msg.index;
+            if (nextIndex < files.length) {
+              setCurrentFileIndex(nextIndex);
+              const item = files[nextIndex];
+              const metadata = {
+                type: 'metadata',
+                name: item.name,
+                size: item.size,
+                fileType: item.type,
+                index: nextIndex,
+                total: files.length
+              };
+              dc.send(JSON.stringify(metadata));
+            }
           } else if (msg.type === 'cancel') {
             setTransferState('cancelled');
             setError('Transfer cancelled by peer.');
@@ -363,7 +391,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
           console.error('Error parsing message:', e);
         }
       } else {
-        // Receiving file chunk
+        // Receiving item chunk
         receiveBuffer.current.push(event.data);
         receivedSize.current += event.data.byteLength;
         
@@ -377,6 +405,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
             startTime.current = Date.now();
             lastTime.current = Date.now();
             
+            if (speedInterval.current) clearInterval(speedInterval.current);
             speedInterval.current = setInterval(() => {
               const now = Date.now();
               const timeDiff = (now - lastTime.current) / 1000;
@@ -397,20 +426,21 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
     };
   };
 
-  const sendFile = () => {
-    if (!file || !dataChannel.current) return;
+  const sendFile = (index: number) => {
+    if (files.length === 0 || index >= files.length || !dataChannel.current) return;
     
+    const item = files[index];
     setTransferState('transferring');
     startTime.current = Date.now();
     lastTime.current = Date.now();
     lastBytes.current = 0;
     
+    if (speedInterval.current) clearInterval(speedInterval.current);
     speedInterval.current = setInterval(() => {
       const now = Date.now();
       const timeDiff = (now - lastTime.current) / 1000;
       if (timeDiff > 0) {
-        // We calculate speed based on progress state which is updated in read slice
-        // but for sender, it's better to calculate based on offset
+        // Speed calculation
       }
     }, 1000);
 
@@ -418,13 +448,13 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
     fileReader.current = new FileReader();
     
     fileReader.current.onerror = (error) => {
-      console.error('Error reading file:', error);
+      console.error('Error reading item:', error);
       setTransferState('failed');
-      setError('Error reading file.');
+      setError('Error reading item.');
     };
 
     fileReader.current.onabort = () => {
-      console.log('File reading aborted');
+      console.log('Item reading aborted');
     };
 
     fileReader.current.onload = (e) => {
@@ -449,7 +479,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
             dataChannel.current.send(e.target.result as ArrayBuffer);
             offset += (e.target.result as ArrayBuffer).byteLength;
             
-            const currentProgress = Math.round((offset / file.size) * 100);
+            const currentProgress = Math.round((offset / item.size) * 100);
             setProgress(currentProgress);
             
             const now = Date.now();
@@ -461,11 +491,16 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
               lastTime.current = now;
             }
 
-            if (offset < file.size) {
+            if (offset < item.size) {
               readSlice(offset);
             } else {
-              setTransferState('completed');
+              // Item finished
               if (speedInterval.current) clearInterval(speedInterval.current);
+              if (index + 1 < files.length) {
+                // More items to send, wait for receiver to be ready for next
+              } else {
+                setTransferState('completed');
+              }
             }
           } catch (err) {
             console.error('Error sending chunk:', err);
@@ -479,8 +514,8 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
     };
 
     const readSlice = (o: number) => {
-      if (!file || !fileReader.current) return;
-      const slice = file.slice(o, o + CHUNK_SIZE);
+      if (!fileReader.current) return;
+      const slice = item.slice(o, o + CHUNK_SIZE);
       fileReader.current.readAsArrayBuffer(slice);
     };
 
@@ -489,9 +524,6 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
 
   const finishReceive = () => {
     if (!fileMeta.current) return;
-    
-    setTransferState('completed');
-    if (speedInterval.current) clearInterval(speedInterval.current);
     
     const blob = new Blob(receiveBuffer.current, { type: fileMeta.current.type });
     const url = URL.createObjectURL(blob);
@@ -506,6 +538,17 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 100);
+
+    // Check if there are more items
+    if (currentFileIndex + 1 < remoteFilesInfo.length) {
+      // Request next item
+      if (dataChannel.current && dataChannel.current.readyState === 'open') {
+        dataChannel.current.send(JSON.stringify({ type: 'next_file', index: currentFileIndex + 1 }));
+      }
+    } else {
+      setTransferState('completed');
+      if (speedInterval.current) clearInterval(speedInterval.current);
+    }
   };
 
   const cancelTransfer = () => {
@@ -524,7 +567,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
+      setFiles(Array.from(e.target.files));
       setError('');
     }
   };
@@ -532,7 +575,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFile(e.dataTransfer.files[0]);
+      setFiles(Array.from(e.dataTransfer.files));
       setError('');
     }
   };
@@ -576,7 +619,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
         <div className="flex items-center justify-between">
           <h2 className={`text-xl font-black flex items-center gap-2 ${textClass}`}>
             <Upload size={24} style={{ color: accentColor }} />
-            P2P File Transfer
+            P2P Item Transfer
           </h2>
           <button onClick={onClose} className={`${textMutedClass} hover:${textClass} transition-colors p-1`}>
             <X size={24} />
@@ -593,27 +636,36 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
 
         {/* Main Content */}
         {!roomId && isSender ? (
-          // Sender: Select File
+          // Sender: Select Item
           <div className="space-y-4">
             <div 
               className={`border-2 border-dashed rounded-2xl p-8 text-center transition-colors cursor-pointer
-                ${file ? (isLightMode ? 'border-slate-300 bg-slate-50' : 'border-white/20 bg-white/5') : (isLightMode ? 'border-slate-200 hover:border-slate-400' : 'border-white/10 hover:border-white/30')}`}
+                ${files.length > 0 ? (isLightMode ? 'border-slate-300 bg-slate-50' : 'border-white/20 bg-white/5') : (isLightMode ? 'border-slate-200 hover:border-slate-400' : 'border-white/10 hover:border-white/30')}`}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => document.getElementById('file-upload')?.click()}
             >
-              <input type="file" id="file-upload" className="hidden" onChange={handleFileSelect} />
+              <input type="file" id="file-upload" className="hidden" onChange={handleFileSelect} multiple />
               
-              {file ? (
+              {files.length > 0 ? (
                 <div className="flex flex-col items-center gap-2">
-                  <FileIcon size={40} style={{ color: accentColor }} />
-                  <p className={`font-bold truncate max-w-full px-4 ${textClass}`}>{file.name}</p>
-                  <p className={`text-xs ${textMutedClass}`}>{formatSize(file.size)}</p>
+                  <div className="relative">
+                    <FileIcon size={40} style={{ color: accentColor }} />
+                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-emerald-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-white">
+                      {files.length}
+                    </span>
+                  </div>
+                  <p className={`font-bold truncate max-w-full px-4 ${textClass}`}>
+                    {files.length === 1 ? files[0].name : `${files.length} files selected`}
+                  </p>
+                  <p className={`text-xs ${textMutedClass}`}>
+                    Total: {formatSize(files.reduce((acc, f) => acc + f.size, 0))}
+                  </p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3">
                   <Upload size={32} className={textMutedClass} />
-                  <p className={`text-sm font-medium ${textClass}`}>Click or drag file to upload</p>
+                  <p className={`text-sm font-medium ${textClass}`}>Click or drag items to upload</p>
                   <p className={`text-xs ${textMutedClass}`}>Direct P2P transfer, no size limit</p>
                 </div>
               )}
@@ -621,7 +673,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
 
             <button 
               onClick={() => startSender(1)}
-              disabled={!file || connState !== 'idle'}
+              disabled={files.length === 0 || connState !== 'idle'}
               className="w-full py-3 rounded-xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
               style={{ backgroundColor: accentColor, color: '#000' }}
             >
@@ -652,13 +704,24 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
                 </span>
               </div>
 
-              {/* File Info */}
-              {(file || fileMeta.current || remoteFileInfo) && (
-                <div className="flex items-center gap-3 mt-2 pt-2 border-t border-current/10">
-                  <FileIcon size={20} style={{ color: accentColor }} />
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-bold truncate ${textClass}`}>{file?.name || fileMeta.current?.name || remoteFileInfo?.name}</p>
-                    <p className={`text-xs ${textMutedClass}`}>{formatSize(file?.size || fileMeta.current?.size || remoteFileInfo?.size || 0)}</p>
+              {/* Item Info */}
+              {(files.length > 0 || fileMeta.current || remoteFilesInfo.length > 0) && (
+                <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-current/10">
+                  <div className="flex items-center gap-3">
+                    <FileIcon size={20} style={{ color: accentColor }} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-bold truncate ${textClass}`}>
+                        {fileMeta.current?.name || (isSender ? files[currentFileIndex]?.name : remoteFilesInfo[currentFileIndex]?.name)}
+                      </p>
+                      <p className={`text-xs ${textMutedClass}`}>
+                        {formatSize(fileMeta.current?.size || (isSender ? files[currentFileIndex]?.size : remoteFilesInfo[currentFileIndex]?.size) || 0)}
+                        {(isSender ? files.length : remoteFilesInfo.length) > 1 && (
+                          <span className="ml-2 opacity-60">
+                            (Item {currentFileIndex + 1} of {isSender ? files.length : remoteFilesInfo.length})
+                          </span>
+                        )}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -667,9 +730,14 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
             {/* Link Sharing (Sender waiting) */}
             {isSender && connState === 'waiting' && (
               <div className="space-y-6">
-                <div className="space-y-1">
-                  <p className={`text-lg font-medium truncate ${textClass}`}>{file?.name}</p>
-                  <p className={`text-sm ${textMutedClass}`}>{formatSize(file?.size || 0)}</p>
+                <div className="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
+                  {files.map((f, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <FileIcon size={14} className={textMutedClass} />
+                      <p className={`text-sm truncate flex-1 ${textClass}`}>{f.name}</p>
+                      <p className={`text-xs ${textMutedClass}`}>{formatSize(f.size)}</p>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -704,11 +772,11 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
                     </a>
                     {/* Email */}
-                    <a href={`mailto:?subject=File Transfer&body=${encodeURIComponent(getShareLink())}`} className="w-10 h-10 rounded-full bg-[#8bc34a] flex items-center justify-center text-white hover:scale-110 transition-transform">
+                    <a href={`mailto:?subject=Item Transfer&body=${encodeURIComponent(getShareLink())}`} className="w-10 h-10 rounded-full bg-[#8bc34a] flex items-center justify-center text-white hover:scale-110 transition-transform">
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     </a>
                     {/* Gmail */}
-                    <a href={`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=&su=File+Transfer&body=${encodeURIComponent(getShareLink())}`} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center text-[#db4437] hover:scale-110 transition-transform">
+                    <a href={`https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=&su=Item+Transfer&body=${encodeURIComponent(getShareLink())}`} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center text-[#db4437] hover:scale-110 transition-transform">
                       <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     </a>
                     {/* LinkedIn */}
@@ -731,7 +799,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
                 className="w-full py-3 rounded-xl font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 style={{ backgroundColor: accentColor, color: '#000' }}
               >
-                <Download size={18} /> Accept File
+                <Download size={18} /> Accept Item
               </button>
             )}
 

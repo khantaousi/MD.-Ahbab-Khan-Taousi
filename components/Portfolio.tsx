@@ -102,8 +102,11 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   const [asyncError, setAsyncError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('transfer')) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    const transferId = searchParams.get('transfer') || hashParams.get('transfer');
+    
+    if (transferId) {
       setIsFileTransferOpen(true);
     }
   }, []);

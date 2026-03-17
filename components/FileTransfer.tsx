@@ -53,14 +53,23 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   // Check URL for room ID on mount or open
   useEffect(() => {
     if (isOpen) {
-      const params = new URLSearchParams(window.location.search);
-      const room = params.get('transfer');
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.split('?')[1]);
+      const room = searchParams.get('transfer') || hashParams.get('transfer');
+      
       if (room) {
         setRoomId(room);
         setIsSender(false);
       }
     }
   }, [isOpen]);
+
+  // Auto-join for receiver if room ID is present
+  useEffect(() => {
+    if (isOpen && !isSender && roomId && connState === 'idle' && !error) {
+      joinReceiver();
+    }
+  }, [isOpen, isSender, roomId, connState, error]);
 
   // Fetch item info for receiver and handle sender disconnect
   useEffect(() => {
@@ -591,14 +600,18 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   };
 
   const getShareLink = () => {
-    let origin = window.location.origin;
-    // If we're in the dev environment, try to use the preview (public) URL for sharing
-    if (origin.includes('ais-dev-')) {
-      origin = origin.replace('ais-dev-', 'ais-pre-');
+    // Get the current page URL without hash or query to get the base path that is working
+    let currentUrl = window.location.href.split('#')[0].split('?')[0];
+    
+    // Handle AI Studio dev to pre transition
+    if (currentUrl.includes('ais-dev-')) {
+      currentUrl = currentUrl.replace('ais-dev-', 'ais-pre-');
     }
-    const url = new URL(origin + window.location.pathname);
-    url.searchParams.set('transfer', roomId);
-    return url.toString();
+    
+    // Append the transfer parameter. This ensures we use the exact same path
+    // that the user is currently on, which we know works.
+    const separator = currentUrl.includes('?') ? '&' : '?';
+    return `${currentUrl}${separator}transfer=${roomId}`;
   };
 
   const copyLink = () => {

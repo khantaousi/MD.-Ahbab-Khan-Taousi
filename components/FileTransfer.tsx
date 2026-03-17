@@ -22,11 +22,19 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
   const [isSender, setIsSender] = useState<boolean>(true);
   const [connState, setConnState] = useState<ConnectionState>('idle');
   const [transferState, setTransferState] = useState<TransferState>('idle');
+  const transferStateRef = useRef<TransferState>('idle');
+  
+  // Sync transferState to ref
+  useEffect(() => {
+    transferStateRef.current = transferState;
+  }, [transferState]);
+
   const [progress, setProgress] = useState<number>(0);
   const [speed, setSpeed] = useState<number>(0); // bytes per second
   const [error, setError] = useState<string>('');
   const [attempt, setAttempt] = useState<number>(1);
   const [copied, setCopied] = useState<boolean>(false);
+  const [remoteFileInfo, setRemoteFileInfo] = useState<{ name: string; size: number } | null>(null);
   
   const peerConnection = useRef<RTCPeerConnection | null>(null);
   const dataChannel = useRef<RTCDataChannel | null>(null);
@@ -51,6 +59,42 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       }
     }
   }, [isOpen]);
+
+  // Fetch file info for receiver and handle sender disconnect
+  useEffect(() => {
+    if (!isSender && roomId && isOpen) {
+      const roomRef = doc(db, 'transfers', roomId);
+      const unsubscribe = onSnapshot(roomRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          if (data.fileMeta) {
+            setRemoteFileInfo(data.fileMeta);
+          }
+        } else {
+          // Room deleted (sender closed tab or cancelled)
+          if (transferStateRef.current !== 'completed') {
+            setError('Transfer link has expired. The sender has disconnected.');
+            setConnState('failed');
+            setTransferState('failed');
+          }
+        }
+      });
+      return () => unsubscribe();
+    }
+  }, [isSender, roomId, isOpen]);
+
+  // Handle beforeunload for sender
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isSender && roomId) {
+        // Attempt to delete the room synchronously or let the receiver handle WebRTC disconnect
+        // Note: deleteDoc is async and might not complete in beforeunload, but we can try
+        deleteDoc(doc(db, 'transfers', roomId)).catch(() => {});
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isSender, roomId]);
 
   // Cleanup on unmount or close
   useEffect(() => {
@@ -105,9 +149,12 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       console.log('ICE State:', pc.iceConnectionState);
       if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
         setConnState('disconnected');
-        if (transferState === 'transferring') {
+        if (transferStateRef.current === 'transferring') {
           setTransferState('failed');
           setError('Connection lost during transfer.');
+        } else if (transferStateRef.current === 'idle') {
+          setTransferState('failed');
+          setError('Connection failed. The sender might have disconnected.');
         }
       } else if (pc.iceConnectionState === 'connected') {
         setConnState('connected');
@@ -164,7 +211,12 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
           sdp: offer.sdp,
         },
         attempt: currentAttempt,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        fileMeta: {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        }
       };
       await setDoc(roomRef, roomWithOffer);
 
@@ -210,6 +262,7 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
       if (!roomSnapshot.exists()) {
         setError('Transfer room not found or expired.');
         setConnState('failed');
+        setTransferState('failed');
         return;
       }
 
@@ -600,12 +653,12 @@ const FileTransfer: React.FC<FileTransferProps> = ({ isOpen, onClose, accentColo
               </div>
 
               {/* File Info */}
-              {(file || fileMeta.current) && (
+              {(file || fileMeta.current || remoteFileInfo) && (
                 <div className="flex items-center gap-3 mt-2 pt-2 border-t border-current/10">
                   <FileIcon size={20} style={{ color: accentColor }} />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-bold truncate ${textClass}`}>{file?.name || fileMeta.current?.name}</p>
-                    <p className={`text-xs ${textMutedClass}`}>{formatSize(file?.size || fileMeta.current?.size || 0)}</p>
+                    <p className={`text-sm font-bold truncate ${textClass}`}>{file?.name || fileMeta.current?.name || remoteFileInfo?.name}</p>
+                    <p className={`text-xs ${textMutedClass}`}>{formatSize(file?.size || fileMeta.current?.size || remoteFileInfo?.size || 0)}</p>
                   </div>
                 </div>
               )}

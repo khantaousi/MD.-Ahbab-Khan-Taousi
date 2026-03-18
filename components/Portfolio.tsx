@@ -511,8 +511,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </footer>
       )}
 
-      {data.showLiveChat && <AIChatBot accentColor={themeConfig.accent} data={data} isLightMode={isLightMode} />}
-
       <FileTransfer 
         isOpen={isFileTransferOpen} 
         onClose={() => setIsFileTransferOpen(false)} 

@@ -95,7 +95,6 @@ export interface PortfolioData {
   showNotice: boolean;
   showWork: boolean;
   showJobExperience: boolean;
-  showLiveChat: boolean;
   showEventSection: boolean;
   showSkillsChart: boolean;
   whatsappNumber: string;

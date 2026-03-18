@@ -43,7 +43,6 @@ export const INITIAL_DATA: PortfolioData = {
   showNotice: true,
   showWork: true,
   showJobExperience: true,
-  showLiveChat: true,
   showEventSection: true,
   showSkillsChart: true,
   whatsappNumber: "+8801518934191",
@@ -186,7 +185,6 @@ export const TRANSLATIONS = {
     visLabelNotice: "Notice Board",
     visLabelWork: "Work Status",
     visLabelJobExperience: "Job Experience Section",
-    visLabelLiveChat: "Live Chat",
     visLabelEvent: "Event Banner",
     noticeLabel: "ALERT",
     noticePublished: "Broadcasted"
@@ -267,7 +265,6 @@ export const TRANSLATIONS = {
     visLabelNotice: "নোটিশ বোর্ড",
     visLabelWork: "কাজের স্ট্যাটাস",
     visLabelJobExperience: "কাজের অভিজ্ঞতা সেকশন",
-    visLabelLiveChat: "লাইভ চ্যাট",
     visLabelEvent: "ইভেন্ট ব্যানার",
     noticeLabel: "জরুরী নোটিশ",
     noticePublished: "প্রকাশিত"

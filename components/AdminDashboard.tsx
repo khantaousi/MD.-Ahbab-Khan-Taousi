@@ -384,7 +384,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                  <VisibilityToggle label={t.visLabelWork} field="showWork" />
                  <VisibilityToggle label={t.visLabelContact} field="showContact" />
                  <VisibilityToggle label={t.visLabelJobExperience} field="showJobExperience" />
-                 <VisibilityToggle label={t.visLabelLiveChat} field="showLiveChat" />
                  <VisibilityToggle label={t.visLabelEvent} field="showEventSection" />
                  <VisibilityToggle label={lang === 'bn' ? 'স্কিল চার্ট দেখান' : 'Show Skills Chart'} field="showSkillsChart" />
                </div>

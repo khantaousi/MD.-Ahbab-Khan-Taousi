@@ -54,7 +54,8 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data, isLightMode = 
     try {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
-        throw new Error('Gemini API key is missing. Please set GEMINI_API_KEY in your environment variables.');
+        console.error('Gemini API Key is missing in process.env.GEMINI_API_KEY');
+        throw new Error('Configuration error');
       }
 
       const ai = new GoogleGenAI({ apiKey });
@@ -78,33 +79,44 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data, isLightMode = 
       
       Be helpful, concise, and professional. If you don't know the answer based on this information, politely say so and suggest contacting ${data.name} directly.`;
 
-      const conversationHistory = messages.map(msg => 
-        `${msg.role === 'user' ? 'Visitor' : 'Assistant'}: ${msg.text}`
-      ).join('\n\n');
-
-      const prompt = `${conversationHistory}\n\nVisitor: ${userMessage.text}\nAssistant:`;
-
-      const response = await ai.models.generateContent({
+      // Use the Chat API for better conversation management
+      const chat = ai.chats.create({
         model: 'gemini-3-flash-preview',
-        contents: prompt,
         config: {
           systemInstruction,
         },
+        history: messages.slice(1).map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'model',
+          parts: [{ text: msg.text || '' }]
+        }))
       });
+
+      const response = await chat.sendMessage({ message: userMessage.text });
+
+      if (!response || !response.text) {
+        throw new Error('Empty response from AI');
+      }
 
       const modelMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'model',
-        text: response.text || 'Sorry, I could not generate a response.',
+        text: response.text,
       };
 
       setMessages((prev) => [...prev, modelMessage]);
-    } catch (error) {
-      console.error('Error generating response:', error);
+    } catch (error: any) {
+      console.error('Gemini API Error:', error);
+      
+      let friendlyError = 'Sorry, I encountered an error while processing your request. Please try again later.';
+      
+      if (error?.message?.includes('API key')) {
+        friendlyError = 'The AI assistant is currently unavailable due to a configuration issue. Please contact the site owner.';
+      }
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'model',
-        text: 'Sorry, I encountered an error while processing your request. Please try again later.',
+        text: friendlyError,
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {

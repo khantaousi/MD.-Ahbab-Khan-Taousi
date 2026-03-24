@@ -10,6 +10,7 @@
         "bio": { "type": "string" },
         "currentWork": { "type": "string" },
         "profileImage": { "type": "string" },
+        "logoUrl": { "type": "string" },
         "aboutText": { "type": "string" },
         "email": { "type": "string" },
         "phone": { "type": "string" },
@@ -133,6 +134,17 @@
         }
       },
       "description": "Stores live chat messages."
+    },
+    "/visits/{visitId}": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string" },
+          "userAgent": { "type": "string" },
+          "path": { "type": "string" }
+        }
+      },
+      "description": "Stores visitor analytics data."
     }
   }
 }

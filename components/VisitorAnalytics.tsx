@@ -28,17 +28,20 @@ const VisitorAnalytics: React.FC<VisitorAnalyticsProps> = ({ currentThemeColor, 
         // Calculate 7 days ago
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-        // 1. Fetch recent visits (last 7 days)
+        // 1. Fetch recent visits (last 1000)
+        // We fetch the last 1000 and filter in-memory to avoid needing a composite index
         const q = query(
           collection(db, 'visits'), 
-          where('timestamp', '>=', sevenDaysAgo),
           orderBy('timestamp', 'desc'), 
           limit(1000)
         );
         const querySnapshot = await getDocs(q);
         const fetchedVisits: Visit[] = [];
         querySnapshot.forEach((doc) => {
-          fetchedVisits.push({ id: doc.id, ...doc.data() } as Visit);
+          const data = doc.data();
+          if (data.timestamp >= sevenDaysAgo) {
+            fetchedVisits.push({ id: doc.id, ...data } as Visit);
+          }
         });
         setVisits(fetchedVisits);
 

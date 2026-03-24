@@ -97,6 +97,7 @@ export interface PortfolioData {
   showJobExperience: boolean;
   showEventSection: boolean;
   showSkillsChart: boolean;
+  logoUrl?: string;
   whatsappNumber: string;
   socialLinks: SocialLink[];
   projects: Project[];

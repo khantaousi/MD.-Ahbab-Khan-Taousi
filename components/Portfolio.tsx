@@ -239,7 +239,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       <nav className="fixed top-0 w-full z-50 glass border-b border-white/5 h-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 h-full flex justify-between items-center">
             <div className="flex items-center gap-6">
-              <a href="#" onClick={(e) => scrollToSection(e, 'top')} className="text-xl font-black tracking-tighter hover:scale-105 transition-all" style={{ color: themeConfig.accent }}>{data.name}<span className="text-white">.</span></a>
+              <a href="#" onClick={(e) => scrollToSection(e, 'top')} className="flex items-center gap-2 hover:scale-105 transition-all">
+                {data.logoUrl ? (
+                  <img src={data.logoUrl} alt={data.name} className="h-8 w-auto object-contain" />
+                ) : (
+                  <span className="text-xl font-black tracking-tighter" style={{ color: themeConfig.accent }}>{data.name}<span className="text-white">.</span></span>
+                )}
+              </a>
               {data.showClock && <div className="hidden lg:block"><DigitalClock label={t.clockLabel} lang={lang} accentColor={themeConfig.accent} /></div>}
             </div>
             <div className="flex gap-4 items-center">

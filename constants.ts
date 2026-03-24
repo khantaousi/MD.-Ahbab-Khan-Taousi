@@ -25,6 +25,7 @@ export const CURRENCY_SYMBOLS = [
 
 export const INITIAL_DATA: PortfolioData = {
   name: "MD Ahbab Khan",
+  logoUrl: "",
   title: "Professional Web Developer & Creative Designer",
   bio: "Hello, I am MD Ahbab Khan. I am a passionate Data Analyst who enjoys turning raw data into meaningful insights. I work with data to discover patterns, solve problems, and help businesses make smarter decisions. With a strong interest in analytics, visualization, and data-driven strategies, I focus on transforming complex information into clear and actionable results that create real value for organizations and individuals.",
   currentWork: "Freelance Full Stack Developer",

@@ -8,7 +8,7 @@ import {
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
-  Phone, Mail, Sparkles, Lock, Globe, BarChart3
+  Phone, Mail, Sparkles, Lock, Globe, BarChart
 } from 'lucide-react';
 import ProfileImageUploader from './ProfileImageUploader';
 import VisitorAnalytics from './VisitorAnalytics';
@@ -87,15 +87,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     setHasUnsavedChanges(true);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'blog' | 'gallery' | 'job', id?: string) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'logo' | 'blog' | 'gallery' | 'job', id?: string) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64 = reader.result as string;
-        const compressed = await compressImage(base64, type === 'job' ? 200 : 800);
+        const compressed = await compressImage(base64, (type === 'job' || type === 'logo') ? 200 : 800);
         
         if (type === 'profile') setFormData(prev => ({ ...prev, profileImage: compressed }));
+        if (type === 'logo') setFormData(prev => ({ ...prev, logoUrl: compressed }));
         if (type === 'blog' && id) updateBlogPost(id, 'image', compressed);
         if (type === 'gallery' && id) updateGalleryItem(id, 'image', compressed);
         if (type === 'job' && id) updateJobExperience(id, 'logoUrl', compressed);
@@ -113,6 +114,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
       
       if (compressedData.profileImage && compressedData.profileImage.startsWith('data:image')) {
         compressedData.profileImage = await compressImage(compressedData.profileImage);
+      }
+
+      if (compressedData.logoUrl && compressedData.logoUrl.startsWith('data:image')) {
+        compressedData.logoUrl = await compressImage(compressedData.logoUrl, 200);
       }
       
       if (compressedData.projects) {
@@ -346,7 +351,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
         <aside className="glass rounded-[32px] p-4 border border-white/10 space-y-1.5 shadow-3xl h-fit sticky top-28">
             {[
               { id: 'basic', label: t.adminBasic, icon: <Info size={16} /> },
-              { id: 'analytics', label: lang === 'bn' ? 'অ্যানালিটিক্স' : 'Analytics', icon: <BarChart3 size={16} /> },
+              { id: 'analytics', label: lang === 'bn' ? 'অ্যানালিটিক্স' : 'Analytics', icon: <BarChart size={16} /> },
               { id: 'visibility', label: t.adminVisibility, icon: <Activity size={16} /> },
               { id: 'contact', label: t.adminContact, icon: <Phone size={16} /> },
               { id: 'notice', label: t.adminNotice, icon: <Bell size={16} /> },
@@ -388,9 +393,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                     />
                   </div>
                   <div className="flex-1 space-y-5">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Display Name</label>
-                       <input name="name" value={formData.name} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Name" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Display Name</label>
+                        <input name="name" value={formData.name} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Name" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logo (Optional)</label>
+                        <div className="flex gap-3">
+                          <div className="w-14 h-14 rounded-xl bg-slate-900 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                            {formData.logoUrl ? (
+                              <img src={formData.logoUrl} className="w-full h-full object-contain" />
+                            ) : (
+                              <ImageIcon size={20} className="text-slate-700" />
+                            )}
+                          </div>
+                          <div className="flex-1 flex flex-col gap-2">
+                            <input 
+                              name="logoUrl" 
+                              value={formData.logoUrl || ''} 
+                              onChange={handleChange} 
+                              className="w-full bg-slate-900/30 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-mono outline-none focus:border-white/20" 
+                              placeholder="Logo URL or Upload" 
+                            />
+                            <label className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-cyan-400 cursor-pointer hover:brightness-125 transition-all">
+                              <Camera size={12} /> {lang === 'bn' ? 'লোগো আপলোড' : 'Upload Logo'}
+                              <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'logo')} accept="image/*" />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <div className="space-y-2">
                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Professional Title</label>

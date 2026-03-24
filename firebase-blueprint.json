@@ -107,9 +107,21 @@
     }
   },
   "firestore": {
-    "/portfolio/{documentId}": {
+    "/portfolio/global": {
       "schema": { "$ref": "#/entities/PortfolioData" },
-      "description": "Stores the global portfolio data."
+      "description": "Stores the basic portfolio settings and info."
+    },
+    "/portfolio/projects": {
+      "schema": { "type": "object", "properties": { "projects": { "type": "array", "$ref": "#/entities/PortfolioData/properties/projects" } } },
+      "description": "Stores the portfolio projects."
+    },
+    "/portfolio/gallery": {
+      "schema": { "type": "object", "properties": { "gallery": { "type": "array", "$ref": "#/entities/PortfolioData/properties/gallery" } } },
+      "description": "Stores the portfolio gallery items."
+    },
+    "/portfolio/jobExperiences": {
+      "schema": { "type": "object", "properties": { "jobExperiences": { "type": "array", "$ref": "#/entities/PortfolioData/properties/jobExperiences" } } },
+      "description": "Stores the job experiences."
     },
     "/chatMessages/{messageId}": {
       "schema": {

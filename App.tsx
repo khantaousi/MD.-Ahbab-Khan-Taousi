@@ -8,7 +8,7 @@ import { INITIAL_DATA, TRANSLATIONS } from './constants';
 import { PortfolioData } from './types';
 import { auth, db, handleFirestoreError, OperationType } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, collection, writeBatch } from 'firebase/firestore';
 
 const App: React.FC = () => {
   const [data, setData] = useState<PortfolioData>(INITIAL_DATA);
@@ -53,16 +53,19 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!isAuthReady) return;
 
-    const docRef = doc(db, 'portfolio', 'global');
+    const portfolioCollection = collection(db, 'portfolio');
     
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const cloudData = docSnap.data() as PortfolioData;
-        const mergedData = { ...INITIAL_DATA, ...cloudData };
-        setData(mergedData);
+    const unsubscribe = onSnapshot(portfolioCollection, (snapshot) => {
+      if (!snapshot.empty) {
+        const mergedData: any = { ...INITIAL_DATA };
+        snapshot.forEach((docSnap) => {
+          const docData = docSnap.data();
+          Object.assign(mergedData, docData);
+        });
+        setData(mergedData as PortfolioData);
         localStorage.setItem('portfolio_data', JSON.stringify(mergedData));
       } else {
-        // If document doesn't exist, use initial data
+        // If no documents exist, use initial data
         const saved = localStorage.getItem('portfolio_data');
         if (saved) setData({ ...INITIAL_DATA, ...JSON.parse(saved) });
       }
@@ -73,7 +76,7 @@ const App: React.FC = () => {
       if (saved) setData({ ...INITIAL_DATA, ...JSON.parse(saved) });
       setIsLoading(false);
       try {
-        handleFirestoreError(error, OperationType.GET, 'portfolio/global');
+        handleFirestoreError(error, OperationType.GET, 'portfolio');
       } catch (e) {
         setAsyncError(e as Error);
       }
@@ -93,10 +96,20 @@ const App: React.FC = () => {
     // Save to Firestore if admin
     if (isLoggedIn) {
       try {
-        await setDoc(doc(db, 'portfolio', 'global'), newData);
+        const batch = writeBatch(db);
+        
+        // Split the data into multiple documents to stay under 1MB limit
+        const { projects, gallery, jobExperiences, ...globalData } = newData;
+        
+        batch.set(doc(db, 'portfolio', 'global'), globalData);
+        batch.set(doc(db, 'portfolio', 'projects'), { projects: projects || [] });
+        batch.set(doc(db, 'portfolio', 'gallery'), { gallery: gallery || [] });
+        batch.set(doc(db, 'portfolio', 'jobExperiences'), { jobExperiences: jobExperiences || [] });
+        
+        await batch.commit();
       } catch (error) {
         try {
-          handleFirestoreError(error, OperationType.WRITE, 'portfolio/global');
+          handleFirestoreError(error, OperationType.WRITE, 'portfolio');
         } catch (e) {
           setAsyncError(e as Error);
         }

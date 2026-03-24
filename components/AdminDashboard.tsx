@@ -42,6 +42,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   
   const currentThemeColor = THEME_OPTIONS.find(th => th.id === formData.theme)?.color || '#0ea5e9';
 
+  const compressImage = (base64: string, maxWidth = 800, quality = 0.7): Promise<string> => {
+    if (!base64 || !base64.startsWith('data:image')) return Promise.resolve(base64);
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(base64);
+    });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -62,15 +87,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     setHasUnsavedChanges(true);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'blog' | 'gallery', id?: string) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'blog' | 'gallery' | 'job', id?: string) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         const base64 = reader.result as string;
-        if (type === 'profile') setFormData(prev => ({ ...prev, profileImage: base64 }));
-        if (type === 'blog' && id) updateBlogPost(id, 'image', base64);
-        if (type === 'gallery' && id) updateGalleryItem(id, 'image', base64);
+        const compressed = await compressImage(base64, type === 'job' ? 200 : 800);
+        
+        if (type === 'profile') setFormData(prev => ({ ...prev, profileImage: compressed }));
+        if (type === 'blog' && id) updateBlogPost(id, 'image', compressed);
+        if (type === 'gallery' && id) updateGalleryItem(id, 'image', compressed);
+        if (type === 'job' && id) updateJobExperience(id, 'logoUrl', compressed);
         setHasUnsavedChanges(true);
       };
       reader.readAsDataURL(file);
@@ -80,7 +108,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const handleSave = async () => {
     setSaveStatus('saving');
     try {
-      await onUpdate(formData);
+      // Compress all images in formData before saving to ensure we stay under Firestore limits
+      const compressedData = { ...formData };
+      
+      if (compressedData.profileImage && compressedData.profileImage.startsWith('data:image')) {
+        compressedData.profileImage = await compressImage(compressedData.profileImage);
+      }
+      
+      if (compressedData.projects) {
+        compressedData.projects = await Promise.all(compressedData.projects.map(async p => ({
+          ...p,
+          image: p.image.startsWith('data:image') ? await compressImage(p.image) : p.image
+        })));
+      }
+      
+      if (compressedData.gallery) {
+        compressedData.gallery = await Promise.all(compressedData.gallery.map(async i => ({
+          ...i,
+          image: i.image.startsWith('data:image') ? await compressImage(i.image) : i.image
+        })));
+      }
+
+      if (compressedData.jobExperiences) {
+        compressedData.jobExperiences = await Promise.all(compressedData.jobExperiences.map(async j => ({
+          ...j,
+          logoUrl: j.logoUrl.startsWith('data:image') ? await compressImage(j.logoUrl, 200) : j.logoUrl
+        })));
+      }
+
+      await onUpdate(compressedData);
+      setFormData(compressedData);
       setSaveStatus('saved');
       setHasUnsavedChanges(false);
       setTimeout(() => setSaveStatus('idle'), 3000);

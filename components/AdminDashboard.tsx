@@ -8,8 +8,9 @@ import {
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
-  Phone, Mail, Sparkles, Lock, Globe, BarChart
+  Phone, Mail, Sparkles, Lock, Globe, BarChart, Eraser, Loader2
 } from 'lucide-react';
+import { removeBackground } from "@imgly/background-removal";
 import ProfileImageUploader from './ProfileImageUploader';
 import VisitorAnalytics from './VisitorAnalytics';
 
@@ -29,6 +30,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const [formData, setFormData] = useState<PortfolioData>(data);
   const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event' | 'security' | 'seo' | 'analytics'>('basic');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [isRemovingBackground, setIsRemovingBackground] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   const [newPassword, setNewPassword] = useState('');
@@ -60,8 +62,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        if (ctx) {
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+        }
+        // Use webp to preserve transparency and keep size small
+        resolve(canvas.toDataURL('image/webp', quality));
       };
       img.onerror = () => resolve(base64);
     });
@@ -93,7 +99,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64 = reader.result as string;
-        const compressed = await compressImage(base64, (type === 'job' || type === 'logo') ? 200 : 800);
+        const compressed = await compressImage(base64, (type === 'job' || type === 'logo') ? 200 : 800, type === 'logo' ? 0.9 : 0.7);
         
         if (type === 'profile') setFormData(prev => ({ ...prev, profileImage: compressed }));
         if (type === 'logo') setFormData(prev => ({ ...prev, logoUrl: compressed }));
@@ -103,6 +109,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
         setHasUnsavedChanges(true);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const removeLogoBackground = async () => {
+    if (!formData.logoUrl) return;
+    
+    setIsRemovingBackground(true);
+    try {
+      // Fetch the image to get a blob if it's a URL, or use the base64 directly
+      const response = await removeBackground(formData.logoUrl, {
+        progress: (key, current, total) => {
+          console.log(`Background removal progress: ${key} ${current}/${total}`);
+        }
+      });
+      
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        // Don't compress with low quality for logo to keep transparency clean
+        const compressed = await compressImage(base64, 200, 0.9);
+        setFormData(prev => ({ ...prev, logoUrl: compressed }));
+        setHasUnsavedChanges(true);
+        setIsRemovingBackground(false);
+      };
+      reader.readAsDataURL(response);
+    } catch (error) {
+      console.error('Failed to remove background:', error);
+      setIsRemovingBackground(false);
+      alert('Failed to remove background. Please try again or use a different image.');
     }
   };
 
@@ -401,9 +436,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logo (Optional)</label>
                         <div className="flex gap-3">
-                          <div className="w-14 h-14 rounded-xl bg-slate-900 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className="w-14 h-14 rounded-xl border border-white/10 overflow-hidden shrink-0 flex items-center justify-center relative" style={{ 
+                            backgroundImage: 'linear-gradient(45deg, #0f172a 25%, transparent 25%), linear-gradient(-45deg, #0f172a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0f172a 75%), linear-gradient(-45deg, transparent 75%, #0f172a 75%)',
+                            backgroundSize: '10px 10px',
+                            backgroundPosition: '0 0, 0 5px, 5px 5px, 5px 0',
+                            backgroundColor: '#1e293b'
+                          }}>
                             {formData.logoUrl ? (
-                              <img src={formData.logoUrl} className="w-full h-full object-contain" />
+                              <img src={formData.logoUrl} className="w-full h-full object-contain relative z-10" />
                             ) : (
                               <ImageIcon size={20} className="text-slate-700" />
                             )}
@@ -420,6 +460,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                               <Camera size={12} /> {lang === 'bn' ? 'লোগো আপলোড' : 'Upload Logo'}
                               <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'logo')} accept="image/*" />
                             </label>
+                            {formData.logoUrl && (
+                              <button 
+                                onClick={removeLogoBackground}
+                                disabled={isRemovingBackground}
+                                className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-400 hover:brightness-125 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {isRemovingBackground ? (
+                                  <Loader2 size={12} className="animate-spin" />
+                                ) : (
+                                  <Eraser size={12} />
+                                )}
+                                {lang === 'bn' ? 'ব্যাকগ্রাউন্ড রিমুভ' : 'Auto Background Remove'}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, User, LogIn, ArrowLeft, ShieldCheck, Mail, RefreshCw } from 'lucide-react';
-import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification } from '../firebase';
+import { auth, signInWithEmailAndPassword, sendEmailVerification } from '../firebase';
 
 interface LoginProps {
   onLogin: () => void;
@@ -16,8 +16,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showReset, setShowReset] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
 
   const handleAuthAction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,32 +24,19 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
     setLoading(true);
     
     try {
-      if (isSignUp) {
-        // Only allow admin email to sign up
-        if (email !== 'khantaousi@gmail.com') {
-          setError(lang === 'bn' ? 'শুধুমাত্র এডমিন ইমেইল দিয়ে একাউন্ট খোলা যাবে।' : 'Only the admin email can create an account.');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      if (user.email === 'khantaousi@gmail.com') {
+        if (!user.emailVerified) {
+          setError(lang === 'bn' ? 'আপনার ইমেইল ভেরিফাই করা নেই। অনুগ্রহ করে আপনার ইনবক্স চেক করুন।' : 'Your email is not verified. Please check your inbox.');
+          await sendEmailVerification(user);
           setLoading(false);
           return;
         }
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await sendEmailVerification(userCredential.user);
-        setSuccess(lang === 'bn' ? 'একাউন্ট তৈরি হয়েছে! অনুগ্রহ করে আপনার ইমেইল ভেরিফাই করুন।' : 'Account created! Please verify your email.');
-        setIsSignUp(false);
+        onLogin();
       } else {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        if (user.email === 'khantaousi@gmail.com') {
-          if (!user.emailVerified) {
-            setError(lang === 'bn' ? 'আপনার ইমেইল ভেরিফাই করা নেই। অনুগ্রহ করে আপনার ইনবক্স চেক করুন।' : 'Your email is not verified. Please check your inbox.');
-            await sendEmailVerification(user);
-            setLoading(false);
-            return;
-          }
-          onLogin();
-        } else {
-          setError(lang === 'bn' ? 'আপনি এডমিন নন।' : 'You are not an admin.');
-        }
+        setError(lang === 'bn' ? 'আপনি এডমিন নন।' : 'You are not an admin.');
       }
     } catch (err: any) {
       console.error("Auth Error Details:", err);
@@ -72,25 +57,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
       setLoading(false);
     }
   };
-
-  const handleResetPassword = async () => {
-    if (!email) {
-      setError(lang === 'bn' ? 'অনুগ্রহ করে আপনার ইমেইল দিন' : 'Please enter your email');
-      return;
-    }
-    setLoading(true);
-    setError('');
-    try {
-      await sendPasswordResetEmail(auth, email);
-      setSuccess(lang === 'bn' ? 'পাসওয়ার্ড রিসেট ইমেইল পাঠানো হয়েছে!' : 'Password reset email sent!');
-      setShowReset(false);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4">
@@ -138,51 +104,31 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
               />
             </div>
             
-            {!showReset && (
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
-                  <Lock size={18} />
-                </div>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-900/50 border border-white/10 text-white pl-14 pr-6 py-5 rounded-2xl focus:border-cyan-500/50 outline-none transition-all font-bold"
-                  required
-                />
+            <div className="relative group">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+                <Lock size={18} />
               </div>
-            )}
-          </div>
-
-          <div className="flex justify-between items-center">
-            <button 
-              type="button" 
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-cyan-400 transition-colors"
-            >
-              {isSignUp ? (lang === 'bn' ? 'লগইন করুন' : 'Already have an account?') : (lang === 'bn' ? 'একাউন্ট তৈরি করুন' : 'Create Admin Account')}
-            </button>
-            <button 
-              type="button" 
-              onClick={() => setShowReset(!showReset)}
-              className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-cyan-400 transition-colors"
-            >
-              {showReset ? (lang === 'bn' ? 'লগইন এ ফিরে যান' : 'Back to Login') : (lang === 'bn' ? 'পাসওয়ার্ড ভুলে গেছেন?' : 'Forgot Password?')}
-            </button>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-slate-900/50 border border-white/10 text-white pl-14 pr-6 py-5 rounded-2xl focus:border-cyan-500/50 outline-none transition-all font-bold"
+                required
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            onClick={showReset ? (e) => { e.preventDefault(); handleResetPassword(); } : undefined}
             className="w-full bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:hover:bg-cyan-600 text-slate-950 font-black py-6 rounded-2xl transition-all shadow-2xl flex items-center justify-center gap-4 uppercase tracking-[0.25em] text-sm active:scale-[0.97] hover:scale-[1.02]"
           >
             {loading ? (
               <RefreshCw className="animate-spin" size={20} />
             ) : (
               <>
-                {showReset ? (lang === 'bn' ? 'রিসেট লিঙ্ক পাঠান' : 'Send Reset Link') : (isSignUp ? (lang === 'bn' ? 'একাউন্ট তৈরি করুন' : 'Sign Up') : (lang === 'bn' ? 'লগইন করুন' : 'Sign in'))} 
+                {lang === 'bn' ? 'লগইন করুন' : 'Sign in'} 
                 <LogIn size={20} />
               </>
             )}

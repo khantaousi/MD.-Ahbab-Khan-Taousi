@@ -8,11 +8,12 @@ import {
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
-  Phone, Mail, Sparkles, Lock, Globe, BarChart, Eraser, Loader2
+  Phone, Mail, Sparkles, Lock, Globe, BarChart, Eraser, Loader2, Share2, Copy
 } from 'lucide-react';
 import { removeBackground } from "@imgly/background-removal";
 import ProfileImageUploader from './ProfileImageUploader';
 import VisitorAnalytics from './VisitorAnalytics';
+import EventSection from './EventSection';
 
 interface AdminDashboardProps {
   data: PortfolioData;
@@ -32,6 +33,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isRemovingBackground, setIsRemovingBackground] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -139,6 +141,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
       setIsRemovingBackground(false);
       alert('Failed to remove background. Please try again or use a different image.');
     }
+  };
+
+  const copyBlogLink = (id: string) => {
+    const url = `${window.location.origin}/#blog-${id}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const handleSave = async () => {
@@ -712,6 +721,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                                   placeholder="External Link" 
                                 />
                              </div>
+                             <button 
+                                onClick={() => copyBlogLink(post.id)} 
+                                className={`p-3 rounded-xl transition-all flex items-center gap-2 font-black text-[10px] uppercase tracking-widest ${copiedId === post.id ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'}`}
+                             >
+                                {copiedId === post.id ? <CheckCircle2 size={18} /> : <Share2 size={18} />}
+                                {copiedId === post.id ? (lang === 'bn' ? 'কপি হয়েছে' : 'Copied') : (lang === 'bn' ? 'শেয়ার' : 'Share')}
+                             </button>
                              <button onClick={() => removeBlogPost(post.id)} className="bg-red-500/10 text-red-500 p-3 rounded-xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18} /></button>
                           </div>
                        </div>
@@ -873,6 +889,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                         <option value="pulse">Pulsing</option>
                         <option value="none">No Animation</option>
                       </select>
+                   </div>
+                 </div>
+
+                 {/* Event Preview */}
+                 <div className="space-y-3 pt-4">
+                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Live Preview</label>
+                   <div className="rounded-[32px] overflow-hidden border border-white/10 bg-slate-950 relative group">
+                     <div className="scale-[0.4] origin-top h-[150px] pointer-events-none">
+                       <EventSection 
+                         title={formData.event?.title || 'EVENT TITLE'} 
+                         subtitle={formData.event?.subtitle || 'Event subtitle message goes here...'} 
+                         theme={formData.event?.theme || 'auto'} 
+                         animationType={formData.event?.animationType || 'float'} 
+                       />
+                     </div>
+                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent pointer-events-none"></div>
+                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-900/80 px-3 py-1 rounded-full border border-white/5 backdrop-blur-sm">
+                       Preview Mode
+                     </div>
                    </div>
                  </div>
                </div>

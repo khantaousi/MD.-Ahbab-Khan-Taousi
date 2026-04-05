@@ -159,16 +159,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
     }
   };
 
-  const getPlatformIcon = (platform: string) => {
+  const getPlatformIcon = (platform: string, size: number = 18) => {
     const p = platform.toLowerCase();
-    if (p.includes('facebook')) return <Facebook size={18} />;
-    if (p.includes('github')) return <Github size={18} />;
-    if (p.includes('linkedin')) return <Linkedin size={18} />;
-    if (p.includes('twitter')) return <Twitter size={18} />;
-    if (p.includes('instagram')) return <Instagram size={18} />;
-    if (p.includes('youtube')) return <Youtube size={18} />;
-    if (p.includes('whatsapp')) return <MessageCircle size={18} />;
-    return <Globe size={18} />;
+    if (p.includes('facebook')) return <Facebook size={size} />;
+    if (p.includes('github')) return <Github size={size} />;
+    if (p.includes('linkedin')) return <Linkedin size={size} />;
+    if (p.includes('twitter')) return <Twitter size={size} />;
+    if (p.includes('instagram')) return <Instagram size={size} />;
+    if (p.includes('youtube')) return <Youtube size={size} />;
+    if (p.includes('whatsapp')) return <MessageCircle size={size} />;
+    return <Globe size={size} />;
   };
 
   const getNoticeTimestamp = () => {
@@ -507,6 +507,28 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 {data.phone}
               </a>
             </div>
+
+            {data.socialLinks && data.socialLinks.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-4 pt-8">
+                {data.socialLinks.map((social) => (
+                  <a 
+                    key={social.id} 
+                    href={social.url} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="group flex flex-col items-center gap-1.5 transition-all hover:scale-110"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:border-white/40 transition-all shadow-2xl" style={{ color: themeConfig.accent }}>
+                      {getPlatformIcon(social.platform, 14)}
+                    </div>
+                    <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white transition-colors">
+                      {social.platform}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            )}
+
             <div className="pt-20 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8">
               <p className="text-slate-600 font-black text-[9px] uppercase tracking-[0.3em]">&copy; {new Date().getFullYear()} {data.name} // ALL RIGHTS RESERVED</p>
               <Link to="/login" className="text-slate-600 font-black uppercase tracking-[0.2em] text-[9px] hover:text-white transition-all flex items-center gap-2 hover:translate-x-1" aria-label="Admin Dashboard">

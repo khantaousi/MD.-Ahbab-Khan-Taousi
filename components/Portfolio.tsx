@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import { PortfolioData } from '../types';
 import { 
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
@@ -145,6 +146,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
     emerald: { accent: '#10b981', gradient: 'radial-gradient(at 0% 0%, hsla(150,100%,8%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(160,100%,10%,1) 0, transparent 50%), radial-gradient(at 50% 100%, hsla(155,100%,6%,1) 0, transparent 50%)' }
   }[theme];
 
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     if (id === 'top') {
@@ -191,49 +199,126 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         {data.seo?.metaKeywords && <meta name="keywords" content={data.seo.metaKeywords} />}
         {data.seo?.favicon && <link rel="icon" href={data.seo.favicon} />}
       </Helmet>
+      {/* Scroll Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 z-[100] origin-left"
+        style={{ backgroundColor: themeConfig.accent, scaleX }}
+      />
+
       {/* Lightbox Modal: Profile */}
-      {isProfileOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setIsProfileOpen(false)}>
-           <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"><X size={32} /></button>
-           <div className="relative max-w-[min(90vw,650px)] w-full aspect-square p-3 bg-white/5 border border-white/10 rounded-full overflow-hidden shadow-3xl" onClick={(e) => e.stopPropagation()}>
-              <img src={data.profileImage} className="w-full h-full object-cover rounded-full border-[6px] border-slate-950 shadow-inner" alt={data.name} />
-           </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isProfileOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] cursor-zoom-out" 
+            onClick={() => setIsProfileOpen(false)}
+          >
+             <motion.button 
+               initial={{ scale: 0.5, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               exit={{ scale: 0.5, opacity: 0 }}
+               className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"
+             >
+               <X size={32} />
+             </motion.button>
+             <motion.div 
+               initial={{ scale: 0.8, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               exit={{ scale: 0.8, opacity: 0 }}
+               className="relative max-w-[min(90vw,650px)] w-full aspect-square p-3 bg-white/5 border border-white/10 rounded-full overflow-hidden shadow-3xl" 
+               onClick={(e) => e.stopPropagation()}
+             >
+                <img src={data.profileImage} className="w-full h-full object-cover rounded-full border-[6px] border-slate-950 shadow-inner" alt={data.name} />
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Lightbox Modal: General Image */}
-      {selectedImage && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setSelectedImage(null)}>
-           <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"><X size={32} /></button>
-           <div className="relative max-w-[90vw] max-h-[90vh] p-3 bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-3xl" onClick={(e) => e.stopPropagation()}>
-              <img src={selectedImage} className="w-full h-full max-h-[85vh] object-contain rounded-2xl" alt="Enlarged view" />
-           </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] cursor-zoom-out" 
+            onClick={() => setSelectedImage(null)}
+          >
+             <motion.button 
+               initial={{ scale: 0.5, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               exit={{ scale: 0.5, opacity: 0 }}
+               className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"
+             >
+               <X size={32} />
+             </motion.button>
+             <motion.div 
+               initial={{ scale: 0.8, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               exit={{ scale: 0.8, opacity: 0 }}
+               className="relative max-w-[90vw] max-h-[90vh] p-3 bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-3xl" 
+               onClick={(e) => e.stopPropagation()}
+             >
+                <img src={selectedImage} className="w-full h-full max-h-[85vh] object-contain rounded-2xl" alt="Enlarged view" />
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Lightbox Modal: Blog Post */}
-      {selectedBlog && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] animate-in fade-in zoom-in duration-300 cursor-zoom-out" onClick={() => setSelectedBlog(null)}>
-           <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"><X size={32} /></button>
-           <div className="relative w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-white/10 rounded-[32px] overflow-hidden shadow-3xl flex flex-col cursor-default" onClick={(e) => e.stopPropagation()}>
-              <div className="w-full h-64 sm:h-80 shrink-0 relative cursor-zoom-in" onClick={() => setSelectedImage(selectedBlog.image)}>
-                <img src={selectedBlog.image} className="w-full h-full object-cover" alt={selectedBlog.title} />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
-              </div>
-              <div className="p-8 sm:p-12 overflow-y-auto flex-1 scrollbar-hide">
-                <h2 className="text-3xl sm:text-4xl font-black mb-6 text-white">{selectedBlog.title}</h2>
-                <div className="text-slate-300 text-base sm:text-lg leading-relaxed whitespace-pre-wrap opacity-90">
-                  {selectedBlog.description}
+      <AnimatePresence>
+        {selectedBlog && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/98 backdrop-blur-[40px] cursor-zoom-out" 
+            onClick={() => setSelectedBlog(null)}
+          >
+             <motion.button 
+               initial={{ scale: 0.5, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               exit={{ scale: 0.5, opacity: 0 }}
+               className="absolute top-8 right-8 text-white/50 hover:text-white transition-all p-4 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:scale-110 shadow-2xl"
+             >
+               <X size={32} />
+             </motion.button>
+             <motion.div 
+               initial={{ y: 50, opacity: 0 }}
+               animate={{ y: 0, opacity: 1 }}
+               exit={{ y: 50, opacity: 0 }}
+               className="relative w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-white/10 rounded-[32px] overflow-hidden shadow-3xl flex flex-col cursor-default" 
+               onClick={(e) => e.stopPropagation()}
+             >
+                <div className="w-full h-64 sm:h-80 shrink-0 relative cursor-zoom-in" onClick={() => setSelectedImage(selectedBlog.image)}>
+                  <img src={selectedBlog.image} className="w-full h-full object-cover" alt={selectedBlog.title} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
                 </div>
-                {selectedBlog.link && selectedBlog.link !== '#' && (
-                  <a href={selectedBlog.link} target="_blank" rel="noreferrer" className="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all hover:scale-105 active:scale-95 text-slate-950" style={{ backgroundColor: themeConfig.accent }}>
-                    {t.blogReadMore} <ExternalLink size={14} />
-                  </a>
-                )}
-              </div>
-           </div>
-        </div>
-      )}
+                <div className="p-8 sm:p-12 overflow-y-auto flex-1 scrollbar-hide">
+                  <h2 className="text-3xl sm:text-4xl font-black mb-6 text-white">{selectedBlog.title}</h2>
+                  <div className="text-slate-300 text-base sm:text-lg leading-relaxed whitespace-pre-wrap opacity-90">
+                    {selectedBlog.description}
+                  </div>
+                  {selectedBlog.link && selectedBlog.link !== '#' && (
+                    <motion.a 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      href={selectedBlog.link} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="mt-8 inline-flex items-center gap-2 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest transition-all text-slate-950" 
+                      style={{ backgroundColor: themeConfig.accent }}
+                    >
+                      {t.blogReadMore} <ExternalLink size={14} />
+                    </motion.a>
+                  )}
+                </div>
+             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Navbar */}
       <nav className="fixed top-0 w-full z-50 glass border-b border-white/5 h-16">
@@ -270,27 +355,71 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       </nav>
 
       {/* Hero Section */}
-      <header className="pt-48 pb-24 px-6 lg:px-12 relative overflow-hidden">
+      <header className="pt-48 pb-32 px-6 lg:px-12 relative overflow-hidden">
         <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row gap-12 items-center">
-          <div className="flex-1 space-y-10 text-center lg:text-left">
-            <div className="space-y-4">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.2
+                }
+              }
+            }}
+            className="flex-1 space-y-10 text-center lg:text-left"
+          >
+            <motion.div 
+              variants={{
+                hidden: { y: 20, opacity: 0 },
+                visible: { y: 0, opacity: 1 }
+              }}
+              className="space-y-4"
+            >
               <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full backdrop-blur-md">
                 <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: themeConfig.accent }}></span>
                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t.heroStatus}</span>
               </div>
               <h1 className="text-4xl lg:text-7xl font-black text-white leading-[1] tracking-tighter">{t.heroIam} <br/> <span style={{ color: themeConfig.accent }}>{data.name}</span></h1>
-            </div>
-            <h2 className="text-xl lg:text-3xl text-slate-400 italic font-medium opacity-80">{data.title}</h2>
+            </motion.div>
+            
+            <motion.h2 
+              variants={{
+                hidden: { y: 20, opacity: 0 },
+                visible: { y: 0, opacity: 1 }
+              }}
+              className="text-xl lg:text-3xl text-slate-400 italic font-medium opacity-80"
+            >
+              {data.title}
+            </motion.h2>
+
             {data.showWork && (
-              <div className="flex items-center justify-center lg:justify-start gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl w-fit mx-auto lg:mx-0 shadow-2xl backdrop-blur-2xl transition-all hover:bg-white/10">
+              <motion.div 
+                variants={{
+                  hidden: { y: 20, opacity: 0 },
+                  visible: { y: 0, opacity: 1 }
+                }}
+                whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                className="flex items-center justify-center lg:justify-start gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl w-fit mx-auto lg:mx-0 shadow-2xl backdrop-blur-2xl transition-all"
+              >
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-900 border border-white/5 shadow-inner" style={{ color: themeConfig.accent }}><Briefcase size={20} /></div>
                 <div className="text-left">
                   <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">{t.heroWorkLabel}</p>
                   <p className="text-xs lg:text-sm font-black text-white leading-tight">{data.currentWork}</p>
                 </div>
-              </div>
+              </motion.div>
             )}
-            <p className="text-lg lg:text-xl text-slate-400 max-w-xl font-medium leading-relaxed opacity-70 mx-auto lg:mx-0">
+
+            <motion.p 
+              variants={{
+                hidden: { y: 20, opacity: 0 },
+                visible: { y: 0, opacity: 1 }
+              }}
+              className="text-lg lg:text-xl text-slate-400 max-w-xl font-medium leading-relaxed opacity-70 mx-auto lg:mx-0"
+            >
               {isBioExpanded ? data.bio : `${data.bio.substring(0, 200)}...`}
               <button 
                 onClick={() => setIsBioExpanded(!isBioExpanded)} 
@@ -299,25 +428,60 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
               >
                 {isBioExpanded ? 'Show Less' : 'Read More'}
               </button>
-            </p>
-            <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
-              <a href={`mailto:${data.email}`} className="px-12 py-5 rounded-full font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-3xl transition-all hover:scale-105 active:scale-95" style={{ backgroundColor: themeConfig.accent, color: '#000' }}>{t.heroEmailBtn} <Mail size={20} /></a>
+            </motion.p>
+
+            <motion.div 
+              variants={{
+                hidden: { y: 20, opacity: 0 },
+                visible: { y: 0, opacity: 1 }
+              }}
+              className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start"
+            >
+              <motion.a 
+                whileHover={{ scale: 1.05, boxShadow: `0 0 20px ${themeConfig.accent}44` }}
+                whileTap={{ scale: 0.95 }}
+                href={`mailto:${data.email}`} 
+                className="px-12 py-5 rounded-full font-black text-[11px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-3xl transition-all" 
+                style={{ backgroundColor: themeConfig.accent, color: '#000' }}
+              >
+                {t.heroEmailBtn} <Mail size={20} />
+              </motion.a>
               <div className="flex gap-3.5 justify-center">
                 {data.socialLinks.map((social) => (
-                  <a key={social.id} href={social.url} target="_blank" rel="noreferrer" className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/5 border border-white/10 hover:border-white/40 hover:bg-white/10 transition-all hover:scale-110 shadow-2xl" style={{ color: themeConfig.accent }}>
+                  <motion.a 
+                    key={social.id} 
+                    whileHover={{ scale: 1.1, backgroundColor: 'rgba(255,255,255,0.1)', borderColor: themeConfig.accent }}
+                    whileTap={{ scale: 0.9 }}
+                    href={social.url} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/5 border border-white/10 transition-all shadow-2xl" 
+                    style={{ color: themeConfig.accent }}
+                  >
                     {getPlatformIcon(social.platform)}
-                  </a>
+                  </motion.a>
                 ))}
               </div>
-            </div>
-          </div>
-          <div className="relative group cursor-zoom-in" onClick={() => setIsProfileOpen(true)}>
+            </motion.div>
+          </motion.div>
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
+            whileInView={{ scale: 1, opacity: 1, rotate: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="relative group cursor-zoom-in" 
+            onClick={() => setIsProfileOpen(true)}
+          >
             <div className="absolute -inset-16 rounded-full blur-[100px] opacity-10 animate-pulse transition-all group-hover:opacity-20" style={{ backgroundColor: themeConfig.accent }}></div>
-            <div className="relative z-10 w-64 h-64 lg:w-[420px] lg:h-[420px] p-3 bg-white/5 border border-white/10 rounded-full backdrop-blur-3xl shadow-3xl transition-all duration-700 hover:scale-[1.03]">
+            <motion.div 
+              whileHover={{ scale: 1.03, rotate: 2 }}
+              transition={{ duration: 0.7 }}
+              className="relative z-10 w-64 h-64 lg:w-[420px] lg:h-[420px] p-3 bg-white/5 border border-white/10 rounded-full backdrop-blur-3xl shadow-3xl transition-all"
+            >
               <img src={data.profileImage} className="w-full h-full object-cover rounded-full border-4 border-slate-950/50" alt={data.name} />
               <div className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-950/50 opacity-0 hover:opacity-100 transition-all duration-500"><Maximize2 className="text-white" size={40} /></div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </header>
 
@@ -349,14 +513,32 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       {/* Product Section */}
       {/* Skills */}
       {data.showSkills && (
-        <section className="py-24 px-6 lg:px-12 bg-white/[0.01] border-y border-white/5">
+        <section className="py-32 px-6 lg:px-12 bg-white/[0.01] border-y border-white/5">
           <div className="max-w-7xl mx-auto text-center">
-            <h2 className="text-2xl lg:text-3xl font-black mb-12 tracking-tighter flex items-center justify-center gap-3 text-white">
+            <motion.h2 
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-2xl lg:text-3xl font-black mb-16 tracking-tighter flex items-center justify-center gap-3 text-white"
+            >
               <Code size={24} style={{ color: themeConfig.accent }} /> {t.skillsHeader}
-            </h2>
+            </motion.h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {data.skills.map((s) => (
-                <div key={s.id} className="relative bg-slate-900/60 p-5 rounded-2xl border border-white/10 text-center group hover:bg-white/10 hover:border-white/30 hover:scale-110 hover:-translate-y-1 transition-all shadow-xl cursor-default">
+              {data.skills.map((s, idx) => (
+                <motion.div 
+                  key={s.id} 
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ 
+                    type: "spring",
+                    stiffness: 260,
+                    damping: 20,
+                    delay: idx * 0.05 
+                  }}
+                  whileHover={{ scale: 1.1, y: -10, backgroundColor: 'rgba(255,255,255,0.1)', borderColor: themeConfig.accent }}
+                  className="relative bg-slate-900/60 p-5 rounded-2xl border border-white/10 text-center group transition-all shadow-xl cursor-default"
+                >
                   <p className="font-black text-[10px] uppercase tracking-[0.2em]" style={{ color: themeConfig.accent }}>{s.name}</p>
                   
                   {/* Tooltip */}
@@ -371,7 +553,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                         )}
                         {s.proficiency !== undefined && (
                           <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full transition-all duration-1000" style={{ width: `${s.proficiency}%`, backgroundColor: themeConfig.accent }} />
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              whileInView={{ width: `${s.proficiency}%` }}
+                              transition={{ duration: 1, delay: 0.5 }}
+                              className="h-full" 
+                              style={{ backgroundColor: themeConfig.accent }} 
+                            />
                           </div>
                         )}
                         {s.description && (
@@ -382,7 +570,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                       <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900/95" />
                     </div>
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
             {data.showSkillsChart && <SkillsChart skills={data.skills} color={themeConfig.accent} isLightMode={isLightMode} />}
@@ -392,17 +580,36 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
 
       {/* Job Experience */}
       {data.showWork && data.jobExperiences && data.jobExperiences.length > 0 && (
-        <section className="py-24 px-6 lg:px-12">
+        <section className="py-32 px-6 lg:px-12">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase">
+            <motion.h2 
+              initial={{ x: -20, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase"
+            >
               <Briefcase size={40} style={{ color: themeConfig.accent }} /> {t.jobExperienceHeader || "Experience"}
-            </h2>
+            </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {data.jobExperiences.map((job) => (
-                <div key={job.id} className="glass p-8 rounded-[32px] border border-white/10 flex flex-col gap-6 items-start hover:border-white/30 transition-all h-full">
-                  <a href={job.website} target="_blank" rel="noreferrer" className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 shrink-0 block hover:opacity-80 transition-opacity">
+              {data.jobExperiences.map((job, idx) => (
+                <motion.div 
+                  key={job.id} 
+                  initial={{ y: 50, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1, duration: 0.6 }}
+                  whileHover={{ y: -15, scale: 1.02, borderColor: themeConfig.accent, boxShadow: `0 20px 40px -20px ${themeConfig.accent}33` }}
+                  className="glass p-8 rounded-[32px] border border-white/10 flex flex-col gap-6 items-start transition-all h-full"
+                >
+                  <motion.a 
+                    whileHover={{ opacity: 0.8 }}
+                    href={job.website} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 shrink-0 block transition-opacity"
+                  >
                     <img src={job.logoUrl} alt={job.companyName} className="w-full h-full object-cover" />
-                  </a>
+                  </motion.a>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
                       <a href={job.website} target="_blank" rel="noreferrer" className="hover:opacity-80 transition-opacity">
@@ -412,7 +619,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                     <p className="text-sm font-bold text-slate-400">{job.duration}</p>
                     <p className="text-sm text-slate-300 leading-relaxed">{job.description}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -421,29 +628,51 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
 
       {/* About */}
       {data.showAbout && (
-        <section id="about" className="py-24 px-6 lg:px-12 scroll-mt-20">
-          <div className="max-w-3xl mx-auto glass p-10 lg:p-16 rounded-[48px] border border-white/10 shadow-3xl relative overflow-hidden text-center transition-all hover:border-white/20">
+        <section id="about" className="py-32 px-6 lg:px-12 scroll-mt-20">
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl mx-auto glass p-10 lg:p-16 rounded-[48px] border border-white/10 shadow-3xl relative overflow-hidden text-center transition-all hover:border-white/20"
+          >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full opacity-20" style={{ backgroundColor: themeConfig.accent }}></div>
             <h2 className="text-3xl lg:text-4xl font-black mb-10 tracking-tighter flex items-center justify-center gap-3 text-white"><User size={32} style={{ color: themeConfig.accent }} /> {t.aboutHeader}</h2>
             <div className="text-slate-400 text-lg lg:text-xl leading-[1.8] font-medium whitespace-pre-wrap opacity-80">{data.aboutText}</div>
-          </div>
+          </motion.div>
         </section>
       )}
 
       {/* Gallery */}
       {data.showGallery && (
-        <section id="gallery" className="py-24 px-6 lg:px-12 scroll-mt-20">
+        <section id="gallery" className="py-32 px-6 lg:px-12 scroll-mt-20">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase"><ImageIcon size={40} style={{ color: themeConfig.accent }} /> {t.galleryHeader}</h2>
+            <motion.h2 
+              initial={{ x: -20, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase"
+            >
+              <ImageIcon size={40} style={{ color: themeConfig.accent }} /> {t.galleryHeader}
+            </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {data.gallery.map((item) => (
-                <div key={item.id} className="group relative aspect-square overflow-hidden rounded-[32px] border border-white/10 shadow-3xl bg-slate-900 hover:border-white/30 transition-all hover:-translate-y-2 cursor-zoom-in" onClick={() => setSelectedImage(item.image)}>
+              {data.gallery.map((item, idx) => (
+                <motion.div 
+                  key={item.id} 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  whileHover={{ y: -10, scale: 1.02, borderColor: themeConfig.accent }}
+                  className="group relative aspect-square overflow-hidden rounded-[32px] border border-white/10 shadow-3xl bg-slate-900 transition-all cursor-zoom-in" 
+                  onClick={() => setSelectedImage(item.image)}
+                >
                   <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 group-hover:brightness-110" />
                   <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-all duration-700 flex flex-col justify-end p-8 backdrop-blur-[2px]">
                      <h3 className="text-lg font-black text-white mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{item.title}</h3>
                      <div className="w-10 h-1 rounded-full scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" style={{ backgroundColor: themeConfig.accent }}></div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -452,23 +681,44 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
 
       {/* Blog */}
       {data.showBlog && (
-        <section id="blog" className="py-24 px-6 lg:px-12 scroll-mt-20">
+        <section id="blog" className="py-32 px-6 lg:px-12 scroll-mt-20">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase"><BookOpen size={40} style={{ color: themeConfig.accent }} /> {t.blogHeader}</h2>
+            <motion.h2 
+              initial={{ x: -20, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter flex items-center gap-4 text-white uppercase"
+            >
+              <BookOpen size={40} style={{ color: themeConfig.accent }} /> {t.blogHeader}
+            </motion.h2>
             <div className="grid md:grid-cols-3 gap-10">
-              {data.projects.map((p) => (
-                <div key={p.id} className="group glass rounded-[32px] overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-700 flex flex-col h-full shadow-3xl hover:-translate-y-2">
+              {data.projects.map((p, idx) => (
+                <motion.div 
+                  key={p.id} 
+                  initial={{ y: 50, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  whileHover={{ y: -15, scale: 1.02, borderColor: themeConfig.accent, boxShadow: `0 20px 40px -20px ${themeConfig.accent}33` }}
+                  className="group glass rounded-[32px] overflow-hidden border border-white/10 transition-all duration-700 flex flex-col h-full shadow-3xl"
+                >
                   <div className="aspect-video overflow-hidden cursor-zoom-in" onClick={() => setSelectedImage(p.image)}>
                     <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 group-hover:brightness-110" />
                   </div>
                   <div className="p-8 flex flex-col flex-1">
                     <h3 className="text-xl font-black mb-3 text-white group-hover:text-sky-400 transition-colors">{p.title}</h3>
                     <p className="text-slate-400 mb-8 flex-1 text-sm opacity-70 leading-relaxed line-clamp-3">{p.description}</p>
-                    <button onClick={() => setSelectedBlog(p)} className="font-black text-[9px] uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all w-fit group/btn hover:scale-105 active:scale-95 hover:brightness-125" style={{ color: themeConfig.accent }}>
+                    <motion.button 
+                      whileHover={{ scale: 1.05, x: 5 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSelectedBlog(p)} 
+                      className="font-black text-[9px] uppercase tracking-[0.2em] flex items-center gap-2.5 transition-all w-fit group/btn hover:brightness-125" 
+                      style={{ color: themeConfig.accent }}
+                    >
                       {t.blogReadMore} <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </button>
+                    </motion.button>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -487,36 +737,57 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
 
       {/* Footer */}
       {data.showContact && (
-        <footer id="contact" className="py-24 glass border-t border-white/10 scroll-mt-20">
+        <footer id="contact" className="py-32 glass border-t border-white/10 scroll-mt-20">
           <div className="max-w-7xl mx-auto px-6 text-center space-y-16">
-            <div className="space-y-4">
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              className="space-y-4"
+            >
               <h2 className="text-4xl lg:text-6xl font-black tracking-tighter text-white">{t.contactHeader}</h2>
               <p className="text-slate-400 text-lg max-w-lg mx-auto font-medium opacity-60">{t.contactSub}</p>
-            </div>
+            </motion.div>
             <div className="flex flex-col lg:flex-row gap-10 justify-center items-center">
-              <a href={`mailto:${data.email}`} className="group flex items-center gap-4 text-xl lg:text-2xl font-black text-slate-300 hover:text-white transition-all hover:scale-105 hover:-translate-y-1 active:scale-95">
+              <motion.a 
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                href={`mailto:${data.email}`} 
+                className="group flex items-center gap-4 text-xl lg:text-2xl font-black text-slate-300 hover:text-white transition-all"
+              >
                 <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:border-white/30 transition-all" style={{ color: themeConfig.accent }}>
                   <Mail size={24} />
                 </div>
                 {data.email}
-              </a>
-              <a href={`tel:${data.phone}`} className="group flex items-center gap-4 text-xl lg:text-2xl font-black text-slate-300 hover:text-white transition-all hover:scale-105 hover:-translate-y-1 active:scale-95">
+              </motion.a>
+              <motion.a 
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                href={`tel:${data.phone}`} 
+                className="group flex items-center gap-4 text-xl lg:text-2xl font-black text-slate-300 hover:text-white transition-all"
+              >
                 <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:border-white/30 transition-all" style={{ color: themeConfig.accent }}>
                   <Phone size={24} />
                 </div>
                 {data.phone}
-              </a>
+              </motion.a>
             </div>
 
             {data.socialLinks && data.socialLinks.length > 0 && (
               <div className="flex flex-wrap justify-center gap-4 pt-8">
-                {data.socialLinks.map((social) => (
-                  <a 
+                {data.socialLinks.map((social, idx) => (
+                  <motion.a 
                     key={social.id} 
+                    initial={{ scale: 0, opacity: 0 }}
+                    whileInView={{ scale: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.05 }}
+                    whileHover={{ scale: 1.1, y: -3 }}
+                    whileTap={{ scale: 0.9 }}
                     href={social.url} 
                     target="_blank" 
                     rel="noreferrer" 
-                    className="group flex flex-col items-center gap-1.5 transition-all hover:scale-110"
+                    className="group flex flex-col items-center gap-1.5 transition-all"
                   >
                     <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:border-white/40 transition-all shadow-2xl" style={{ color: themeConfig.accent }}>
                       {getPlatformIcon(social.platform, 14)}
@@ -524,7 +795,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                     <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 group-hover:text-white transition-colors">
                       {social.platform}
                     </span>
-                  </a>
+                  </motion.a>
                 ))}
               </div>
             )}

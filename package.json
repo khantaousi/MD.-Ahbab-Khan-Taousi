@@ -14,6 +14,7 @@
     "@imgly/background-removal": "^1.7.0",
     "firebase": "^12.10.0",
     "lucide-react": "^0.562.0",
+    "motion": "^12.38.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

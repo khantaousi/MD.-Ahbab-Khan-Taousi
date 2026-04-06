@@ -25,12 +25,17 @@ export const CURRENCY_SYMBOLS = [
 
 export const INITIAL_DATA: PortfolioData = {
   name: "MD Ahbab Khan",
+  nameBn: "এমডি আহবাব খান",
   logoUrl: "",
   title: "Professional Web Developer & Creative Designer",
+  titleBn: "পেশাদার ওয়েব ডেভেলপার এবং ক্রিয়েটিভ ডিজাইনার",
   bio: "Hello, I am MD Ahbab Khan. I am a passionate Data Analyst who enjoys turning raw data into meaningful insights. I work with data to discover patterns, solve problems, and help businesses make smarter decisions. With a strong interest in analytics, visualization, and data-driven strategies, I focus on transforming complex information into clear and actionable results that create real value for organizations and individuals.",
+  bioBn: "হ্যালো, আমি এমডি আহবাব খান। আমি একজন নিবেদিত ডাটা অ্যানালিস্ট যিনি কাঁচা ডাটাকে অর্থপূর্ণ অন্তর্দৃষ্টিতে রূপান্তর করতে পছন্দ করেন। আমি প্যাটার্ন আবিষ্কার করতে, সমস্যা সমাধান করতে এবং ব্যবসায়িকদের স্মার্ট সিদ্ধান্ত নিতে সাহায্য করার জন্য ডাটা নিয়ে কাজ করি। অ্যানালিটিক্স, ভিজ্যুয়ালাইজেশন এবং ডাটা-চালিত কৌশলের প্রতি গভীর আগ্রহের সাথে, আমি জটিল তথ্যকে পরিষ্কার এবং কার্যকর ফলাফলে রূপান্তর করার দিকে মনোনিবেশ করি যা সংস্থা এবং ব্যক্তিদের জন্য প্রকৃত মূল্য তৈরি করে।",
   currentWork: "Freelance Full Stack Developer",
+  currentWorkBn: "ফ্রিল্যান্স ফুল স্ট্যাক ডেভেলপার",
   profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop", 
   aboutText: "I am MD Ahbab Khan, a tech enthusiast and developer with a focus on crafting high-quality web applications. With expertise in modern frameworks and a keen eye for design, I strive to create web experiences that are not only functional but also visually stunning. My goal is to help clients transform their ideas into reality through clean, efficient code.",
+  aboutTextBn: "আমি এমডি আহবাব খান, একজন প্রযুক্তিপ্রেমী এবং ডেভেলপার যার লক্ষ্য উচ্চমানের ওয়েব অ্যাপ্লিকেশন তৈরি করা। আধুনিক ফ্রেমওয়ার্ক এবং ডিজাইনের প্রতি তীক্ষ্ণ দৃষ্টির সাথে, আমি এমন ওয়েব অভিজ্ঞতা তৈরি করার চেষ্টা করি যা কেবল কার্যকরী নয় বরং দৃশ্যত অত্যাশ্চর্য। আমার লক্ষ্য হলো ক্লায়েন্টদের তাদের আইডিয়াগুলোকে পরিষ্কার এবং দক্ষ কোডের মাধ্যমে বাস্তবে রূপান্তর করতে সাহায্য করা।",
   email: "khantaousi@gmail.com",
   phone: "01518934191",
   theme: 'neon',
@@ -54,13 +59,17 @@ export const INITIAL_DATA: PortfolioData = {
   },
   event: {
     title: "EID MUBARAK",
+    titleBn: "ঈদ মোবারক",
     subtitle: "Wishing you and your family a blessed Ramadan and a joyous Eid filled with peace, prosperity, and happiness.",
+    subtitleBn: "আপনার এবং আপনার পরিবারের জন্য একটি বরকতময় রমজান এবং শান্তি, সমৃদ্ধি ও সুখে ভরপুর একটি আনন্দময় ঈদের শুভেচ্ছা রইল।",
     animationType: "float",
     theme: "islamic"
   },
   seo: {
     metaTitle: "MD Ahbab Khan | Professional Web Developer",
+    metaTitleBn: "এমডি আহবাব খান | পেশাদার ওয়েব ডেভেলপার",
     metaDescription: "Official portfolio of MD Ahbab Khan, a professional web developer and creative designer specializing in modern web applications.",
+    metaDescriptionBn: "এমডি আহবাব খান-এর অফিসিয়াল পোর্টফোলিও, একজন পেশাদার ওয়েব ডেভেলপার এবং ক্রিয়েটিভ ডিজাইনার যিনি আধুনিক ওয়েব অ্যাপ্লিকেশন তৈরিতে বিশেষজ্ঞ।",
     metaKeywords: "MD Ahbab Khan, Web Developer, Portfolio, React Developer, Full Stack Developer",
     favicon: "https://picsum.photos/seed/favicon/32/32"
   },
@@ -73,38 +82,53 @@ export const INITIAL_DATA: PortfolioData = {
     {
       id: "1",
       title: "Pohela Boishakh: The Bengali New Year",
+      titleBn: "পহেলা বৈশাখ: বাংলা নববর্ষ",
       description: "A vibrant celebration of the Bengali New Year, marked by colorful processions (Mangal Shobhajatra), traditional music, and festive foods like Panta Ilish.",
+      descriptionBn: "বাংলা নববর্ষের একটি প্রাণবন্ত উদযাপন, যা রঙিন শোভাযাত্রা (মঙ্গল শোভাযাত্রা), ঐতিহ্যবাহী সঙ্গীত এবং পান্তা ইলিশের মতো উৎসবমুখর খাবারের মাধ্যমে পালিত হয়।",
       image: "https://picsum.photos/seed/boishakh/600/400",
       link: "#"
     },
     {
       id: "2",
       title: "The Art of Rickshaw Painting",
+      titleBn: "রিকশা পেইন্টিংয়ের শিল্প",
       description: "Rickshaw art is a unique and colorful folk art of Bangladesh, featuring intricate motifs, film stars, and rural landscapes painted on cycle rickshaws.",
+      descriptionBn: "রিকশা শিল্প বাংলাদেশের একটি অনন্য এবং রঙিন লোকশিল্প, যাতে সাইকেল রিকশায় আঁকা জটিল মোটিফ, চলচ্চিত্র তারকা এবং গ্রামীণ দৃশ্য ফুটে ওঠে।",
       image: "https://picsum.photos/seed/rickshaw/600/400",
       link: "#"
     },
     {
       id: "3",
       title: "Jamdani: The Woven Heritage",
+      titleBn: "জামদানি: বোনা ঐতিহ্য",
       description: "Jamdani is a fine muslin textile woven by hand, recognized as an Intangible Cultural Heritage of Humanity by UNESCO, representing centuries of Bengali craftsmanship.",
+      descriptionBn: "জামদানি হলো হাতে বোনা একটি সূক্ষ্ম মসলিন টেক্সটাইল, যা ইউনেস্কো কর্তৃক মানবতার অমূর্ত সাংস্কৃতিক ঐতিহ্য হিসেবে স্বীকৃত এবং এটি শতাব্দী প্রাচীন বাঙালি কারুশিল্পের প্রতিনিধিত্ব করে।",
       image: "https://picsum.photos/seed/jamdani/600/400",
       link: "#"
     }
   ],
   gallery: [
-    { id: "1", image: "https://picsum.photos/800/800?random=10", title: "Tech Innovation" },
-    { id: "2", image: "https://picsum.photos/800/800?random=11", title: "Creative Workspace" }
+    { id: "1", image: "https://picsum.photos/800/800?random=10", title: "Tech Innovation", titleBn: "প্রযুক্তিগত উদ্ভাবন" },
+    { id: "2", image: "https://picsum.photos/800/800?random=11", title: "Creative Workspace", titleBn: "সৃজনশীল কর্মক্ষেত্র" }
   ],
   skills: [
-    { id: "1", name: "HTML & CSS" },
-    { id: "2", name: "JavaScript" },
-    { id: "3", name: "React JS" },
-    { id: "4", name: "Tailwind CSS" },
-    { id: "5", name: "Node.js" }
+    { id: "1", name: "HTML & CSS", nameBn: "এইচটিএমএল এবং সিএসএস" },
+    { id: "2", name: "JavaScript", nameBn: "জাভাস্ক্রিপ্ট" },
+    { id: "3", name: "React JS", nameBn: "রিয়্যাক্ট জেএস" },
+    { id: "4", name: "Tailwind CSS", nameBn: "টেইলউইন্ড সিএসএস" },
+    { id: "5", name: "Node.js", nameBn: "নোড জেএস" }
   ],
   jobExperiences: [
-    { id: "1", companyName: "Tech Corp", website: "https://techcorp.com", logoUrl: "https://picsum.photos/100/100?random=50", duration: "2 years", description: "Full Stack Developer" }
+    { 
+      id: "1", 
+      companyName: "Tech Corp", 
+      website: "https://techcorp.com", 
+      logoUrl: "https://picsum.photos/100/100?random=50", 
+      duration: "2 years", 
+      durationBn: "২ বছর",
+      description: "Full Stack Developer",
+      descriptionBn: "ফুল স্ট্যাক ডেভেলপার"
+    }
   ]
 };
 
@@ -187,8 +211,11 @@ export const TRANSLATIONS = {
     visLabelWork: "Work Status",
     visLabelJobExperience: "Job Experience Section",
     visLabelEvent: "Event Banner",
+    fileTransfer: "File Transfer",
     noticeLabel: "ALERT",
-    noticePublished: "Broadcasted"
+    noticePublished: "Broadcasted",
+    showLess: "Show Less",
+    readMore: "Read More"
   },
   bn: {
     navHome: "হোম",
@@ -199,7 +226,7 @@ export const TRANSLATIONS = {
     navAdmin: "অ্যাডমিন",
     heroWelcome: "আমার ডিজিটাল প্রোফাইলে স্বাগতম",
     heroIam: "আমি",
-    heroEmailBtn: "পরিচয়",
+    heroEmailBtn: "ইমেইল পাঠান",
     heroStatus: "অ্যাভেইলবল",
     heroWorkLabel: "বর্তমানে কর্মরত",
     clockLabel: "বাংলাদেশ সময়",
@@ -244,8 +271,8 @@ export const TRANSLATIONS = {
     adminEvent: "ইভেন্ট ব্যানার",
     adminSEO: "এসইও সেটিংস",
     adminSave: "লাইভ আপডেট",
-    adminSaving: "আপডেট হচ্ছে...",
-    adminSaved: "আপডেট হয়েছে!",
+    adminSaving: "Syncing...",
+    adminSaved: "লাইভ!",
     adminLogout: "লগ আউট",
     adminViewSite: "ওয়েবসাইট ভিউ",
     adminNewSkill: "নতুন স্কিল",
@@ -267,7 +294,10 @@ export const TRANSLATIONS = {
     visLabelWork: "কাজের স্ট্যাটাস",
     visLabelJobExperience: "কাজের অভিজ্ঞতা সেকশন",
     visLabelEvent: "ইভেন্ট ব্যানার",
+    fileTransfer: "ফাইল ট্রান্সফার",
     noticeLabel: "জরুরী নোটিশ",
-    noticePublished: "প্রকাশিত"
+    noticePublished: "প্রকাশিত",
+    showLess: "সংক্ষেপ করুন",
+    readMore: "বিস্তারিত পড়ুন"
   }
 };

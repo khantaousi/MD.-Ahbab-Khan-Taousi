@@ -2,7 +2,15 @@ import React from 'react';
 import { Moon, Star, PartyPopper, Sparkles, Zap } from 'lucide-react';
 import { EventData } from '../types';
 
-const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, theme }) => {
+interface EventSectionProps extends EventData {
+  lang?: 'en' | 'bn';
+}
+
+const EventSection: React.FC<EventSectionProps> = ({ title, subtitle, titleBn, subtitleBn, animationType, theme, lang }) => {
+  const getContent = (en: string, bn?: string) => {
+    return lang === 'bn' && bn ? bn : en;
+  };
+
   const getAnimationClass = () => {
     switch (animationType) {
       case 'float': return 'animate-float';
@@ -63,7 +71,7 @@ const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, the
     }
 
     // Auto theme logic based on keywords
-    const lowerTitle = title.toLowerCase();
+    const lowerTitle = (title || '').toLowerCase();
     if (lowerTitle.includes('eid') || lowerTitle.includes('ramadan') || lowerTitle.includes('mubarak')) {
       return (
         <div className="relative w-32 h-32 mb-4">
@@ -105,10 +113,10 @@ const EventSection: React.FC<EventData> = ({ title, subtitle, animationType, the
           {/* Text Content */}
           <div className="space-y-4">
             <h2 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-200 tracking-tighter drop-shadow-lg animate-shimmer bg-[length:200%_auto]">
-              {title}
+              {getContent(title, titleBn)}
             </h2>
             <p className="text-slate-400 text-lg md:text-xl font-medium tracking-wide max-w-2xl mx-auto">
-              {subtitle}
+              {getContent(subtitle, subtitleBn)}
             </p>
           </div>
 

@@ -191,6 +191,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
 
   const layout = data.layout || 'default';
 
+  const getContent = (en: string, bn?: string) => {
+    return lang === 'bn' && bn ? bn : en;
+  };
+
   return (
     <div className={`min-h-screen transition-all duration-1000 selection:bg-white/10 layout-${layout} ${isLightMode ? 'theme-light' : ''}`} style={(layout === 'default' || layout === 'classic') && !isLightMode ? { backgroundColor: '#020617', backgroundImage: themeConfig.gradient } : (isLightMode ? { backgroundColor: '#f8fafc' } : {})}>
       <Helmet>
@@ -297,9 +301,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
                 </div>
                 <div className="p-8 sm:p-12 overflow-y-auto flex-1 scrollbar-hide">
-                  <h2 className="text-3xl sm:text-4xl font-black mb-6 text-white">{selectedBlog.title}</h2>
+                  <h2 className="text-3xl sm:text-4xl font-black mb-6 text-white">{getContent(selectedBlog.title, selectedBlog.titleBn)}</h2>
                   <div className="text-slate-300 text-base sm:text-lg leading-relaxed whitespace-pre-wrap opacity-90">
-                    {selectedBlog.description}
+                    {getContent(selectedBlog.description, selectedBlog.descriptionBn)}
                   </div>
                   {selectedBlog.link && selectedBlog.link !== '#' && (
                     <motion.a 
@@ -343,7 +347,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
               </div>
               <button onClick={() => window.open('https://toffeeshare.com/', '_blank')} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-black hover:bg-white/10 transition-all flex items-center gap-1.5 text-slate-300 hover:text-white" aria-label="File Transfer">
                 <Share2 size={12} style={{ color: themeConfig.accent }} />
-                <span className="hidden sm:inline">File Transfer</span>
+                <span className="hidden sm:inline">{t.fileTransfer}</span>
               </button>
               <button onClick={() => setIsLightMode(!isLightMode)} className="bg-white/5 border border-white/10 p-2 rounded-full hover:bg-white/10 transition-all text-slate-300 hover:text-white" aria-label="Toggle Theme">
                 {isLightMode ? <Moon size={14} /> : <Sun size={14} />}
@@ -383,7 +387,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: themeConfig.accent }}></span>
                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t.heroStatus}</span>
               </div>
-              <h1 className="text-4xl lg:text-7xl font-black text-white leading-[1] tracking-tighter">{t.heroIam} <br/> <span style={{ color: themeConfig.accent }}>{data.name}</span></h1>
+              <h1 className="text-4xl lg:text-7xl font-black text-white leading-[1] tracking-tighter">{t.heroIam} <br/> <span style={{ color: themeConfig.accent }}>{getContent(data.name, data.nameBn)}</span></h1>
             </motion.div>
             
             <motion.h2 
@@ -393,7 +397,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
               }}
               className="text-xl lg:text-3xl text-slate-400 italic font-medium opacity-80"
             >
-              {data.title}
+              {getContent(data.title, data.titleBn)}
             </motion.h2>
 
             {data.showWork && (
@@ -408,7 +412,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-900 border border-white/5 shadow-inner" style={{ color: themeConfig.accent }}><Briefcase size={20} /></div>
                 <div className="text-left">
                   <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">{t.heroWorkLabel}</p>
-                  <p className="text-xs lg:text-sm font-black text-white leading-tight">{data.currentWork}</p>
+                  <p className="text-xs lg:text-sm font-black text-white leading-tight">{getContent(data.currentWork, data.currentWorkBn)}</p>
                 </div>
               </motion.div>
             )}
@@ -420,13 +424,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
               }}
               className="text-lg lg:text-xl text-slate-400 max-w-xl font-medium leading-relaxed opacity-70 mx-auto lg:mx-0"
             >
-              {isBioExpanded ? data.bio : `${data.bio.substring(0, 200)}...`}
+              {isBioExpanded ? getContent(data.bio, data.bioBn) : `${getContent(data.bio, data.bioBn).substring(0, 200)}...`}
               <button 
                 onClick={() => setIsBioExpanded(!isBioExpanded)} 
                 className="ml-2 font-black text-[10px] uppercase tracking-widest hover:underline"
                 style={{ color: themeConfig.accent }}
               >
-                {isBioExpanded ? 'Show Less' : 'Read More'}
+                {isBioExpanded ? t.showLess : t.readMore}
               </button>
             </motion.p>
 
@@ -539,10 +543,10 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                   whileHover={{ scale: 1.1, y: -10, backgroundColor: 'rgba(255,255,255,0.1)', borderColor: themeConfig.accent }}
                   className="relative bg-slate-900/60 p-5 rounded-2xl border border-white/10 text-center group transition-all shadow-xl cursor-default"
                 >
-                  <p className="font-black text-[10px] uppercase tracking-[0.2em]" style={{ color: themeConfig.accent }}>{s.name}</p>
+                  <p className="font-black text-[10px] uppercase tracking-[0.2em]" style={{ color: themeConfig.accent }}>{getContent(s.name, s.nameBn)}</p>
                   
                   {/* Tooltip */}
-                  {(s.proficiency || s.description) && (
+                  {(s.proficiency || s.description || s.descriptionBn) && (
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 p-4 bg-slate-900/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 pointer-events-none">
                       <div className="space-y-2">
                         {s.proficiency !== undefined && (
@@ -562,8 +566,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                             />
                           </div>
                         )}
-                        {s.description && (
-                          <p className="text-[10px] text-slate-400 leading-relaxed text-left pt-1 border-t border-white/5">{s.description}</p>
+                        {(s.description || s.descriptionBn) && (
+                          <p className="text-[10px] text-slate-400 leading-relaxed text-left pt-1 border-t border-white/5">{getContent(s.description || '', s.descriptionBn)}</p>
                         )}
                       </div>
                       {/* Arrow */}
@@ -616,8 +620,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                         <h3 className="text-xl font-black text-white">{job.companyName}</h3>
                       </a>
                     </div>
-                    <p className="text-sm font-bold text-slate-400">{job.duration}</p>
-                    <p className="text-sm text-slate-300 leading-relaxed">{job.description}</p>
+                    <p className="text-sm font-bold text-slate-400">{getContent(job.duration, job.durationBn)}</p>
+                    <p className="text-sm text-slate-300 leading-relaxed">{getContent(job.description, job.descriptionBn)}</p>
                   </div>
                 </motion.div>
               ))}
@@ -638,7 +642,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full opacity-20" style={{ backgroundColor: themeConfig.accent }}></div>
             <h2 className="text-3xl lg:text-4xl font-black mb-10 tracking-tighter flex items-center justify-center gap-3 text-white"><User size={32} style={{ color: themeConfig.accent }} /> {t.aboutHeader}</h2>
-            <div className="text-slate-400 text-lg lg:text-xl leading-[1.8] font-medium whitespace-pre-wrap opacity-80">{data.aboutText}</div>
+            <div className="text-slate-400 text-lg lg:text-xl leading-[1.8] font-medium whitespace-pre-wrap opacity-80">{getContent(data.aboutText, data.aboutTextBn)}</div>
           </motion.div>
         </section>
       )}
@@ -667,9 +671,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                   className="group relative aspect-square overflow-hidden rounded-[32px] border border-white/10 shadow-3xl bg-slate-900 transition-all cursor-zoom-in" 
                   onClick={() => setSelectedImage(item.image)}
                 >
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 group-hover:brightness-110" />
+                  <img src={item.image} alt={getContent(item.title, item.titleBn)} className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 group-hover:brightness-110" />
                   <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition-all duration-700 flex flex-col justify-end p-8 backdrop-blur-[2px]">
-                     <h3 className="text-lg font-black text-white mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{item.title}</h3>
+                     <h3 className="text-lg font-black text-white mb-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{getContent(item.title, item.titleBn)}</h3>
                      <div className="w-10 h-1 rounded-full scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" style={{ backgroundColor: themeConfig.accent }}></div>
                   </div>
                 </motion.div>
@@ -706,8 +710,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                     <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-1000 group-hover:brightness-110" />
                   </div>
                   <div className="p-8 flex flex-col flex-1">
-                    <h3 className="text-xl font-black mb-3 text-white group-hover:text-sky-400 transition-colors">{p.title}</h3>
-                    <p className="text-slate-400 mb-8 flex-1 text-sm opacity-70 leading-relaxed line-clamp-3">{p.description}</p>
+                    <h3 className="text-xl font-black mb-3 text-white group-hover:text-sky-400 transition-colors">{getContent(p.title, p.titleBn)}</h3>
+                    <p className="text-slate-400 mb-8 flex-1 text-sm opacity-70 leading-relaxed line-clamp-3">{getContent(p.description, p.descriptionBn)}</p>
                     <motion.button 
                       whileHover={{ scale: 1.05, x: 5 }}
                       whileTap={{ scale: 0.95 }}
@@ -728,10 +732,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       {/* Event Section */}
       {data.showEventSection && data.event && (
         <EventSection 
-          title={data.event.title} 
-          subtitle={data.event.subtitle} 
-          animationType={data.event.animationType}
-          theme={data.event.theme}
+          {...data.event} 
+          lang={lang}
         />
       )}
 

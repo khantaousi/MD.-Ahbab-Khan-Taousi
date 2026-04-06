@@ -8,7 +8,8 @@ import {
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
-  Phone, Mail, Sparkles, Lock, Globe, BarChart, Eraser, Loader2, Share2, Copy
+  Phone, Mail, Sparkles, Lock, Globe, BarChart, Eraser, Loader2, Share2, Copy,
+  Facebook, Github, Linkedin, Twitter, Instagram, Youtube, MessageCircle
 } from 'lucide-react';
 import { removeBackground } from "@imgly/background-removal";
 import ProfileImageUploader from './ProfileImageUploader';
@@ -24,7 +25,7 @@ interface AdminDashboardProps {
 }
 
 const SOCIAL_PLATFORMS = [
-  'Facebook', 'GitHub', 'LinkedIn', 'Twitter', 'Instagram', 'YouTube', 'WhatsApp', 'Globe'
+  'Facebook', 'GitHub', 'LinkedIn', 'Twitter', 'Instagram', 'YouTube', 'WhatsApp', 'Globe', 'Other'
 ];
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogout, lang, t }) => {
@@ -807,21 +808,52 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                     </div>
                     <div className="space-y-3">
                        {formData.socialLinks.map(link => (
-                         <div key={link.id} className="bg-white/5 border border-white/5 rounded-[24px] p-4 flex gap-3 group/link hover:border-white/20 transition-all">
-                            <select 
-                              value={link.platform} 
-                              onChange={(e) => updateSocialLink(link.id, 'platform', e.target.value)} 
-                              className="bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white cursor-pointer outline-none"
-                            >
-                              {SOCIAL_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                            </select>
-                            <input 
-                              value={link.url} 
-                              onChange={(e) => updateSocialLink(link.id, 'url', e.target.value)} 
-                              className="flex-1 bg-slate-950 border border-white/5 rounded-xl px-5 py-2 text-xs font-mono outline-none focus:border-cyan-500/30" 
-                              placeholder="https://" 
-                            />
-                            <button onClick={() => removeSocialLink(link.id)} className="text-red-500/50 hover:text-red-500 p-2 transition-all"><Trash2 size={16} /></button>
+                         <div key={link.id} className="bg-white/5 border border-white/5 rounded-[24px] p-4 flex flex-col gap-4 group/link hover:border-white/20 transition-all">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center border border-white/10 text-slate-400 group-hover/link:text-cyan-400 transition-colors">
+                                {(() => {
+                                  const p = link.platform.toLowerCase();
+                                  if (p === 'facebook') return <Facebook size={18} />;
+                                  if (p === 'github') return <Github size={18} />;
+                                  if (p === 'linkedin') return <Linkedin size={18} />;
+                                  if (p === 'twitter') return <Twitter size={18} />;
+                                  if (p === 'instagram') return <Instagram size={18} />;
+                                  if (p === 'youtube') return <Youtube size={18} />;
+                                  if (p === 'whatsapp') return <MessageCircle size={18} />;
+                                  return <Globe size={18} />;
+                                })()}
+                              </div>
+                              <div className="flex-1 flex gap-2">
+                                <select 
+                                  value={SOCIAL_PLATFORMS.includes(link.platform) ? link.platform : 'Other'} 
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    updateSocialLink(link.id, 'platform', val === 'Other' ? '' : val);
+                                  }} 
+                                  className="bg-slate-900 border border-white/10 rounded-xl px-4 py-2 text-[9px] font-black uppercase tracking-widest text-white cursor-pointer outline-none"
+                                >
+                                  {SOCIAL_PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+                                </select>
+                                {!SOCIAL_PLATFORMS.filter(p => p !== 'Other').includes(link.platform) && (
+                                  <input 
+                                    value={link.platform} 
+                                    onChange={(e) => updateSocialLink(link.id, 'platform', e.target.value)} 
+                                    className="flex-1 bg-slate-950 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-cyan-500/30" 
+                                    placeholder="Platform Name" 
+                                  />
+                                )}
+                              </div>
+                              <button onClick={() => removeSocialLink(link.id)} className="text-red-500/50 hover:text-red-500 p-2 transition-all"><Trash2 size={16} /></button>
+                            </div>
+                            <div className="relative">
+                               <LinkIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
+                               <input 
+                                 value={link.url} 
+                                 onChange={(e) => updateSocialLink(link.id, 'url', e.target.value)} 
+                                 className="w-full bg-slate-950 border border-white/5 rounded-xl px-10 py-2 text-xs font-mono outline-none focus:border-cyan-500/30" 
+                                 placeholder="https://" 
+                               />
+                            </div>
                          </div>
                        ))}
                     </div>

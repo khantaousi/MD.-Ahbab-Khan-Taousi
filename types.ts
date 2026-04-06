@@ -12,12 +12,15 @@ export interface Project {
   description: string;
   image: string;
   link: string;
+  titleBn?: string;
+  descriptionBn?: string;
 }
 
 export interface GalleryItem {
   id: string;
   image: string;
   title: string;
+  titleBn?: string;
 }
 
 export interface Skill {
@@ -25,6 +28,8 @@ export interface Skill {
   name: string;
   proficiency?: number;
   description?: string;
+  nameBn?: string;
+  descriptionBn?: string;
 }
 
 export interface SocialLink {
@@ -46,11 +51,15 @@ export interface JobExperience {
   logoUrl: string;
   duration: string;
   description: string;
+  durationBn?: string;
+  descriptionBn?: string;
 }
 
 export interface EventData {
   title: string;
   subtitle: string;
+  titleBn?: string;
+  subtitleBn?: string;
   animationType: 'float' | 'pulse' | 'none';
   theme: 'auto' | 'islamic' | 'party' | 'minimal';
 }
@@ -60,6 +69,8 @@ export interface SEOData {
   metaDescription: string;
   metaKeywords: string;
   favicon?: string;
+  metaTitleBn?: string;
+  metaDescriptionBn?: string;
 }
 
 export type OrderStatus = 'pending' | 'completed' | 'cancelled';
@@ -83,6 +94,11 @@ export interface PortfolioData {
   aboutText: string;
   email: string;
   phone: string;
+  nameBn?: string;
+  titleBn?: string;
+  bioBn?: string;
+  currentWorkBn?: string;
+  aboutTextBn?: string;
   theme: 'neon' | 'gold' | 'rose' | 'emerald';
   layout: 'default' | 'minimal' | 'brutalist' | 'split' | 'classic';
   // Visibility Controls

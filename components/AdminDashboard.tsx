@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PortfolioData, Project, Skill, SocialLink, GalleryItem, JobExperience, OrderStatus } from '../types';
 import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
 import { auth } from '../firebase';
-import { updatePassword, updateEmail } from 'firebase/auth';
+import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { 
   Save, LogOut, Plus, Trash2, Camera, Link as LinkIcon, 
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
   Phone, Mail, Sparkles, Lock, Globe, BarChart, Eraser, Loader2, Share2, Copy,
-  Facebook, Github, Linkedin, Twitter, Instagram, Youtube, MessageCircle, Languages
+  Facebook, Github, Linkedin, Twitter, Instagram, Youtube, MessageCircle, Languages,
+  Eye, EyeOff
 } from 'lucide-react';
 import { removeBackground } from "@imgly/background-removal";
 import ProfileImageUploader from './ProfileImageUploader';
@@ -44,8 +45,34 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const [newEmail, setNewEmail] = useState('');
   const [emailStatus, setEmailStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [emailError, setEmailError] = useState('');
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    setShowWelcome(true);
+    const timer = setTimeout(() => setShowWelcome(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
   
   const currentThemeColor = THEME_OPTIONS.find(th => th.id === formData.theme)?.color || '#0ea5e9';
+
+  const getPasswordStrength = (pass: string) => {
+    if (!pass) return { score: 0, label: '', color: 'bg-slate-800' };
+    let score = 0;
+    if (pass.length >= 6) score += 1;
+    if (pass.length >= 8) score += 1;
+    if (/[A-Z]/.test(pass)) score += 1;
+    if (/[0-9]/.test(pass)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+
+    if (score <= 2) return { score: 33, label: lang === 'bn' ? 'দুর্বল' : 'Weak', color: 'bg-red-500' };
+    if (score <= 4) return { score: 66, label: lang === 'bn' ? 'মাঝারি' : 'Normal', color: 'bg-yellow-500' };
+    return { score: 100, label: lang === 'bn' ? 'শক্তিশালী' : 'Hard', color: 'bg-green-500' };
+  };
 
   const compressImage = (base64: string, maxWidth = 800, quality = 0.7): Promise<string> => {
     if (!base64 || !base64.startsWith('data:image')) return Promise.resolve(base64);
@@ -209,17 +236,30 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
       setEmailStatus('error');
       return;
     }
+    if (!currentPassword) {
+      setEmailError(lang === 'bn' ? 'বর্তমান পাসওয়ার্ড দিন' : 'Please enter current password');
+      setEmailStatus('error');
+      return;
+    }
 
     setEmailStatus('saving');
     try {
-      if (auth.currentUser) {
+      if (auth.currentUser && auth.currentUser.email) {
+        const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+        await reauthenticateWithCredential(auth.currentUser, credential);
         await updateEmail(auth.currentUser, newEmail);
         setEmailStatus('success');
         setNewEmail('');
+        setCurrentPassword('');
         setTimeout(() => setEmailStatus('idle'), 3000);
       }
     } catch (error: any) {
-      setEmailError(error.message);
+      console.error(error);
+      let errorMessage = error.message;
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = lang === 'bn' ? 'ভুল পাসওয়ার্ড' : 'Incorrect password';
+      }
+      setEmailError(errorMessage);
       setEmailStatus('error');
     }
   };
@@ -236,14 +276,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
       setPasswordStatus('error');
       return;
     }
+    if (!currentPassword) {
+      setPasswordError(lang === 'bn' ? 'বর্তমান পাসওয়ার্ড দিন' : 'Please enter current password');
+      setPasswordStatus('error');
+      return;
+    }
 
     setPasswordStatus('saving');
     try {
-      if (auth.currentUser) {
+      if (auth.currentUser && auth.currentUser.email) {
+        const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+        await reauthenticateWithCredential(auth.currentUser, credential);
         await updatePassword(auth.currentUser, newPassword);
         setPasswordStatus('success');
         setNewPassword('');
         setConfirmPassword('');
+        setCurrentPassword('');
         setTimeout(() => setPasswordStatus('idle'), 3000);
       } else {
         throw new Error('No user logged in');
@@ -251,7 +299,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     } catch (error: any) {
       console.error(error);
       let errorMessage = error.message;
-      if (error.code === 'auth/requires-recent-login') {
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = lang === 'bn' ? 'ভুল পাসওয়ার্ড' : 'Incorrect password';
+      } else if (error.code === 'auth/requires-recent-login') {
         errorMessage = lang === 'bn' ? 'নিরাপত্তার কারণে আপনাকে আবার লগইন করতে হবে' : 'Please re-login to change password for security reasons';
       }
       setPasswordError(errorMessage);
@@ -373,6 +423,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col text-slate-100">
+      {showWelcome && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="glass border border-white/10 px-8 py-4 rounded-full shadow-2xl flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: currentThemeColor }}>
+              <Sparkles size={16} className="text-slate-950" />
+            </div>
+            <span className="font-black uppercase tracking-[0.2em] text-xs">Welcome Chief</span>
+          </div>
+        </div>
+      )}
       <header className="glass border-b border-white/5 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -1013,9 +1073,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                           required
                         />
                      </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                          {lang === 'bn' ? 'বর্তমান পাসওয়ার্ড' : 'Current Password'}
+                        </label>
+                        <div className="relative">
+                          <input 
+                            type={showCurrentPassword ? "text" : "password"}
+                            value={currentPassword} 
+                            onChange={(e) => setCurrentPassword(e.target.value)} 
+                            className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none pr-14" 
+                            placeholder="••••••••" 
+                            required
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                          >
+                            {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </button>
+                        </div>
+                     </div>
                      <button 
                        type="submit" 
-                       disabled={emailStatus === 'saving' || !newEmail}
+                       disabled={emailStatus === 'saving' || !newEmail || !currentPassword}
                        className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                      >
                        {emailStatus === 'saving' ? (lang === 'bn' ? 'সংরক্ষণ করা হচ্ছে...' : 'Saving...') : (lang === 'bn' ? 'ইমেইল পরিবর্তন করুন' : 'Update Email')}
@@ -1041,36 +1123,106 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                        <p className="text-red-400 text-xs font-bold uppercase tracking-widest">{passwordError}</p>
                      </div>
                    )}
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                        {lang === 'bn' ? 'নতুন পাসওয়ার্ড' : 'New Password'}
-                      </label>
-                      <input 
-                        type="password"
-                        value={newPassword} 
-                        onChange={(e) => setNewPassword(e.target.value)} 
-                        className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
-                        placeholder="••••••••" 
-                        required
-                      />
-                   </div>
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                        {lang === 'bn' ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}
-                      </label>
-                      <input 
-                        type="password"
-                        value={confirmPassword} 
-                        onChange={(e) => setConfirmPassword(e.target.value)} 
-                        className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
-                        placeholder="••••••••" 
-                        required
-                      />
-                   </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                         {lang === 'bn' ? 'বর্তমান পাসওয়ার্ড' : 'Current Password'}
+                       </label>
+                       <div className="relative">
+                         <input 
+                           type={showCurrentPassword ? "text" : "password"}
+                           value={currentPassword} 
+                           onChange={(e) => setCurrentPassword(e.target.value)} 
+                           className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none pr-14" 
+                           placeholder="••••••••" 
+                           required
+                         />
+                         <button 
+                           type="button"
+                           onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                           className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                         >
+                           {showCurrentPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                         </button>
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                       <div className="flex justify-between items-center">
+                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                           {lang === 'bn' ? 'নতুন পাসওয়ার্ড' : 'New Password'}
+                         </label>
+                         {newPassword && (
+                           <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${getPasswordStrength(newPassword).color} text-slate-950 transition-all duration-500`}>
+                             {getPasswordStrength(newPassword).label}
+                           </span>
+                         )}
+                       </div>
+                       <div className="relative">
+                         <input 
+                           type={showNewPassword ? "text" : "password"}
+                           value={newPassword} 
+                           onChange={(e) => setNewPassword(e.target.value)} 
+                           className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none pr-14" 
+                           placeholder="••••••••" 
+                           required
+                         />
+                         <button 
+                           type="button"
+                           onClick={() => setShowNewPassword(!showNewPassword)}
+                           className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                         >
+                           {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                         </button>
+                       </div>
+                       {newPassword && (
+                         <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden mt-1">
+                           <div 
+                             className={`h-full transition-all duration-500 ${getPasswordStrength(newPassword).color}`}
+                             style={{ width: `${getPasswordStrength(newPassword).score}%` }}
+                           />
+                         </div>
+                       )}
+                    </div>
+                    <div className="space-y-2">
+                       <div className="flex justify-between items-center">
+                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                           {lang === 'bn' ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}
+                         </label>
+                         {confirmPassword && (
+                           <div className="flex items-center gap-1">
+                             {newPassword === confirmPassword ? (
+                               <span className="text-[9px] font-black uppercase tracking-widest text-green-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-2">
+                                 <CheckCircle2 size={10} /> {lang === 'bn' ? 'মিলেছে' : 'Matched'}
+                               </span>
+                             ) : (
+                               <span className="text-[9px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-2">
+                                 <AlertCircle size={10} /> {lang === 'bn' ? 'মিলেনি' : 'Not Matched'}
+                               </span>
+                             )}
+                           </div>
+                         )}
+                       </div>
+                       <div className="relative">
+                         <input 
+                           type={showConfirmPassword ? "text" : "password"}
+                           value={confirmPassword} 
+                           onChange={(e) => setConfirmPassword(e.target.value)} 
+                           className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none pr-14" 
+                           placeholder="••••••••" 
+                           required
+                         />
+                         <button 
+                           type="button"
+                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                           className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                         >
+                           {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                         </button>
+                       </div>
+                    </div>
                    <button 
                      type="submit" 
-                     disabled={passwordStatus === 'saving'}
-                     className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 bg-slate-800 hover:bg-slate-700 text-white border border-white/10"
+                     disabled={passwordStatus === 'saving' || !newPassword || !confirmPassword || !currentPassword}
+                     className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all active:scale-95 bg-slate-800 hover:bg-slate-700 text-white border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
                    >
                      {passwordStatus === 'saving' ? <RefreshCw className="animate-spin" size={16} /> : <Lock size={16} />} 
                      {passwordStatus === 'saving' ? (lang === 'bn' ? 'আপডেট হচ্ছে...' : 'Updating...') : (lang === 'bn' ? 'পাসওয়ার্ড আপডেট করুন' : 'Update Password')}

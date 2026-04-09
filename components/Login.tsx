@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Lock, User, LogIn, ArrowLeft, ShieldCheck, Mail, RefreshCw } from 'lucide-react';
+import { Lock, User, LogIn, ArrowLeft, ShieldCheck, Mail, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { auth, signInWithEmailAndPassword, sendEmailVerification } from '../firebase';
 
 interface LoginProps {
@@ -16,6 +16,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleAuthAction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,13 +110,20 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
                 <Lock size={18} />
               </div>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-900/50 border border-white/10 text-white pl-14 pr-6 py-5 rounded-2xl focus:border-cyan-500/50 outline-none transition-all font-bold"
+                className="w-full bg-slate-900/50 border border-white/10 text-white pl-14 pr-14 py-5 rounded-2xl focus:border-cyan-500/50 outline-none transition-all font-bold"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 

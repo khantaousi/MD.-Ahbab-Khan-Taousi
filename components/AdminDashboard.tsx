@@ -9,7 +9,7 @@ import {
   Image as ImageIcon, Bell, Clock, Briefcase, ShoppingBag, 
   ListChecks, Activity, User, Code, X, ChevronRight, CheckCircle2, AlertCircle,
   Phone, Mail, Sparkles, Lock, Globe, BarChart, Eraser, Loader2, Share2, Copy,
-  Facebook, Github, Linkedin, Twitter, Instagram, Youtube, MessageCircle
+  Facebook, Github, Linkedin, Twitter, Instagram, Youtube, MessageCircle, Languages
 } from 'lucide-react';
 import { removeBackground } from "@imgly/background-removal";
 import ProfileImageUploader from './ProfileImageUploader';
@@ -438,67 +438,21 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                     />
                   </div>
                   <div className="flex-1 space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Display Name</label>
-                        <input name="name" value={formData.name} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Name" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logo (Optional)</label>
-                        <div className="flex gap-3">
-                          <div className="w-14 h-14 rounded-xl border border-white/10 overflow-hidden shrink-0 flex items-center justify-center relative" style={{ 
-                            backgroundImage: 'linear-gradient(45deg, #0f172a 25%, transparent 25%), linear-gradient(-45deg, #0f172a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #0f172a 75%), linear-gradient(-45deg, transparent 75%, #0f172a 75%)',
-                            backgroundSize: '10px 10px',
-                            backgroundPosition: '0 0, 0 5px, 5px 5px, 5px 0',
-                            backgroundColor: '#1e293b'
-                          }}>
-                            {formData.logoUrl ? (
-                              <img src={formData.logoUrl} className="w-full h-full object-contain relative z-10" />
-                            ) : (
-                              <ImageIcon size={20} className="text-slate-700" />
-                            )}
-                          </div>
-                          <div className="flex-1 flex flex-col gap-2">
-                            <input 
-                              name="logoUrl" 
-                              value={formData.logoUrl || ''} 
-                              onChange={handleChange} 
-                              className="w-full bg-slate-900/30 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-mono outline-none focus:border-white/20" 
-                              placeholder="Logo URL or Upload" 
-                            />
-                            <label className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-cyan-400 cursor-pointer hover:brightness-125 transition-all">
-                              <Camera size={12} /> {lang === 'bn' ? 'লোগো আপলোড' : 'Upload Logo'}
-                              <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'logo')} accept="image/*" />
-                            </label>
-                            {formData.logoUrl && (
-                              <button 
-                                onClick={removeLogoBackground}
-                                disabled={isRemovingBackground}
-                                className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-400 hover:brightness-125 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {isRemovingBackground ? (
-                                  <Loader2 size={12} className="animate-spin" />
-                                ) : (
-                                  <Eraser size={12} />
-                                )}
-                                {lang === 'bn' ? 'ব্যাকগ্রাউন্ড রিমুভ' : 'Auto Background Remove'}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Display Name</label>
+                      <input name="name" value={formData.name} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Name" />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Professional Title</label>
-                       <input name="title" value={formData.title} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Title" />
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Professional Title</label>
+                      <input name="title" value={formData.title} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Title" />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Short Catchy Bio</label>
-                       <textarea name="bio" value={formData.bio} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" placeholder="Bio" />
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Short Catchy Bio</label>
+                      <textarea name="bio" value={formData.bio} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" placeholder="Bio" />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Current Company / Status</label>
-                       <input name="currentWork" value={formData.currentWork} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Current Workplace" />
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Current Company / Status</label>
+                      <input name="currentWork" value={formData.currentWork} onChange={handleChange} className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" placeholder="Current Workplace" />
                     </div>
                   </div>
                </div>
@@ -557,12 +511,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                     <div key={skill.id} className="bg-white/5 p-6 rounded-[32px] border border-white/5 focus-within:border-cyan-500/30 transition-all space-y-4">
                        <div className="flex items-center gap-4">
                          <Code size={18} style={{ color: currentThemeColor }} />
-                         <input 
-                           value={skill.name} 
-                           onChange={(e) => updateSkill(skill.id, 'name', e.target.value)} 
-                           className="flex-1 bg-transparent border-none outline-none font-black text-base" 
-                           placeholder="Skill name" 
-                         />
+                         <div className="flex-1">
+                            <input 
+                              value={skill.name} 
+                              onChange={(e) => updateSkill(skill.id, 'name', e.target.value)} 
+                              className="w-full bg-transparent border-b border-white/10 outline-none font-black text-base" 
+                              placeholder="Skill name" 
+                            />
+                         </div>
                          <div className="flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-xl border border-white/10">
                            <input 
                              type="number" 
@@ -577,12 +533,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                          </div>
                          <button onClick={() => removeSkill(skill.id)} className="text-red-500/50 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>
                        </div>
-                       <textarea 
-                         value={skill.description || ''} 
-                         onChange={(e) => updateSkill(skill.id, 'description', e.target.value)} 
-                         className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-cyan-500/20 resize-none h-20" 
-                         placeholder="Brief description of your expertise in this skill..." 
-                       />
+                       <div className="w-full">
+                          <textarea 
+                            value={skill.description || ''} 
+                            onChange={(e) => updateSkill(skill.id, 'description', e.target.value)} 
+                            className="w-full bg-black/20 border border-white/5 rounded-xl px-4 py-3 text-xs outline-none focus:border-cyan-500/20 resize-none h-20" 
+                            placeholder="Description" 
+                          />
+                       </div>
                     </div>
                   ))}
                </div>
@@ -608,10 +566,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                              <input value={job.companyName} onChange={(e) => updateJobExperience(job.id, 'companyName', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-black text-sm outline-none" placeholder="Company Name" />
                              <input value={job.website} onChange={(e) => updateJobExperience(job.id, 'website', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-mono text-xs outline-none" placeholder="Website URL" />
-                             <input value={job.duration} onChange={(e) => updateJobExperience(job.id, 'duration', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-bold text-sm outline-none" placeholder="Duration (e.g., 2 years)" />
+                             <input value={job.duration} onChange={(e) => updateJobExperience(job.id, 'duration', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-bold text-sm outline-none" placeholder="Duration" />
                              <input value={job.logoUrl} onChange={(e) => updateJobExperience(job.id, 'logoUrl', e.target.value)} className="bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-mono text-xs outline-none" placeholder="Logo URL" />
                           </div>
-                          <textarea value={job.description} onChange={(e) => updateJobExperience(job.id, 'description', e.target.value)} className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-sm outline-none resize-none" placeholder="Role Description" />
+                          <div className="w-full">
+                            <textarea value={job.description} onChange={(e) => updateJobExperience(job.id, 'description', e.target.value)} className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-sm outline-none resize-none h-24" placeholder="Description" />
+                          </div>
                        </div>
                        <button onClick={() => removeJobExperience(job.id)} className="text-red-500/50 hover:text-red-500 p-2 h-fit"><Trash2 size={20} /></button>
                     </div>
@@ -670,8 +630,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
           {activeTab === 'about' && (
             <div className="space-y-8 animate-in fade-in">
                <h2 className="text-2xl font-black">{t.aboutHeader}</h2>
-               <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Long-form Bio (Professional Journey)</label>
+               <div className="w-full">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Long-form Bio</label>
                   <textarea 
                     name="aboutText" 
                     value={formData.aboutText} 
@@ -700,18 +660,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                           <label className="absolute inset-0 flex items-center justify-center bg-slate-950/70 opacity-0 group-hover:opacity-100 cursor-pointer transition-all"><Camera size={24} /><input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'blog', post.id)} /></label>
                        </div>
                        <div className="flex-1 space-y-4">
-                          <input 
-                            value={post.title} 
-                            onChange={(e) => updateBlogPost(post.id, 'title', e.target.value)} 
-                            className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-black text-lg outline-none focus:border-cyan-500/30" 
-                            placeholder="Post Title" 
-                          />
-                          <textarea 
-                            value={post.description} 
-                            onChange={(e) => updateBlogPost(post.id, 'description', e.target.value)} 
-                            className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-sm min-h-[100px] outline-none focus:border-cyan-500/30 resize-none" 
-                            placeholder="Description Content" 
-                          />
+                          <div className="w-full">
+                             <input 
+                               value={post.title} 
+                               onChange={(e) => updateBlogPost(post.id, 'title', e.target.value)} 
+                               className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 font-black text-lg outline-none focus:border-cyan-500/30" 
+                               placeholder="Post Title" 
+                             />
+                          </div>
+                          <div className="w-full">
+                             <textarea 
+                               value={post.description} 
+                               onChange={(e) => updateBlogPost(post.id, 'description', e.target.value)} 
+                               className="w-full bg-slate-950/50 border border-white/5 rounded-xl px-4 py-3 text-sm min-h-[100px] outline-none focus:border-cyan-500/30 resize-none" 
+                               placeholder="Description Content" 
+                             />
+                          </div>
                           <div className="flex gap-4">
                              <div className="flex-1 relative">
                                 <LinkIcon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -754,14 +718,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                           <img src={item.image} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                           <label className="absolute inset-0 flex items-center justify-center bg-slate-950/70 opacity-0 group-hover:opacity-100 cursor-pointer transition-all"><Camera size={24} /><input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'gallery', item.id)} /></label>
                        </div>
-                       <div className="p-4 flex gap-2">
+                       <div className="p-4 flex flex-col gap-2">
                           <input 
                             value={item.title} 
                             onChange={(e) => updateGalleryItem(item.id, 'title', e.target.value)} 
-                            className="flex-1 bg-slate-900 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none" 
+                            className="w-full bg-slate-900 border border-white/5 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none" 
                             placeholder="Photo Tag" 
                           />
-                          <button onClick={() => removeGalleryItem(item.id)} className="text-red-500/50 hover:text-red-500 p-2 transition-colors"><Trash2 size={16} /></button>
+                          <button onClick={() => removeGalleryItem(item.id)} className="text-red-500/50 hover:text-red-500 p-2 transition-colors self-end"><Trash2 size={16} /></button>
                        </div>
                     </div>
                   ))}
@@ -866,29 +830,33 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
             <div className="space-y-8 animate-in fade-in">
                <h2 className="text-2xl font-black">{t.adminEvent}</h2>
                <div className="space-y-6">
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Section Title</label>
-                    <input 
-                      value={formData.event?.title || ''} 
-                      onChange={(e) => {
-                        setFormData(prev => ({ ...prev, event: { ...prev.event, title: e.target.value } }));
-                        setHasUnsavedChanges(true);
-                      }} 
-                      className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
-                      placeholder="EID MUBARAK" 
-                    />
+                 <div className="w-full">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Section Title</label>
+                       <input 
+                         value={formData.event?.title || ''} 
+                         onChange={(e) => {
+                           setFormData(prev => ({ ...prev, event: { ...prev.event, title: e.target.value } }));
+                           setHasUnsavedChanges(true);
+                         }} 
+                         className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                         placeholder="EID MUBARAK" 
+                       />
+                    </div>
                  </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Greeting Message</label>
-                    <textarea 
-                      value={formData.event?.subtitle || ''} 
-                      onChange={(e) => {
-                        setFormData(prev => ({ ...prev, event: { ...prev.event, subtitle: e.target.value } }));
-                        setHasUnsavedChanges(true);
-                      }} 
-                      className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" 
-                      placeholder="Greeting message..." 
-                    />
+                 <div className="w-full">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Greeting Message</label>
+                       <textarea 
+                         value={formData.event?.subtitle || ''} 
+                         onChange={(e) => {
+                           setFormData(prev => ({ ...prev, event: { ...prev.event, subtitle: e.target.value } }));
+                           setHasUnsavedChanges(true);
+                         }} 
+                         className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" 
+                         placeholder="Greeting message..." 
+                       />
+                    </div>
                  </div>
                  <div className="grid grid-cols-2 gap-6">
                    <div className="space-y-2">
@@ -951,27 +919,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
             <div className="space-y-8 animate-in fade-in">
                <h2 className="text-2xl font-black">{t.adminSEO || (lang === 'bn' ? 'এসইও সেটিংস' : 'SEO Settings')}</h2>
                <div className="space-y-6">
-                  <div className="space-y-2">
-                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Title</label>
-                     <input 
-                       name="metaTitle" 
-                       value={formData.seo?.metaTitle || ''} 
-                       onChange={handleSEOChange} 
-                       className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
-                       placeholder="Meta Title" 
-                     />
-                     <p className="text-[9px] text-slate-500 uppercase tracking-widest">Recommended: 50-60 characters</p>
+                  <div className="w-full">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Title</label>
+                       <input 
+                         name="metaTitle" 
+                         value={formData.seo?.metaTitle || ''} 
+                         onChange={handleSEOChange} 
+                         className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                         placeholder="Meta Title" 
+                       />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Description</label>
-                     <textarea 
-                       name="metaDescription" 
-                       value={formData.seo?.metaDescription || ''} 
-                       onChange={handleSEOChange} 
-                       className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" 
-                       placeholder="Meta Description" 
-                     />
-                     <p className="text-[9px] text-slate-500 uppercase tracking-widest">Recommended: 150-160 characters</p>
+                  <div className="w-full">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Description</label>
+                       <textarea 
+                         name="metaDescription" 
+                         value={formData.seo?.metaDescription || ''} 
+                         onChange={handleSEOChange} 
+                         className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 h-32 focus:border-cyan-500/50 outline-none resize-none" 
+                         placeholder="Meta Description" 
+                       />
+                    </div>
                   </div>
                   <div className="space-y-2">
                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Meta Keywords</label>

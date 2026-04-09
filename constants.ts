@@ -228,7 +228,7 @@ export const TRANSLATIONS = {
     heroIam: "আমি",
     heroEmailBtn: "ইমেইল পাঠান",
     heroStatus: "অ্যাভেইলবল",
-    heroWorkLabel: "বর্তমানে কর্মরত",
+    heroWorkLabel: "বর্তমান কর্মস্থল",
     clockLabel: "বাংলাদেশ সময়",
     skillsHeader: "দক্ষতাসমূহ",
     aboutHeader: "আমার সম্পর্কে",

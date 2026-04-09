@@ -6,7 +6,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import { PortfolioData } from '../types';
 import { 
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
-  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2, Sun, Moon, MessageCircle
+  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2, Sun, Moon, MessageCircle, Languages
 } from 'lucide-react';
 import AIChatBot from './AIChatBot';
 import EventSection from './EventSection';
@@ -192,7 +192,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
   const layout = data.layout || 'default';
 
   const getContent = (en: string, bn?: string) => {
-    return lang === 'bn' && bn ? bn : en;
+    if (lang === 'bn' && bn && bn.trim() !== '') return bn;
+    return en;
   };
 
   return (
@@ -352,7 +353,14 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
               <button onClick={() => setIsLightMode(!isLightMode)} className="bg-white/5 border border-white/10 p-2 rounded-full hover:bg-white/10 transition-all text-slate-300 hover:text-white" aria-label="Toggle Theme">
                 {isLightMode ? <Moon size={14} /> : <Sun size={14} />}
               </button>
-              <button onClick={() => setLang(lang === 'en' ? 'bn' : 'en')} className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[8px] font-black hover:bg-white/10 transition-all">{lang.toUpperCase()}</button>
+              <button 
+                onClick={() => setLang(lang === 'en' ? 'bn' : 'en')} 
+                className="bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-[10px] font-black hover:bg-white/10 transition-all flex items-center gap-2 group"
+                title={lang === 'en' ? 'বাংলায় দেখুন' : 'View in English'}
+              >
+                <Languages size={14} className="text-slate-400 group-hover:text-white transition-colors" />
+                <span className="text-slate-200">{lang === 'en' ? 'BN' : 'EN'}</span>
+              </button>
               <Link to="/login" className="w-10 h-10 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110" style={{ backgroundColor: themeConfig.accent, color: '#000' }}><User size={16} /></Link>
             </div>
         </div>
@@ -501,12 +509,12 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
               <div className="marquee-wrapper flex items-center gap-10 whitespace-nowrap">
                 <p className="text-[11px] font-bold text-white pl-4">
                   <span className="opacity-40 font-mono text-[9px] mr-2">[{getNoticeTimestamp()}]</span>
-                  {data.notice.text}
+                  {typeof data.notice.text === 'object' ? (data.notice.text as any).text : data.notice.text}
                 </p>
                 <span className="text-slate-700 font-black">/ / /</span>
                 <p className="text-[11px] font-bold text-white">
                   <span className="opacity-40 font-mono text-[9px] mr-2">[{getNoticeTimestamp()}]</span>
-                  {data.notice.text}
+                  {typeof data.notice.text === 'object' ? (data.notice.text as any).text : data.notice.text}
                 </p>
               </div>
             </div>

@@ -9,11 +9,11 @@ export interface ChatMessage {
 export interface Project {
   id: string;
   title: string;
+  titleBn?: string;
   description: string;
+  descriptionBn?: string;
   image: string;
   link: string;
-  titleBn?: string;
-  descriptionBn?: string;
 }
 
 export interface GalleryItem {
@@ -26,10 +26,11 @@ export interface GalleryItem {
 export interface Skill {
   id: string;
   name: string;
+  nameBn?: string;
   proficiency?: number;
   description?: string;
-  nameBn?: string;
   descriptionBn?: string;
+  category?: string;
 }
 
 export interface SocialLink {
@@ -50,15 +51,15 @@ export interface JobExperience {
   website: string;
   logoUrl: string;
   duration: string;
-  description: string;
   durationBn?: string;
+  description: string;
   descriptionBn?: string;
 }
 
 export interface EventData {
   title: string;
-  subtitle: string;
   titleBn?: string;
+  subtitle: string;
   subtitleBn?: string;
   animationType: 'float' | 'pulse' | 'none';
   theme: 'auto' | 'islamic' | 'party' | 'minimal';
@@ -66,11 +67,11 @@ export interface EventData {
 
 export interface SEOData {
   metaTitle: string;
+  metaTitleBn?: string;
   metaDescription: string;
+  metaDescriptionBn?: string;
   metaKeywords: string;
   favicon?: string;
-  metaTitleBn?: string;
-  metaDescriptionBn?: string;
 }
 
 export type OrderStatus = 'pending' | 'completed' | 'cancelled';
@@ -87,18 +88,18 @@ export interface Order {
 
 export interface PortfolioData {
   name: string;
+  nameBn?: string;
   title: string;
+  titleBn?: string;
   bio: string;
+  bioBn?: string;
   currentWork: string;
+  currentWorkBn?: string;
   profileImage: string;
   aboutText: string;
+  aboutTextBn?: string;
   email: string;
   phone: string;
-  nameBn?: string;
-  titleBn?: string;
-  bioBn?: string;
-  currentWorkBn?: string;
-  aboutTextBn?: string;
   theme: 'neon' | 'gold' | 'rose' | 'emerald';
   layout: 'default' | 'minimal' | 'brutalist' | 'split' | 'classic';
   // Visibility Controls

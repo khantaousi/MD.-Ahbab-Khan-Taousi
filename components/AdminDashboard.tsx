@@ -619,8 +619,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                <div className="space-y-6">
                   {formData.jobExperiences.map(job => (
                     <div key={job.id} className="bg-white/5 rounded-[32px] p-6 border border-white/5 flex flex-col md:flex-row gap-6">
-                       <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shrink-0">
+                       <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shrink-0 relative group">
                           <img src={job.logoUrl} className="w-full h-full object-cover" />
+                           <label className="absolute inset-0 flex items-center justify-center bg-slate-950/70 opacity-0 group-hover:opacity-100 cursor-pointer transition-all">
+                              <Camera size={24} />
+                              <input type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'job', job.id)} />
+                           </label>
                        </div>
                        <div className="flex-1 space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

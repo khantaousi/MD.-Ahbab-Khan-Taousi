@@ -100,7 +100,8 @@ export interface PortfolioData {
   aboutTextBn?: string;
   email: string;
   phone: string;
-  theme: 'neon' | 'gold' | 'rose' | 'emerald';
+  theme: 'neon' | 'gold' | 'rose' | 'emerald' | 'custom';
+  customColor?: string;
   layout: 'default' | 'minimal' | 'brutalist' | 'split' | 'classic';
   // Visibility Controls
   showAbout: boolean;

@@ -58,7 +58,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     return () => clearTimeout(timer);
   }, []);
   
-  const currentThemeColor = THEME_OPTIONS.find(th => th.id === formData.theme)?.color || '#0ea5e9';
+  const currentThemeColor = formData.theme === 'custom' 
+    ? (formData.customColor || '#0ea5e9') 
+    : (THEME_OPTIONS.find(th => th.id === formData.theme)?.color || '#0ea5e9');
 
   const getPasswordStrength = (pass: string) => {
     if (!pass) return { score: 0, label: '', color: 'bg-slate-800' };
@@ -519,7 +521,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
 
                <div className="pt-6 border-t border-white/5">
                   <h3 className="text-sm font-black uppercase tracking-widest mb-6">{t.adminTheme}</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     {THEME_OPTIONS.map(theme => (
                       <button 
                         key={theme.id} 
@@ -530,7 +532,47 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                         <span className="text-[10px] font-black uppercase tracking-tighter">{theme.name}</span>
                       </button>
                     ))}
+                    <button 
+                      onClick={() => { setFormData(prev => ({ ...prev, theme: 'custom' })); setHasUnsavedChanges(true); }}
+                      className={`p-4 rounded-2xl border transition-all flex flex-col items-center gap-2 ${formData.theme === 'custom' ? 'border-white bg-white/10' : 'border-white/5 bg-slate-900/50'}`}
+                    >
+                      <div className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center overflow-hidden" style={{ backgroundColor: formData.customColor || '#ffffff' }}>
+                        {formData.theme === 'custom' && <div className="w-2 h-2 bg-white rounded-full shadow-lg"></div>}
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-tighter">{lang === 'bn' ? 'কাস্টম' : 'Custom'}</span>
+                    </button>
                   </div>
+
+                  {formData.theme === 'custom' && (
+                    <div className="mt-6 p-6 bg-white/5 rounded-3xl border border-white/10 animate-in fade-in slide-in-from-top-2">
+                       <div className="flex flex-col md:flex-row items-center gap-6">
+                          <div className="relative group">
+                             <input 
+                               type="color" 
+                               value={formData.customColor || '#0ea5e9'} 
+                               onChange={(e) => { setFormData(prev => ({ ...prev, customColor: e.target.value })); setHasUnsavedChanges(true); }}
+                               className="w-20 h-20 rounded-2xl cursor-pointer bg-transparent border-none outline-none"
+                             />
+                             <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                                <Sparkles size={20} className="text-white mix-blend-difference" />
+                             </div>
+                          </div>
+                          <div className="flex-1 space-y-2">
+                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Hex Color Code</label>
+                             <div className="flex gap-2">
+                                <input 
+                                  type="text" 
+                                  value={formData.customColor || '#0ea5e9'} 
+                                  onChange={(e) => { setFormData(prev => ({ ...prev, customColor: e.target.value })); setHasUnsavedChanges(true); }}
+                                  className="flex-1 bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 font-mono text-xs uppercase outline-none focus:border-white/30"
+                                  placeholder="#000000"
+                                />
+                                <div className="w-10 h-10 rounded-xl border border-white/10" style={{ backgroundColor: formData.customColor || '#0ea5e9' }}></div>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                  )}
                </div>
 
 

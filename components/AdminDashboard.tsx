@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { PortfolioData, Project, Skill, SocialLink, GalleryItem, JobExperience, OrderStatus } from '../types';
 import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { collection, getDocs, query, limit } from 'firebase/firestore';
 import { 
   Save, LogOut, Plus, Trash2, Camera, Link as LinkIcon, 
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
@@ -51,10 +52,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [totalVisits, setTotalVisits] = useState<number | null>(null);
 
   useEffect(() => {
     setShowWelcome(true);
     const timer = setTimeout(() => setShowWelcome(false), 5000);
+    
+    // Fetch total visits
+    const fetchTotalVisits = async () => {
+      try {
+        const q = query(collection(db, 'visits'), limit(2000));
+        const snapshot = await getDocs(q);
+        setTotalVisits(snapshot.size);
+      } catch (error) {
+        console.error('Error fetching total visits:', error);
+      }
+    };
+    fetchTotalVisits();
+
     return () => clearTimeout(timer);
   }, []);
   
@@ -440,7 +455,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
           <div className="flex items-center gap-4">
             <Shield size={20} style={{ color: currentThemeColor }} />
             <div>
-                <h1 className="text-lg font-black">{t.adminHeader}</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-black">{t.adminHeader}</h1>
+                  {totalVisits !== null && (
+                    <div className="bg-white/5 border border-white/10 px-2 py-0.5 rounded-full flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">
+                        {lang === 'bn' ? 'ভিজিটর:' : 'Visits:'} <span className="text-white">{totalVisits}{totalVisits >= 2000 ? '+' : ''}</span>
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <p className="text-[8px] text-slate-500 uppercase tracking-widest">{hasUnsavedChanges ? (lang === 'bn' ? "পরিবর্তনগুলো সেভ করা হয়নি" : "Unsaved Changes") : t.adminSub}</p>
             </div>
           </div>

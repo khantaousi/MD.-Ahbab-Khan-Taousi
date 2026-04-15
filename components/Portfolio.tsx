@@ -6,7 +6,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import { PortfolioData } from '../types';
 import { 
   Github, Linkedin, Mail, Phone, ExternalLink, ArrowRight, User, 
-  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, Maximize2, Sun, Moon, MessageCircle, Languages
+  BookOpen, Code, Facebook, Instagram, Twitter, Globe, Youtube, Clock, Calendar, Image as ImageIcon, Bell, Briefcase, X, ChevronDown, ChevronUp, Maximize2, Sun, Moon, MessageCircle, Languages
 } from 'lucide-react';
 import AIChatBot from './AIChatBot';
 import EventSection from './EventSection';
@@ -101,6 +101,20 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
     return localStorage.getItem('theme_mode') === 'light';
   });
   const [asyncError, setAsyncError] = useState<Error | null>(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -827,6 +841,27 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         accentColor={themeConfig.accent} 
         isLightMode={isLightMode} 
       />
+
+      {/* Back to Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-8 right-8 z-[90] p-4 rounded-full shadow-2xl backdrop-blur-xl border border-white/10 transition-all hover:scale-110 active:scale-95 group"
+            style={{ 
+              backgroundColor: `${themeConfig.accent}22`,
+              color: themeConfig.accent,
+              borderColor: `${themeConfig.accent}44`
+            }}
+          >
+            <div className="absolute inset-0 rounded-full bg-gradient-to-t from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <ChevronUp size={24} className="relative z-10" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       <style>{`
         .flag-wrapper {

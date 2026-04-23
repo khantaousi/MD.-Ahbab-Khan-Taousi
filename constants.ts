@@ -55,7 +55,8 @@ export const INITIAL_DATA: PortfolioData = {
   notice: {
     text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",
     updatedAt: new Date().toISOString(),
-    speed: 45
+    speed: 45,
+    isAuto: false
   },
   event: {
     title: "EID MUBARAK",
@@ -63,7 +64,8 @@ export const INITIAL_DATA: PortfolioData = {
     subtitle: "Wishing you and your family a blessed Ramadan and a joyous Eid filled with peace, prosperity, and happiness.",
     subtitleBn: "আপনার এবং আপনার পরিবারের জন্য একটি বরকতময় রমজান এবং শান্তি, সমৃদ্ধি ও সুখে ভরপুর একটি আনন্দময় ঈদের শুভেচ্ছা রইল।",
     animationType: "float",
-    theme: "islamic"
+    theme: "islamic",
+    isAuto: true
   },
   seo: {
     metaTitle: "MD Ahbab Khan | Professional Web Developer",

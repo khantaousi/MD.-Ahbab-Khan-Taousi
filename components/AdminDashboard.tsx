@@ -4,6 +4,7 @@ import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
 import { auth, db } from '../firebase';
 import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { collection, getDocs, query, limit } from 'firebase/firestore';
+import { getAutoEvent } from '../lib/eventUtils';
 import { 
   Save, LogOut, Plus, Trash2, Camera, Link as LinkIcon, 
   FileText, Layout, Info, BookOpen, Shield, Cloud, RefreshCw, 
@@ -716,21 +717,46 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
             <div className="space-y-8 animate-in fade-in">
                <h2 className="text-2xl font-black">{t.adminNotice}</h2>
                <div className="bg-white/5 rounded-[40px] p-10 border border-white/10 space-y-6">
-                  <div className="flex items-center gap-3 mb-4">
-                     <Bell size={24} className="animate-bounce" style={{ color: currentThemeColor }} />
-                     <h3 className="text-sm font-black uppercase tracking-widest">Global Broadcast Text</h3>
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                     <div className="flex items-center gap-3">
+                        <Bell size={24} className="animate-bounce" style={{ color: currentThemeColor }} />
+                        <h3 className="text-sm font-black uppercase tracking-widest">Global Broadcast Text</h3>
+                     </div>
+                     <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                          {lang === 'bn' ? 'ইভেন্ট গ্রিটিং' : 'Event Greeting'}
+                        </span>
+                        <button 
+                          onClick={() => {
+                            setFormData(prev => ({ 
+                              ...prev, 
+                              notice: { ...prev.notice, isAuto: !prev.notice?.isAuto } 
+                            }));
+                            setHasUnsavedChanges(true);
+                          }}
+                          className={`w-9 h-5 rounded-full transition-all relative shrink-0 ${formData.notice?.isAuto ? 'bg-cyan-500' : 'bg-slate-800'}`}
+                        >
+                          <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-all duration-300 ${formData.notice?.isAuto ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                        </button>
+                      </div>
                   </div>
                   <textarea 
-                    value={formData.notice?.text || ''} 
+                    value={formData.notice?.isAuto ? (() => {
+                      const event = getAutoEvent();
+                      if (event) return lang === 'bn' ? event.subBn : event.subEn;
+                      return lang === 'bn' ? (formData.event?.subtitleBn || formData.event?.subtitle) : (formData.event?.subtitle);
+                    })() : (formData.notice?.text || '')} 
                     onChange={(e) => {
+                      if (formData.notice?.isAuto) return;
                       setFormData(prev => ({ 
                         ...prev, 
                         notice: { ...prev.notice, text: e.target.value, updatedAt: new Date().toISOString() } 
                       }));
                       setHasUnsavedChanges(true);
                     }} 
-                    className="w-full bg-slate-900 border border-white/10 rounded-2xl px-6 py-5 font-bold text-sm focus:border-cyan-500/50 outline-none h-44 resize-none" 
-                    placeholder="Enter urgent update or welcome message..." 
+                    readOnly={formData.notice?.isAuto}
+                    className={`w-full bg-slate-900 border border-white/10 rounded-2xl px-6 py-5 font-bold text-sm focus:border-cyan-500/50 outline-none h-44 resize-none transition-all ${formData.notice?.isAuto ? 'opacity-50 cursor-not-allowed grayscale' : ''}`} 
+                    placeholder={formData.notice?.isAuto ? "Auto Event Greeting active..." : "Enter urgent update or welcome message..."} 
                   />
                   <div className="space-y-2">
                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Scroll Speed (Seconds)</label>
@@ -959,8 +985,25 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
           {/* 11. Event Settings */}
           {activeTab === 'event' && (
             <div className="space-y-8 animate-in fade-in">
-               <h2 className="text-2xl font-black">{t.adminEvent}</h2>
-               <div className="space-y-6">
+               <div className="flex justify-between items-center">
+                  <h2 className="text-2xl font-black">{t.adminEvent}</h2>
+                  <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      {lang === 'bn' ? 'অটো ইভেন্ট' : 'Auto Event'}
+                    </span>
+                    <button 
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, event: { ...prev.event, isAuto: !prev.event?.isAuto } }));
+                        setHasUnsavedChanges(true);
+                      }}
+                      className={`w-10 h-5 rounded-full transition-all relative ${formData.event?.isAuto ? 'bg-cyan-500' : 'bg-slate-800'}`}
+                    >
+                      <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${formData.event?.isAuto ? 'left-6' : 'left-1'}`}></div>
+                    </button>
+                  </div>
+               </div>
+
+               <div className={`space-y-6 transition-all duration-500 ${formData.event?.isAuto ? 'opacity-40 pointer-events-none grayscale' : ''}`}>
                  <div className="w-full">
                     <div className="space-y-2">
                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Section Title</label>

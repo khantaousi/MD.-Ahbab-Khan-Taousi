@@ -11,6 +11,7 @@ import {
 import AIChatBot from './AIChatBot';
 import EventSection from './EventSection';
 import FileTransfer from './FileTransfer';
+import { getAutoEvent } from '../lib/eventUtils';
 import { Share2 } from 'lucide-react';
 
 interface PortfolioProps {
@@ -513,7 +514,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
       </header>
 
       {/* Notice Board */}
-      {data.showNotice && data.notice?.text && (
+      {data.showNotice && (data.notice?.text || data.notice?.isAuto) && (
         <div className="fixed top-20 left-0 right-0 z-[40] px-6 lg:px-12 pointer-events-none">
           <div className="max-w-7xl mx-auto bg-slate-900/60 backdrop-blur-3xl border border-white/10 rounded-xl overflow-hidden shadow-3xl flex items-center h-10 pointer-events-auto">
             <div className="bg-slate-950 px-4 h-full flex items-center gap-2 shrink-0 z-10 border-r border-white/5" style={{ color: themeConfig.accent }}>
@@ -524,12 +525,20 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
               <div className="marquee-wrapper flex items-center gap-10 whitespace-nowrap">
                 <p className="text-[11px] font-bold text-white pl-4">
                   <span className="opacity-40 font-mono text-[9px] mr-2">[{getNoticeTimestamp()}]</span>
-                  {typeof data.notice.text === 'object' ? (data.notice.text as any).text : data.notice.text}
+                  {data.notice.isAuto ? (() => {
+                    const event = getAutoEvent();
+                    if (event) return lang === 'bn' ? event.subBn : event.subEn;
+                    return lang === 'bn' ? (data.event?.subtitleBn || data.event?.subtitle) : (data.event?.subtitle);
+                  })() : (typeof data.notice.text === 'object' ? (data.notice.text as any).text : data.notice.text)}
                 </p>
                 <span className="text-slate-700 font-black">/ / /</span>
                 <p className="text-[11px] font-bold text-white">
                   <span className="opacity-40 font-mono text-[9px] mr-2">[{getNoticeTimestamp()}]</span>
-                  {typeof data.notice.text === 'object' ? (data.notice.text as any).text : data.notice.text}
+                  {data.notice.isAuto ? (() => {
+                    const event = getAutoEvent();
+                    if (event) return lang === 'bn' ? event.subBn : event.subEn;
+                    return lang === 'bn' ? (data.event?.subtitleBn || data.event?.subtitle) : (data.event?.subtitle);
+                  })() : (typeof data.notice.text === 'object' ? (data.notice.text as any).text : data.notice.text)}
                 </p>
               </div>
             </div>

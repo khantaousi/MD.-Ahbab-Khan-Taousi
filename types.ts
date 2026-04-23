@@ -43,6 +43,7 @@ export interface Notice {
   text: string;
   updatedAt: string;
   speed?: number;
+  isAuto?: boolean;
 }
 
 export interface JobExperience {
@@ -63,6 +64,7 @@ export interface EventData {
   subtitleBn?: string;
   animationType: 'float' | 'pulse' | 'none';
   theme: 'auto' | 'islamic' | 'party' | 'minimal';
+  isAuto?: boolean;
 }
 
 export interface SEOData {

@@ -60,14 +60,19 @@ const DigitalClock: React.FC<{ label: string; lang: string; accentColor: string 
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
   }, [lang]);
 
   return (
     <div className="flex items-center gap-3 bg-slate-900/60 px-5 py-2 rounded-full border border-white/10 text-[11px] font-mono shadow-2xl backdrop-blur-xl hover:border-white/20 transition-all cursor-default" style={{ borderColor: `${accentColor}33`, color: accentColor }}>
       <div className="hidden sm:flex items-center gap-2 border-r border-white/10 pr-4">
         <div className="relative w-8 h-5 flex items-center justify-center">
-          <div className="flag-wrapper w-6 h-4 relative shadow-lg border border-white/5 overflow-visible">
+          <div 
+            className="flag-wrapper w-6 h-4 relative shadow-lg border border-white/5 overflow-visible transition-all"
+            title="Bangladesh"
+          >
              <div className="flag-cloth absolute inset-0 bg-[#006a4e]">
                 <div className="flag-circle absolute top-1/2 left-[45%] -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#f42a41]"></div>
                 <div className="flag-wind-shimmer absolute inset-0"></div>

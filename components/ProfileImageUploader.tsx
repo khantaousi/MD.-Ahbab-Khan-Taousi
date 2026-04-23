@@ -78,6 +78,10 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({ currentImag
 
     if (!ctx) return;
 
+    // Use natural dimensions to ensure full resolution
+    canvas.width = completedCrop.width * scaleX;
+    canvas.height = completedCrop.height * scaleY;
+
     ctx.drawImage(
       imgRef.current,
       completedCrop.x * scaleX,
@@ -86,11 +90,11 @@ const ProfileImageUploader: React.FC<ProfileImageUploaderProps> = ({ currentImag
       completedCrop.height * scaleY,
       0,
       0,
-      completedCrop.width,
-      completedCrop.height,
+      canvas.width,
+      canvas.height,
     );
 
-    const base64Image = canvas.toDataURL('image/jpeg');
+    const base64Image = canvas.toDataURL('image/jpeg', 0.95);
     onImageUpdate(base64Image);
     setIsCropping(false);
     setImgSrc('');

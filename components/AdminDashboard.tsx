@@ -92,7 +92,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     return { score: 100, label: lang === 'bn' ? 'শক্তিশালী' : 'Hard', color: 'bg-green-500' };
   };
 
-  const compressImage = (base64: string, maxWidth = 800, quality = 0.7): Promise<string> => {
+  const compressImage = (base64: string, maxWidth = 1920, quality = 0.9): Promise<string> => {
     if (!base64 || !base64.startsWith('data:image')) return Promise.resolve(base64);
     return new Promise((resolve) => {
       const img = new Image();
@@ -147,7 +147,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64 = reader.result as string;
-        const compressed = await compressImage(base64, (type === 'job' || type === 'logo') ? 200 : 800, type === 'logo' ? 0.9 : 0.7);
+        // High resolution and high quality for all images
+        const compressed = await compressImage(base64, (type === 'job' || type === 'logo') ? 400 : 1920, 0.9);
         
         if (type === 'profile') setFormData(prev => ({ ...prev, profileImage: compressed }));
         if (type === 'logo') setFormData(prev => ({ ...prev, logoUrl: compressed }));
@@ -176,7 +177,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
       reader.onloadend = async () => {
         const base64 = reader.result as string;
         // Don't compress with low quality for logo to keep transparency clean
-        const compressed = await compressImage(base64, 200, 0.9);
+        const compressed = await compressImage(base64, 400, 0.95);
         setFormData(prev => ({ ...prev, logoUrl: compressed }));
         setHasUnsavedChanges(true);
         setIsRemovingBackground(false);

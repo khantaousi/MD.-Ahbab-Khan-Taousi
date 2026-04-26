@@ -14,6 +14,8 @@
         "aboutText": { "type": "string" },
         "email": { "type": "string" },
         "phone": { "type": "string" },
+        "countryCode": { "type": "string" },
+        "timezone": { "type": "string" },
         "theme": { "type": "string", "enum": ["neon", "gold", "rose", "emerald"] },
         "showAbout": { "type": "boolean" },
         "showSkills": { "type": "boolean" },
@@ -27,6 +29,8 @@
         "showLiveChat": { "type": "boolean" },
         "showEventSection": { "type": "boolean" },
         "showSkillsChart": { "type": "boolean" },
+        "showAIChatBot": { "type": "boolean" },
+        "showFileTransfer": { "type": "boolean" },
         "socialLinks": {
           "type": "array",
           "items": {

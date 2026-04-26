@@ -485,8 +485,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
         <aside className="glass rounded-[32px] p-4 border border-white/10 space-y-1.5 shadow-3xl h-fit sticky top-28">
             {[
               { id: 'basic', label: t.adminBasic, icon: <Info size={16} /> },
+              { id: 'visibility', label: lang === 'bn' ? 'মডিউল টগল' : 'Module Toggle', icon: <Activity size={16} /> },
               { id: 'analytics', label: lang === 'bn' ? 'অ্যানালিটিক্স' : 'Analytics', icon: <BarChart size={16} /> },
-              { id: 'visibility', label: t.adminVisibility, icon: <Activity size={16} /> },
               { id: 'contact', label: t.adminContact, icon: <Phone size={16} /> },
               { id: 'notice', label: t.adminNotice, icon: <Bell size={16} /> },
               { id: 'about', label: t.aboutHeader, icon: <FileText size={16} /> },
@@ -600,28 +600,151 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
                        </div>
                     </div>
                   )}
+
+                  <div className="pt-8 border-t border-white/5 space-y-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                        <ImageIcon size={20} className="text-orange-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black uppercase tracking-widest">{lang === 'bn' ? 'ব্র্যান্ডিং / লোগো' : 'Branding / Logo'}</h3>
+                        <p className="text-[10px] text-slate-500 font-medium">{lang === 'bn' ? 'আপনার ব্যক্তিগত লোগো পরিবর্তন করুন' : 'Change your personal identity logo'}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row items-center gap-8 bg-slate-900/40 p-6 rounded-[32px] border border-white/5 shadow-inner">
+                      <div className="relative group">
+                        <div className="w-32 h-32 rounded-3xl overflow-hidden bg-slate-950 border border-white/10 flex items-center justify-center relative">
+                           {formData.logoUrl ? (
+                             <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                           ) : (
+                             <div className="text-slate-700 font-black text-2xl">LOGO</div>
+                           )}
+                           <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer backdrop-blur-sm">
+                             <Camera size={24} className="text-white" />
+                             <span className="text-[9px] font-black uppercase text-white tracking-widest">{lang === 'bn' ? 'আপলোড' : 'Upload'}</span>
+                             <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, 'logo')} />
+                           </label>
+                        </div>
+                        {formData.logoUrl && (
+                          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+                             <button 
+                               onClick={() => { setFormData(prev => ({ ...prev, logoUrl: '' })); setHasUnsavedChanges(true); }}
+                               className="p-2 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 transition-all"
+                               title={lang === 'bn' ? 'বাদ দিন' : 'Remove Logo'}
+                             >
+                               <Trash2 size={14} />
+                             </button>
+                             <button 
+                               onClick={removeLogoBackground}
+                               disabled={isRemovingBackground}
+                               className={`p-2 ${isRemovingBackground ? 'bg-slate-700' : 'bg-cyan-500'} text-white rounded-xl shadow-lg hover:bg-cyan-600 transition-all flex items-center gap-2`}
+                               title={lang === 'bn' ? 'ব্যাকগ্রাউন্ড সরান' : 'Remove Background'}
+                             >
+                               {isRemovingBackground ? <Loader2 size={14} className="animate-spin" /> : <Eraser size={14} />}
+                             </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lang === 'bn' ? 'লোগো ইউআরএল (URL)' : 'Logo URL (External link)'}</label>
+                          <input 
+                            name="logoUrl" 
+                            value={formData.logoUrl} 
+                            onChange={handleChange} 
+                            className="w-full bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-4 font-mono text-xs focus:border-orange-500/30 outline-none" 
+                            placeholder="https://..." 
+                          />
+                        </div>
+                        <div className="p-4 bg-orange-500/5 rounded-2xl border border-orange-500/10">
+                          <p className="text-[10px] text-orange-400 font-medium leading-relaxed italic">
+                            {lang === 'bn' 
+                              ? 'প্রো টিপ: একটি স্বচ্ছ (Transparent) PNG লোগো ব্যবহার করুন সেরা লুক পেতে। আপনি আমাদের আরটিফিশিয়াল ইন্টেলিজেন্স ব্যবহার করে ব্যাকগ্রাউন্ড মুছে ফেলতে পারেন।' 
+                              : 'Pro Tip: Use a transparent PNG logo for the best look. You can use our AI tool above to remove backgrounds automatically.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-8 border-t border-white/5 space-y-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                        <Globe size={20} className="text-cyan-500" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black uppercase tracking-widest">{lang === 'bn' ? 'পতাকা ও সময় সেটিং' : 'Flag & Time Setting'}</h3>
+                        <p className="text-[10px] text-slate-500 font-medium">{lang === 'bn' ? 'আপনার বর্তমান অবস্থান ও সময় নিয়ন্ত্রণ করুন' : 'Control your current location and time'}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lang === 'bn' ? 'দেশের কান্ট্রি কোড (উদা: BD, US)' : 'Country Code (e.g., BD, US)'}</label>
+                         <input 
+                           name="countryCode" 
+                           value={formData.countryCode || ''} 
+                           onChange={handleChange} 
+                           className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                           placeholder="BD" 
+                         />
+                         <p className="text-[9px] text-slate-500">
+                           {lang === 'bn' ? 'পতাকা পরিবর্তন করতে ISO কান্ট্রি কোড লিখুন' : 'Enter ISO country code for flag'} 
+                           (<a href="https://flagpedia.net/index" target="_blank" rel="noopener noreferrer" className="underline hover:text-cyan-400">List</a>)
+                         </p>
+                      </div>
+
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{lang === 'bn' ? 'টাইমজোন (উদা: Asia/Dhaka)' : 'Timezone (e.g., Asia/Dhaka)'}</label>
+                         <input 
+                           name="timezone" 
+                           value={formData.timezone || ''} 
+                           onChange={handleChange} 
+                           className="w-full bg-slate-900/50 border border-white/10 rounded-2xl px-6 py-4 font-bold focus:border-cyan-500/50 outline-none" 
+                           placeholder="Asia/Dhaka" 
+                         />
+                         <p className="text-[9px] text-slate-500">
+                           {lang === 'bn' ? 'সঠিক সময় দেখাতে টাইমজোন লিখুন' : 'Enter TZ database name'} 
+                           (<a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" target="_blank" rel="noopener noreferrer" className="underline hover:text-cyan-400">List</a>)
+                         </p>
+                      </div>
+                    </div>
+                  </div>
                </div>
 
 
             </div>
           )}
 
-          {/* 2. Visibility Controls */}
+          {/* 2. Module Toggle */}
           {activeTab === 'visibility' && (
             <div className="space-y-8 animate-in fade-in">
-               <h2 className="text-2xl font-black">{t.adminVisibility}</h2>
-               <div className="grid md:grid-cols-2 gap-4">
+               <div className="flex items-center gap-3">
+                 <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center">
+                   <Activity size={24} className="text-cyan-500" />
+                 </div>
+                 <div>
+                   <h2 className="text-2xl font-black">{lang === 'bn' ? 'মডিউল টগল' : 'Module Toggle'}</h2>
+                   <p className="text-xs text-slate-500 font-medium">{lang === 'bn' ? 'আপনার ওয়েবসাইটের মডিউলগুলো এখান থেকে অন অথবা অফ করুন' : 'Enable or disable website features globally'}</p>
+                 </div>
+               </div>
+               
+               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                  <VisibilityToggle label={t.visLabelAbout} field="showAbout" />
                  <VisibilityToggle label={t.visLabelSkills} field="showSkills" />
+                 <VisibilityToggle label={lang === 'bn' ? 'স্কিল চার্ট দেখান' : 'Show Skills Chart'} field="showSkillsChart" />
                  <VisibilityToggle label={t.visLabelBlog} field="showBlog" />
+                 <VisibilityToggle label={t.visLabelWork} field="showWork" />
+                 <VisibilityToggle label={t.visLabelJobExperience} field="showJobExperience" />
                  <VisibilityToggle label={t.visLabelGallery} field="showGallery" />
                  <VisibilityToggle label={t.visLabelNotice} field="showNotice" />
                  <VisibilityToggle label={t.visLabelClock} field="showClock" />
-                 <VisibilityToggle label={t.visLabelWork} field="showWork" />
                  <VisibilityToggle label={t.visLabelContact} field="showContact" />
-                 <VisibilityToggle label={t.visLabelJobExperience} field="showJobExperience" />
                  <VisibilityToggle label={t.visLabelEvent} field="showEventSection" />
-                 <VisibilityToggle label={lang === 'bn' ? 'স্কিল চার্ট দেখান' : 'Show Skills Chart'} field="showSkillsChart" />
+                 <VisibilityToggle label={lang === 'bn' ? 'এআই চ্যাট বোট' : 'AI Chat Bot'} field="showAIChatBot" />
+                 <VisibilityToggle label={lang === 'bn' ? 'ফাইল ট্রান্সফার' : 'File Transfer'} field="showFileTransfer" />
                </div>
             </div>
           )}

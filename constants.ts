@@ -51,7 +51,11 @@ export const INITIAL_DATA: PortfolioData = {
   showJobExperience: true,
   showEventSection: true,
   showSkillsChart: true,
+  showAIChatBot: true,
+  showFileTransfer: true,
   whatsappNumber: "+8801518934191",
+  countryCode: "BD",
+  timezone: "Asia/Dhaka",
   notice: {
     text: "স্বাগতম! আমি MD Ahbab Khan। আমার অফিসিয়াল পোর্টফোলিওতে আপনাকে স্বাগতম। যেকোনো সেবার জন্য যোগাযোগ করুন।",
     updatedAt: new Date().toISOString(),

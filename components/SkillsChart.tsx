@@ -102,9 +102,6 @@ const SkillsChart: React.FC<SkillsChartProps> = ({ skills, color, isLightMode = 
             <div className="flex justify-between items-end">
               <div>
                 <h4 className="text-sm font-black uppercase tracking-widest">{skill.name}</h4>
-                {skill.description && (
-                  <p className="text-[10px] text-slate-500 line-clamp-1">{skill.description}</p>
-                )}
               </div>
               <span className="text-xs font-mono font-bold" style={{ color }}>{skill.proficiency}%</span>
             </div>

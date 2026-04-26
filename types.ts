@@ -117,8 +117,12 @@ export interface PortfolioData {
   showJobExperience: boolean;
   showEventSection: boolean;
   showSkillsChart: boolean;
+  showAIChatBot?: boolean;
+  showFileTransfer?: boolean;
   logoUrl?: string;
   whatsappNumber: string;
+  countryCode?: string;
+  timezone?: string;
   socialLinks: SocialLink[];
   projects: Project[];
   gallery: GalleryItem[];

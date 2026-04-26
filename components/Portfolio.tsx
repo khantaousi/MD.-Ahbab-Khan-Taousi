@@ -35,48 +35,63 @@ const COUNTRIES = [
   { name: 'Other', code: 'OT' }
 ];
 
-const DigitalClock: React.FC<{ label: string; lang: string; accentColor: string }> = ({ label, lang, accentColor }) => {
+const DigitalClock: React.FC<{ label: string; lang: string; accentColor: string; timezone?: string; countryCode?: string }> = ({ label, lang, accentColor, timezone, countryCode }) => {
   const [dateTime, setDateTime] = useState<{ time: string; date: string }>({ time: '', date: '' });
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const timeOptions: Intl.DateTimeFormatOptions = {
-        timeZone: 'Asia/Dhaka',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      };
-      const dateOptions: Intl.DateTimeFormatOptions = {
-        timeZone: 'Asia/Dhaka',
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      };
-      const bdTime = new Intl.DateTimeFormat(lang === 'bn' ? 'bn-BD' : 'en-US', timeOptions).format(now);
-      const bdDate = new Intl.DateTimeFormat(lang === 'bn' ? 'bn-BD' : 'en-GB', dateOptions).format(now);
-      setDateTime({ time: bdTime, date: bdDate });
+      try {
+        const timeOptions: Intl.DateTimeFormatOptions = {
+          timeZone: timezone || 'Asia/Dhaka',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        };
+        const dateOptions: Intl.DateTimeFormatOptions = {
+          timeZone: timezone || 'Asia/Dhaka',
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        };
+        const bdTime = new Intl.DateTimeFormat(lang === 'bn' ? 'bn-BD' : 'en-US', timeOptions).format(now);
+        const bdDate = new Intl.DateTimeFormat(lang === 'bn' ? 'bn-BD' : 'en-GB', dateOptions).format(now);
+        setDateTime({ time: bdTime, date: bdDate });
+      } catch (e) {
+        // Fallback to local time if timezone is invalid
+        const bdTime = new Intl.DateTimeFormat(lang === 'bn' ? 'bn-BD' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).format(now);
+        const bdDate = new Intl.DateTimeFormat(lang === 'bn' ? 'bn-BD' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(now);
+        setDateTime({ time: bdTime, date: bdDate });
+      }
     };
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => {
       clearInterval(timer);
     };
-  }, [lang]);
+  }, [lang, timezone]);
 
   return (
     <div className="flex items-center gap-3 bg-slate-900/60 px-5 py-2 rounded-full border border-white/10 text-[11px] font-mono shadow-2xl backdrop-blur-xl hover:border-white/20 transition-all cursor-default" style={{ borderColor: `${accentColor}33`, color: accentColor }}>
       <div className="hidden sm:flex items-center gap-2 border-r border-white/10 pr-4">
         <div className="relative w-8 h-5 flex items-center justify-center">
           <div 
-            className="flag-wrapper w-6 h-4 relative shadow-lg border border-white/5 overflow-visible transition-all"
-            title="Bangladesh"
+            className="flag-wrapper w-6 h-4 relative shadow-lg border border-white/5 overflow-visible transition-all waving"
+            title={countryCode || "Bangladesh"}
           >
-             <div className="flag-cloth absolute inset-0 bg-[#006a4e]">
-                <div className="flag-circle absolute top-1/2 left-[45%] -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#f42a41]"></div>
-                <div className="flag-wind-shimmer absolute inset-0"></div>
-             </div>
+             {countryCode ? (
+               <img 
+                 src={`https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`} 
+                 alt={countryCode}
+                 className="w-full h-full object-cover"
+               />
+             ) : (
+                <div className="flag-cloth absolute inset-0 bg-[#006a4e]">
+                   <div className="flag-circle absolute top-1/2 left-[45%] -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#f42a41]"></div>
+                   <div className="flag-wind-shimmer absolute inset-0"></div>
+                </div>
+             )}
           </div>
         </div>
       </div>
@@ -86,7 +101,7 @@ const DigitalClock: React.FC<{ label: string; lang: string; accentColor: string 
       </div>
       <div className="flex items-center gap-1.5">
         <Clock size={12} className="animate-pulse" style={{ color: accentColor }} />
-        <span className="font-bold">{dateTime.time} <span className="text-[9px] opacity-40 ml-1">BST</span></span>
+        <span className="font-bold">{dateTime.time} <span className="text-[9px] opacity-40 ml-1">{timezone ? timezone.split('/').pop()?.replace('_', ' ') : 'BST'}</span></span>
       </div>
     </div>
   );
@@ -357,7 +372,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
                   <span className="text-xl font-black tracking-tighter" style={{ color: themeConfig.accent }}>{data.name}<span className="text-white">.</span></span>
                 )}
               </a>
-              {data.showClock && <div className="hidden lg:block"><DigitalClock label={t.clockLabel} lang={lang} accentColor={themeConfig.accent} /></div>}
+              {data.showClock && <div className="hidden lg:block"><DigitalClock label={t.clockLabel} lang={lang} accentColor={themeConfig.accent} timezone={data.timezone} countryCode={data.countryCode} /></div>}
             </div>
             <div className="flex gap-4 items-center">
               <div className="hidden md:flex gap-6">
@@ -849,12 +864,16 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </footer>
       )}
 
-      <FileTransfer 
-        isOpen={isFileTransferOpen} 
-        onClose={() => setIsFileTransferOpen(false)} 
-        accentColor={themeConfig.accent} 
-        isLightMode={isLightMode} 
-      />
+      {data.showAIChatBot && <AIChatBot data={data} accentColor={themeConfig.accent} isLightMode={isLightMode} />}
+
+      {data.showFileTransfer && (
+        <FileTransfer 
+          isOpen={isFileTransferOpen} 
+          onClose={() => setIsFileTransferOpen(false)} 
+          accentColor={themeConfig.accent} 
+          isLightMode={isLightMode} 
+        />
+      )}
 
       {/* Back to Top Button */}
       <AnimatePresence>
@@ -1072,6 +1091,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         }
         .layout-classic nav a:hover, .layout-classic nav button:hover {
           color: #0f172a !important;
+        }
+
+        @keyframes waving {
+          0% { transform: skewX(0deg) skewY(0deg); }
+          25% { transform: skewX(2deg) skewY(1deg); }
+          50% { transform: skewX(0deg) skewY(0deg); }
+          75% { transform: skewX(-2deg) skewY(-1deg); }
+          100% { transform: skewX(0deg) skewY(0deg); }
+        }
+        .flag-wrapper.waving {
+          animation: waving 4s ease-in-out infinite;
+          transform-origin: left center;
         }
       `}</style>
     </div>

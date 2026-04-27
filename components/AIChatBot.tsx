@@ -129,7 +129,7 @@ const AIChatBot: React.FC<AIChatBotProps> = ({ accentColor, data, isLightMode = 
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-24 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 z-[100] ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+        className={`fixed bottom-8 right-24 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 z-[100] ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
         style={{ backgroundColor: accentColor, color: '#000' }}
         aria-label="Open AI Chat"
       >

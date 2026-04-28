@@ -864,7 +864,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </footer>
       )}
 
-      {data.showAIChatBot && <AIChatBot data={data} accentColor={themeConfig.accent} isLightMode={isLightMode} />}
+      {data.showAIChatBot && <AIChatBot data={data} accentColor={themeConfig.accent} isLightMode={isLightMode} showBackToTop={showBackToTop} />}
 
       {data.showFileTransfer && (
         <FileTransfer 

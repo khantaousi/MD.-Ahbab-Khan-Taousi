@@ -97,7 +97,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
               </div>
               <input
                 type="email"
-                placeholder="Email Address"
+                placeholder={t.loginEmailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-slate-900/50 border border-white/10 text-white pl-14 pr-6 py-5 rounded-2xl focus:border-cyan-500/50 outline-none transition-all font-bold"
@@ -111,7 +111,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, lang, t }) => {
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder={t.loginPassPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-slate-900/50 border border-white/10 text-white pl-14 pr-14 py-5 rounded-2xl focus:border-cyan-500/50 outline-none transition-all font-bold"

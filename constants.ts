@@ -84,6 +84,7 @@ export const INITIAL_DATA: PortfolioData = {
     { id: "2", platform: "LinkedIn", url: "https://linkedin.com" },
     { id: "3", platform: "Facebook", url: "https://facebook.com" }
   ],
+  workItems: [],
   projects: [
     {
       id: "1",

@@ -781,6 +781,33 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         </section>
       )}
 
+      {/* Work Section */}
+      {data.workItems && data.workItems.length > 0 && (
+         <section className="py-32 px-6 lg:px-12 bg-slate-900/20">
+            <div className="max-w-7xl mx-auto">
+               <h2 className="text-3xl lg:text-4xl font-black mb-16 tracking-tighter text-white uppercase">{lang === 'bn' ? 'আমার কাজ' : 'My Work'}</h2>
+               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                 {data.workItems.map(item => (
+                   <div key={item.id} className="glass rounded-[32px] p-6 border border-white/10 space-y-4">
+                     <h3 className="text-lg font-black text-white">{item.title}</h3>
+                     <div className="aspect-video w-full overflow-hidden rounded-2xl bg-slate-950 relative">
+                       <iframe 
+                        src={item.link} 
+                        className="w-[1280px] h-[720px] border-none absolute top-0 left-0" 
+                        style={{ transform: 'scale(0.35)', transformOrigin: 'top left' }}
+                        title={item.title} 
+                       />
+                     </div>
+                     <a href={item.link} target="_blank" rel="noreferrer" className="block text-center font-black text-[10px] uppercase py-3 rounded-xl transition-all" style={{ backgroundColor: themeConfig.accent, color: '#000' }}>
+                       {lang === 'bn' ? 'সম্পূর্ণ দেখুন' : 'View Full'}
+                     </a>
+                   </div>
+                 ))}
+               </div>
+            </div>
+         </section>
+      )}
+
       {/* Event Section */}
       {data.showEventSection && data.event && (
         <EventSection 

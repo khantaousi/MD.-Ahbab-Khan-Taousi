@@ -6,6 +6,13 @@ export interface ChatMessage {
   timestamp: any;
 }
 
+export interface WorkItem {
+  id: string;
+  title: string;
+  titleBn?: string;
+  link: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -125,6 +132,7 @@ export interface PortfolioData {
   timezone?: string;
   socialLinks: SocialLink[];
   projects: Project[];
+  workItems: WorkItem[];
   gallery: GalleryItem[];
   skills: Skill[];
   jobExperiences: JobExperience[];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PortfolioData, Project, Skill, SocialLink, GalleryItem, JobExperience, OrderStatus } from '../types';
+import { PortfolioData, Project, WorkItem, Skill, SocialLink, GalleryItem, JobExperience, OrderStatus } from '../types';
 import { THEME_OPTIONS, CURRENCY_SYMBOLS } from '../constants';
 import { auth, db } from '../firebase';
 import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
@@ -89,7 +89,7 @@ const COUNTRY_TIMEZONE_MAP: Record<string, string> = {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogout, lang, t }) => {
   const [formData, setFormData] = useState<PortfolioData>(data);
-  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event' | 'security' | 'seo' | 'analytics'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'about' | 'skills' | 'blog' | 'gallery' | 'notice' | 'contact' | 'visibility' | 'jobExperience' | 'event' | 'security' | 'seo' | 'analytics' | 'work'>('basic');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isRemovingBackground, setIsRemovingBackground] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -411,6 +411,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
     setHasUnsavedChanges(true);
   };
 
+  // Work Actions
+  const addWorkItem = () => {
+    const newItem: WorkItem = { id: Date.now().toString(), title: "New Work", link: "https://" };
+    setFormData(prev => ({ ...prev, workItems: [...(prev.workItems || []), newItem] }));
+    setHasUnsavedChanges(true);
+  };
+
+  const updateWorkItem = (id: string, field: keyof WorkItem, value: string) => {
+    setFormData(prev => ({ ...prev, workItems: (prev.workItems || []).map(i => i.id === id ? { ...i, [field]: value } : i) }));
+    setHasUnsavedChanges(true);
+  };
+
+  const removeWorkItem = (id: string) => {
+    setFormData(prev => ({ ...prev, workItems: (prev.workItems || []).filter(i => i.id !== id) }));
+    setHasUnsavedChanges(true);
+  };
+
   // Skill Actions
   const addSkill = () => {
     const newSkill: Skill = { id: Date.now().toString(), name: "New Skill", proficiency: 80 };
@@ -560,6 +577,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
               { id: 'gallery', label: t.adminGallery, icon: <ImageIcon size={16} /> },
               { id: 'skills', label: t.adminSkills, icon: <Layout size={16} /> },
               { id: 'jobExperience', label: t.adminJobExperience, icon: <Briefcase size={16} /> },
+              { id: 'work', label: lang === 'bn' ? 'আমার কাজ' : 'My Work', icon: <Briefcase size={16} /> },
               { id: 'event', label: t.adminEvent, icon: <Sparkles size={16} /> },
               { id: 'seo', label: t.adminSEO || (lang === 'bn' ? 'এসইও সেটিংস' : 'SEO Settings'), icon: <Cloud size={16} /> },
               { id: 'security', label: lang === 'bn' ? 'নিরাপত্তা সেটিংস' : 'Security Settings', icon: <Lock size={16} /> },
@@ -575,6 +593,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ data, onUpdate, onLogou
           {/* Analytics */}
           {activeTab === 'analytics' && (
             <VisitorAnalytics currentThemeColor={currentThemeColor} lang={lang} />
+          )}
+
+          {/* Work Items */}
+          {activeTab === 'work' && (
+            <div className="space-y-8 animate-in fade-in">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-black">{lang === 'bn' ? 'আমার কাজ' : 'My Work'}</h2>
+                <button onClick={addWorkItem} className="bg-cyan-500 text-slate-950 px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-cyan-400 transition-all">
+                  <Plus size={14} /> {lang === 'bn' ? 'নতুন কাজ যোগ করুন' : 'Add New Work'}
+                </button>
+              </div>
+              <div className="grid gap-6">
+                {(formData.workItems || []).map(item => (
+                  <div key={item.id} className="bg-slate-900/40 p-6 rounded-[32px] border border-white/5 space-y-4">
+                    <div className="flex gap-4">
+                      <input name="title" value={item.title} onChange={(e) => updateWorkItem(item.id, 'title', e.target.value)} className="flex-1 bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-4 font-bold outline-none focus:border-cyan-500/30" placeholder={lang === 'bn' ? 'কাজের নাম' : 'Work Title'} />
+                      <input name="link" value={item.link} onChange={(e) => updateWorkItem(item.id, 'link', e.target.value)} className="flex-1 bg-slate-950/50 border border-white/5 rounded-2xl px-6 py-4 font-mono text-xs outline-none focus:border-cyan-500/30" placeholder="https://..." />
+                      <button onClick={() => removeWorkItem(item.id)} className="p-4 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16} /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* 1. Basic Identity */}

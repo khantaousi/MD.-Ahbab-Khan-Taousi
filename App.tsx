@@ -89,6 +89,19 @@ const App: React.FC = () => {
     localStorage.setItem('app_lang', lang);
   }, [lang]);
 
+  // Dynamically update favicon on browser tab to profile picture
+  useEffect(() => {
+    if (data.profileImage) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = data.profileImage;
+    }
+  }, [data.profileImage]);
+
   const handleUpdateData = async (newData: PortfolioData) => {
     setData(newData);
     localStorage.setItem('portfolio_data', JSON.stringify(newData));

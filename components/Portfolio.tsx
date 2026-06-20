@@ -238,7 +238,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ data, lang, setLang, t, onUpdate 
         <title>{data.seo?.metaTitle || `${data.name} | ${data.title}`}</title>
         <meta name="description" content={data.seo?.metaDescription || data.bio} />
         {data.seo?.metaKeywords && <meta name="keywords" content={data.seo.metaKeywords} />}
-        {data.seo?.favicon && <link rel="icon" href={data.seo.favicon} />}
+        <link rel="icon" href={data.profileImage || data.seo?.favicon || '/favicon.ico'} />
       </Helmet>
       {/* Scroll Progress Bar */}
       <motion.div
